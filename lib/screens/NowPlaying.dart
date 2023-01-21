@@ -27,12 +27,6 @@ class _NowPlayingState extends State<NowPlaying> {
   List<AudioSource> audioSourceList = [];
   // 現在再生中のindexを入れる変数を宣言
   int currentIndex = 0;
-  void seekToSeconds(int seconds) {
-    // 時間のクラスに秒をセット
-    Duration duration = Duration(seconds: seconds);
-    // 再生位置の変更
-    widget.audioPlayer.seek(duration);
-  }
 
   // 初回表示時の処理
   @override
@@ -69,12 +63,12 @@ class _NowPlayingState extends State<NowPlaying> {
       // 音源ファイルの曲時間を取得
       widget.audioPlayer.durationStream.listen((duration) {
         if (duration != null) {
-          if (mounted) {
-            // 画面の再描画
-            setState(() {
-              _duration = duration;
-            });
-          }
+          //if (mounted) {
+          //  // 画面の再描画
+          //  setState(() {
+          _duration = duration;
+          //  });
+          //}
         }
       });
       // 現在の再生位置を取得
@@ -84,11 +78,10 @@ class _NowPlayingState extends State<NowPlaying> {
           setState(() {
             _position = position;
           });
+          debugPrint('$_isPlaying');
         }
       });
 
-      // 再生状況の取得
-      listenToEvent();
       // 再生中の曲のidを取得
       listenToSongIndex();
     } on Exception catch (_) {
@@ -97,40 +90,13 @@ class _NowPlayingState extends State<NowPlaying> {
     }
   }
 
-  void listenToEvent() {
-    widget.audioPlayer.playerStateStream.listen((state) {
-      if (state.playing) {
-        if (mounted) {
-          setState(() {
-            _isPlaying = true;
-          });
-        }
-      } else {
-        if (mounted) {
-          setState(() {
-            _isPlaying = false;
-          });
-        }
-      }
-      if (state.processingState == ProcessingState.completed) {
-        if (mounted) {
-          setState(() {
-            _isPlaying = false;
-          });
-        }
-      }
-    });
-  }
-
   void listenToSongIndex() {
     widget.audioPlayer.currentIndexStream.listen((event) {
       if (mounted) {
-        setState(() {
-          if (event != null) {
-            currentIndex = event;
-          }
-          context.read<SongModelProvider>().setId(widget.songModelList[currentIndex].id);
-        });
+        if (event != null) {
+          currentIndex = event;
+        }
+        context.read<SongModelProvider>().setId(widget.songModelList[currentIndex].id);
       }
     });
   }
@@ -203,10 +169,8 @@ class _NowPlayingState extends State<NowPlaying> {
                           value: _position.inSeconds.toDouble(),
                           max: _duration.inSeconds.toDouble(),
                           onChanged: (value) {
-                            setState(() {
-                              seekToSeconds(value.toInt());
-                              value = value;
-                            });
+                            _position = Duration(seconds: value.toInt());
+                            widget.audioPlayer.seek(_position);
                           },
                         ),
                         Text(_duration.toString().split(".")[0]),
@@ -232,11 +196,7 @@ class _NowPlayingState extends State<NowPlaying> {
                               if (_isPlaying) {
                                 widget.audioPlayer.pause();
                               } else {
-                                if (_position >= _duration) {
-                                  seekToSeconds(0);
-                                } else {
-                                  widget.audioPlayer.play();
-                                }
+                                widget.audioPlayer.play();
                               }
                               _isPlaying = !_isPlaying;
                             });

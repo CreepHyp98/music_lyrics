@@ -98,8 +98,8 @@ class _AllSongsState extends State<AllSongs> {
                 itemCount: item.data!.length,
                 // Listの生成
                 itemBuilder: (context, index) {
-                  // 全曲Listに取得したitemを全て追加
-                  allSongs.addAll(item.data!);
+                  // 全曲Listに取得した全てのitemをセット
+                  allSongs = item.data!;
 
                   // タッチイベントを検出できるwidget
                   return GestureDetector(
