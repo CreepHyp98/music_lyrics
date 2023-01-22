@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:music_lyrics/provider/SongModelProvider.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
@@ -45,6 +46,11 @@ class _NowPlayingState extends State<NowPlaying> {
           // URI文字列 → URIオブジェクト → 音源ファイル
           AudioSource.uri(
             Uri.parse(element.uri!),
+            tag: MediaItem(
+              id: element.id.toString(),
+              title: element.title,
+              artist: element.artist,
+            ),
           ),
         );
       }
@@ -63,25 +69,19 @@ class _NowPlayingState extends State<NowPlaying> {
       // 音源ファイルの曲時間を取得
       widget.audioPlayer.durationStream.listen((duration) {
         if (duration != null) {
-          //if (mounted) {
-          //  // 画面の再描画
-          //  setState(() {
           _duration = duration;
-          //  });
-          //}
         }
       });
       // 現在の再生位置を取得
       widget.audioPlayer.positionStream.listen((position) {
         if (mounted) {
-          // 画面の再描画
+          // 再生位置を逐次更新するため画面を再描画
           setState(() {
             _position = position;
           });
-          debugPrint('$_isPlaying');
         }
       });
-
+      listenToEvent();
       // 再生中の曲のidを取得
       listenToSongIndex();
     } on Exception catch (_) {
@@ -90,13 +90,29 @@ class _NowPlayingState extends State<NowPlaying> {
     }
   }
 
+  void listenToEvent() {
+    widget.audioPlayer.playerStateStream.listen((state) {
+      if (state.playing) {
+        _isPlaying = true;
+      } else {
+        _isPlaying = false;
+      }
+      if (state.processingState == ProcessingState.completed) {
+        _isPlaying = false;
+      }
+    });
+  }
+
   void listenToSongIndex() {
     widget.audioPlayer.currentIndexStream.listen((event) {
       if (mounted) {
-        if (event != null) {
-          currentIndex = event;
-        }
-        context.read<SongModelProvider>().setId(widget.songModelList[currentIndex].id);
+        // このsetstateがないと通知タップから再生画面に飛ばない
+        setState(() {
+          if (event != null) {
+            currentIndex = event;
+          }
+          context.read<SongModelProvider>().setId(widget.songModelList[currentIndex].id);
+        });
       }
     });
   }
@@ -192,14 +208,12 @@ class _NowPlayingState extends State<NowPlaying> {
                         ),
                         IconButton(
                           onPressed: () {
-                            setState(() {
-                              if (_isPlaying) {
-                                widget.audioPlayer.pause();
-                              } else {
-                                widget.audioPlayer.play();
-                              }
-                              _isPlaying = !_isPlaying;
-                            });
+                            if (_isPlaying) {
+                              widget.audioPlayer.pause();
+                            } else {
+                              widget.audioPlayer.play();
+                            }
+                            _isPlaying = !_isPlaying;
                           },
                           icon: Icon(
                             _isPlaying ? Icons.pause : Icons.play_arrow,
