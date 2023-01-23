@@ -38,7 +38,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       // テーマデータ
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: const Color.fromARGB(255, 251, 247, 229),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 251, 247, 229),
         fontFamily: "Noto Sans JP",
       ),
       // 初期表示のクラス

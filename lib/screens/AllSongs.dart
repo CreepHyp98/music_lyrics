@@ -76,10 +76,7 @@ class _AllSongsState extends State<AllSongs> {
               child: Column(
                 children: const [
                   CircularProgressIndicator(),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  Text("ロード中")
+                  Text("ロード中"),
                 ],
               ),
             );
@@ -88,63 +85,88 @@ class _AllSongsState extends State<AllSongs> {
             return const Center(child: Text("曲が見つかりません"));
           }
 
-          // 自由に要素を並べるためのwidget
-          return Stack(
-            // 複数の子要素
-            children: [
-              // スクロールに対応したwidgetの生成
-              ListView.builder(
-                // Listの要素数
-                itemCount: item.data!.length,
-                // Listの生成
-                itemBuilder: (context, index) {
-                  // 全曲Listに取得した全てのitemをセット
-                  allSongs = item.data!;
-
-                  // タッチイベントを検出できるwidget
-                  return GestureDetector(
-                    onTap: () {
-                      // ProviderからSongModelのidを受け取る（受け取ったデータを元にUIの構築を行わない）
-                      context.read<SongModelProvider>().setId(item.data![index].id);
-                      // ページ遷移（進む）
-                      Navigator.push(
-                        context,
-                        // マテリアルデザインに則ったアニメーションを行う
-                        MaterialPageRoute(
-                          // NowPlayingクラスの生成
-                          builder: (context) => NowPlaying(
-                            // 全曲リストを渡す
-                            songModelList: allSongs,
-                            // タッチされた曲のidを渡す
-                            songIndex: index,
-                            // クラスのインスタンス化
-                            audioPlayer: _audioPlayer,
-                          ),
-                        ),
-                      );
-                    },
-
-                    // Listに表示するwidgetのセット
-                    child: ListTile(
-                      title: Text(item.data![index].title),
-                      subtitle: Text("${item.data![index].artist}"),
-                      trailing: const Icon(Icons.more_horiz),
-                      leading: Card(
-                        child: QueryArtworkWidget(
-                          id: item.data![index].id,
-                          type: ArtworkType.AUDIO,
-                          artworkBorder: BorderRadius.circular(0),
-                          nullArtworkWidget: const Icon(Icons.music_note),
-                        ),
+          // 箱型のwidget
+          return ListView.builder(
+            // Listの要素数
+            itemCount: item.data!.length,
+            // Listの生成
+            itemBuilder: (context, index) {
+              // 全曲Listに取得した全てのitemをセット
+              allSongs = item.data!;
+              // Listに表示するwidgetのセット
+              return ListTile(
+                onTap: () {
+                  // ProviderからSongModelのidを受け取る（受け取ったデータを元にUIの構築を行わない）
+                  context.read<SongModelProvider>().setId(item.data![index].id);
+                  // ページ遷移（進む）
+                  Navigator.push(
+                    context,
+                    // マテリアルデザインに則ったアニメーションを行う
+                    MaterialPageRoute(
+                      // NowPlayingクラスの生成
+                      builder: (context) => NowPlaying(
+                        // 全曲リストを渡す
+                        songModelList: allSongs,
+                        // タッチされた曲のidを渡す
+                        songIndex: index,
+                        // クラスのインスタンス化
+                        audioPlayer: _audioPlayer,
                       ),
                     ),
                   );
                 },
-              ),
-            ],
+                title: Text(
+                  item.data![index].title,
+                  maxLines: 1,
+                ),
+                subtitle: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "${item.data![index].artist}",
+                      maxLines: 1,
+                    ),
+                    Text(IntDurationToMS(item.data![index].duration)),
+                  ],
+                ),
+                trailing: IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.more_horiz),
+                ),
+                leading: Card(
+                  color: Theme.of(context).primaryColor,
+                  child: QueryArtworkWidget(
+                    id: item.data![index].id,
+                    type: ArtworkType.AUDIO,
+                    artworkBorder: BorderRadius.circular(0),
+                    artworkFit: BoxFit.contain,
+                    nullArtworkWidget: const Icon(Icons.music_note),
+                  ),
+                ),
+                // leadingとtitleの幅
+                horizontalTitleGap: 5,
+                // ListTile両端の余白
+                contentPadding: const EdgeInsets.symmetric(horizontal: 5),
+              );
+            },
           );
         },
       ),
     );
   }
+}
+
+String IntDurationToMS(int? time) {
+  String result;
+
+  int minutes = (time! / (1000 * 60)).floor();
+  int seconds = ((time / 1000) % 60).floor();
+
+  if (seconds < 10) {
+    result = "$minutes:0$seconds";
+  } else {
+    result = "$minutes:$seconds";
+  }
+
+  return result;
 }
