@@ -1,12 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SongModelProvider with ChangeNotifier {
-  int _id = 0;
-
-  int get id => _id;
-
-  void setId(int id) {
-    _id = id;
-    notifyListeners();
-  }
-}
+// SongModelのidを管理
+final SongModelProvider = StateProvider((ref) => 0);
+// 再生位置の状態を管理
+final StateProvider<Duration> PositionProvider = StateProvider<Duration>((ref) => const Duration());

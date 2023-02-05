@@ -1,22 +1,22 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
 import 'package:on_audio_query/on_audio_query.dart';
-import 'package:provider/provider.dart';
 import 'package:music_lyrics/provider/SongModelProvider.dart';
 import 'NowPlaying.dart';
 
-class AllSongs extends StatefulWidget {
+class AllSongs extends ConsumerStatefulWidget {
   // 定数コンストラクタ
   const AllSongs({Key? key}) : super(key: key);
 
   // stateの作成
   @override
-  State<AllSongs> createState() => _AllSongsState();
+  ConsumerState<AllSongs> createState() => _AllSongsState();
 }
 
-class _AllSongsState extends State<AllSongs> {
+class _AllSongsState extends ConsumerState<AllSongs> {
   // クラスのインスタンス化
   final OnAudioQuery _audioQuery = OnAudioQuery();
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -97,23 +97,26 @@ class _AllSongsState extends State<AllSongs> {
               return ListTile(
                 onTap: () {
                   // ProviderからSongModelのidを受け取る（受け取ったデータを元にUIの構築を行わない）
-                  context.read<SongModelProvider>().setId(item.data![index].id);
-                  // ページ遷移（進む）
-                  Navigator.push(
-                    context,
-                    // マテリアルデザインに則ったアニメーションを行う
-                    MaterialPageRoute(
-                      // NowPlayingクラスの生成
-                      builder: (context) => NowPlaying(
-                        // 全曲リストを渡す
-                        songModelList: allSongs,
-                        // タッチされた曲のidを渡す
-                        songIndex: index,
-                        // クラスのインスタンス化
-                        audioPlayer: _audioPlayer,
-                      ),
-                    ),
-                  );
+                  ref.read(SongModelProvider.notifier).update(((state) => item.data![index].id));
+                  getLyric(item.data![index].data).then((dividedLineLyric) =>
+                      // ページ遷移（進む）
+                      Navigator.push(
+                        context,
+                        // マテリアルデザインに則ったアニメーションを行う
+                        MaterialPageRoute(
+                          // NowPlayingクラスの生成
+                          builder: (context) => NowPlaying(
+                            // 全曲リストを渡す
+                            songModelList: allSongs,
+                            // タッチされた曲のidを渡す
+                            songIndex: index,
+                            // タッチされた曲の歌詞データを渡す
+                            songLyricList: dividedLineLyric,
+                            // クラスのインスタンス化
+                            audioPlayer: _audioPlayer,
+                          ),
+                        ),
+                      ));
                 },
                 title: Text(
                   item.data![index].title,
@@ -133,15 +136,13 @@ class _AllSongsState extends State<AllSongs> {
                   onPressed: () {},
                   icon: const Icon(Icons.more_horiz),
                 ),
-                leading: Card(
-                  color: Theme.of(context).primaryColor,
-                  child: QueryArtworkWidget(
-                    id: item.data![index].id,
-                    type: ArtworkType.AUDIO,
-                    artworkBorder: BorderRadius.circular(0),
-                    artworkFit: BoxFit.contain,
-                    nullArtworkWidget: const Icon(Icons.music_note),
-                  ),
+
+                leading: QueryArtworkWidget(
+                  id: item.data![index].id,
+                  type: ArtworkType.AUDIO,
+                  artworkBorder: BorderRadius.circular(0),
+                  artworkFit: BoxFit.contain,
+                  nullArtworkWidget: const Icon(Icons.music_note),
                 ),
                 // leadingとtitleの幅
                 horizontalTitleGap: 5,
@@ -169,4 +170,21 @@ String IntDurationToMS(int? time) {
   }
 
   return result;
+}
+
+Future<List<String>> getLyric(String? audioPath) async {
+  String lyric;
+  List<String> dividedLineLyric = [];
+  int extensionIndex = audioPath!.lastIndexOf('.');
+
+  try {
+    String lyricPath = '${audioPath.substring(0, extensionIndex)}.lrc';
+    File file = File(lyricPath);
+    lyric = await file.readAsString();
+    dividedLineLyric = lyric.split('\n');
+  } catch (e) {
+    dividedLineLyric.add('歌詞データ(.lrc)が見つかりません');
+  }
+
+  return dividedLineLyric;
 }
