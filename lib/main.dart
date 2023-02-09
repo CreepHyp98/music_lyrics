@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio_background/just_audio_background.dart';
-import 'package:provider/provider.dart';
-import 'package:music_lyrics/provider/SongModelProvider.dart';
 import 'screens/AllSongs.dart';
 
 Future<void> main() async {
   // widget配置用のデバッグフラグ
-  debugPaintSizeEnabled = true;
+  //debugPaintSizeEnabled = true;
 
   // メディア通知のセットアップ
   await JustAudioBackground.init(
@@ -16,15 +14,7 @@ Future<void> main() async {
     androidNotificationOngoing: true,
   );
 
-  runApp(
-    // notifyListeners()が宣言された時、変数を変更できるようにするウィジェット
-    ChangeNotifierProvider(
-      // ChangeNotifierを継承した状態管理オブジェクトを生成
-      create: (context) => SongModelProvider(),
-      // 子要素
-      child: const MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -38,8 +28,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       // テーマデータ
       theme: ThemeData(
-        primaryColor: const Color.fromARGB(255, 251, 247, 229),
-        scaffoldBackgroundColor: const Color.fromARGB(255, 251, 247, 229),
+        useMaterial3: true,
         fontFamily: "Noto Sans JP",
       ),
       // 初期表示のクラス

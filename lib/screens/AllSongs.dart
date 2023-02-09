@@ -1,22 +1,22 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
 import 'package:on_audio_query/on_audio_query.dart';
-import 'package:provider/provider.dart';
 import 'package:music_lyrics/provider/SongModelProvider.dart';
 import 'NowPlaying.dart';
 
-class AllSongs extends StatefulWidget {
+class AllSongs extends ConsumerStatefulWidget {
   // 定数コンストラクタ
   const AllSongs({Key? key}) : super(key: key);
 
   // stateの作成
   @override
-  State<AllSongs> createState() => _AllSongsState();
+  ConsumerState<AllSongs> createState() => _AllSongsState();
 }
 
-class _AllSongsState extends State<AllSongs> {
+class _AllSongsState extends ConsumerState<AllSongs> {
   // クラスのインスタンス化
   final OnAudioQuery _audioQuery = OnAudioQuery();
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -53,11 +53,6 @@ class _AllSongsState extends State<AllSongs> {
   Widget build(BuildContext context) {
     // 画面を構成するUI構造
     return Scaffold(
-      // 画面上部のバー
-      appBar: AppBar(
-        title: const Text('全曲'),
-      ),
-
       // 非同期かつ動的にwidgetを生成できるクラス
       body: FutureBuilder<List<SongModel>>(
         // buildのたびに呼ばれるメソッド
@@ -96,8 +91,8 @@ class _AllSongsState extends State<AllSongs> {
               // Listに表示するwidgetのセット
               return ListTile(
                 onTap: () {
-                  // ProviderからSongModelのidを受け取る（受け取ったデータを元にUIの構築を行わない）
-                  context.read<SongModelProvider>().setId(item.data![index].id);
+                  // SongModelのidを更新
+                  ref.read(SongModelProvider.notifier).state = item.data![index].id;
                   // ページ遷移（進む）
                   Navigator.push(
                     context,
@@ -133,15 +128,12 @@ class _AllSongsState extends State<AllSongs> {
                   onPressed: () {},
                   icon: const Icon(Icons.more_horiz),
                 ),
-                leading: Card(
-                  color: Theme.of(context).primaryColor,
-                  child: QueryArtworkWidget(
-                    id: item.data![index].id,
-                    type: ArtworkType.AUDIO,
-                    artworkBorder: BorderRadius.circular(0),
-                    artworkFit: BoxFit.contain,
-                    nullArtworkWidget: const Icon(Icons.music_note),
-                  ),
+                leading: QueryArtworkWidget(
+                  id: item.data![index].id,
+                  type: ArtworkType.AUDIO,
+                  artworkBorder: BorderRadius.circular(0),
+                  artworkFit: BoxFit.contain,
+                  nullArtworkWidget: const Icon(Icons.music_note),
                 ),
                 // leadingとtitleの幅
                 horizontalTitleGap: 5,

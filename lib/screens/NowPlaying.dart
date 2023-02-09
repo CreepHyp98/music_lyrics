@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:music_lyrics/provider/SongModelProvider.dart';
 import 'package:on_audio_query/on_audio_query.dart';
-import 'package:provider/provider.dart';
 
-class NowPlaying extends StatefulWidget {
+class NowPlaying extends ConsumerStatefulWidget {
   // 定数コンストラクタ
   final List<SongModel> songModelList;
   final int songIndex;
@@ -15,13 +15,12 @@ class NowPlaying extends StatefulWidget {
 
   // stateの作成
   @override
-  State<NowPlaying> createState() => _NowPlayingState();
+  ConsumerState<NowPlaying> createState() => _NowPlayingState();
 }
 
-class _NowPlayingState extends State<NowPlaying> {
+class _NowPlayingState extends ConsumerState<NowPlaying> {
   // クラスのインスタンス化
   Duration _duration = const Duration();
-  Duration _position = const Duration();
 
   // 再生中かどうかのフラグをfalseで初期化
   bool _isPlaying = false;
@@ -75,14 +74,13 @@ class _NowPlayingState extends State<NowPlaying> {
       });
       // 現在の再生位置を取得
       widget.audioPlayer.positionStream.listen((position) {
+        // このmountedがないとエラーになる
         if (mounted) {
-          setState(() {
-            _position = position;
-          });
+          ref.read(PositionProvider.notifier).state = position;
         }
       });
-      listenToEvent();
-      // 再生中の曲のidを取得
+      //listenToEvent();
+      // これがないとメディア通知での操作が画面に反映されない
       listenToSongIndex();
     } on Exception catch (_) {
       // ページ遷移（戻る）
@@ -90,6 +88,7 @@ class _NowPlayingState extends State<NowPlaying> {
     }
   }
 
+  /*
   void listenToEvent() {
     widget.audioPlayer.playerStateStream.listen((state) {
       if (state.playing) {
@@ -102,17 +101,16 @@ class _NowPlayingState extends State<NowPlaying> {
       }
     });
   }
+  */
 
   void listenToSongIndex() {
     widget.audioPlayer.currentIndexStream.listen((event) {
+      // このmountedがないとエラーになる
       if (mounted) {
-        // このsetstateがないと通知タップから再生画面に飛ばない
-        setState(() {
-          if (event != null) {
-            currentIndex = event;
-          }
-          context.read<SongModelProvider>().setId(widget.songModelList[currentIndex].id);
-        });
+        if (event != null) {
+          currentIndex = event;
+        }
+        ref.read(SongModelProvider.notifier).state = widget.songModelList[currentIndex].id;
       }
     });
   }
@@ -126,155 +124,93 @@ class _NowPlayingState extends State<NowPlaying> {
     double fontSizeS = width / 30;
     double fontSizeM = width / 25;
 
-    // OS側で出している上下のバーを避ける
-    return SafeArea(
-      // 画面を構成するUI構造
-      child: Scaffold(
-        // 子要素をカスタマイズするwidget
-        body: Container(
-          padding: const EdgeInsets.all(8.0),
+    return Scaffold(
+      // 子要素をカスタマイズするwidget
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // アートワーク
+            const ArtworkWidget(),
 
-          // 子要素を描画領域の最大サイズまで引き伸ばすwidget
-          child: Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // アートワーク
-                Card(
-                  color: Theme.of(context).primaryColor,
-                  child: const ArtworkWidget(),
-                ),
-
-                // 再生リストの現在地
-                Text(
-                  "$currentIndex / ${audioSourceList.length}",
-                  style: TextStyle(
-                    fontSize: fontSizeS,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                SizedBox(height: width / 13),
-
-                // タイトル
-                Text(
-                  widget.songModelList[currentIndex].title,
-                  overflow: TextOverflow.fade,
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontSize: width / 20,
-                  ),
-                ),
-                SizedBox(height: sizedBoxM),
-
-                // アーティスト
-                Text(
-                  widget.songModelList[currentIndex].artist.toString(),
-                  overflow: TextOverflow.fade,
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontSize: fontSizeM,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                SizedBox(height: sizedBoxM),
-
-                // アルバム
-                Text(
-                  widget.songModelList[currentIndex].album.toString(),
-                  overflow: TextOverflow.fade,
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontSize: fontSizeM,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                SizedBox(height: sizedBoxM),
-
-                // 再生時間/スライダー/全体時間
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      DynamicDurationToMs(_position),
-                      style: TextStyle(
-                        fontSize: fontSizeS,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    Expanded(
-                      child: SliderTheme(
-                        data: SliderThemeData(
-                          inactiveTrackColor: Colors.grey[600],
-                          activeTrackColor: Colors.black,
-                          thumbColor: Colors.black,
-                          trackHeight: 3,
-                        ),
-                        child: Slider(
-                          min: 0.0,
-                          value: _position.inSeconds.toDouble(),
-                          max: _duration.inSeconds.toDouble(),
-                          onChanged: (value) {
-                            _position = Duration(seconds: value.toInt());
-                            widget.audioPlayer.seek(_position);
-                          },
-                        ),
-                      ),
-                    ),
-                    Text(
-                      DynamicDurationToMs(_duration),
-                      style: TextStyle(
-                        fontSize: fontSizeS,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-
-                // 戻る/再生・停止/進む
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        if (widget.audioPlayer.hasPrevious) {
-                          widget.audioPlayer.seekToPrevious();
-                        }
-                      },
-                      icon: const Icon(
-                        Icons.skip_previous,
-                        size: 24.0,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        if (_isPlaying) {
-                          widget.audioPlayer.pause();
-                        } else {
-                          widget.audioPlayer.play();
-                        }
-                        _isPlaying = !_isPlaying;
-                      },
-                      icon: Icon(
-                        _isPlaying ? Icons.pause : Icons.play_arrow,
-                        size: 24.0,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        if (widget.audioPlayer.hasNext) {
-                          widget.audioPlayer.seekToNext();
-                        }
-                      },
-                      icon: const Icon(
-                        Icons.skip_next,
-                        size: 24.0,
-                      ),
-                    ),
-                  ],
-                )
-              ],
+            // 再生リストの現在地
+            Text(
+              "${currentIndex + 1} / ${audioSourceList.length}",
+              style: TextStyle(
+                fontSize: fontSizeS,
+                color: Colors.grey,
+              ),
             ),
-          ),
+            SizedBox(height: width / 13),
+
+            // タイトル
+            Text(
+              widget.songModelList[currentIndex].title,
+              overflow: TextOverflow.fade,
+              maxLines: 1,
+              style: TextStyle(
+                fontSize: width / 20,
+              ),
+            ),
+            SizedBox(height: sizedBoxM),
+
+            // アーティスト
+            Text(
+              widget.songModelList[currentIndex].artist.toString(),
+              overflow: TextOverflow.fade,
+              maxLines: 1,
+              style: TextStyle(
+                fontSize: fontSizeM,
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: sizedBoxM),
+
+            // アルバム
+            Text(
+              widget.songModelList[currentIndex].album.toString(),
+              overflow: TextOverflow.fade,
+              maxLines: 1,
+              style: TextStyle(
+                fontSize: fontSizeM,
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: sizedBoxM),
+
+            // 再生・停止/進む
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    if (_isPlaying) {
+                      widget.audioPlayer.pause();
+                    } else {
+                      widget.audioPlayer.play();
+                    }
+                    _isPlaying = !_isPlaying;
+                    setState(() {});
+                  },
+                  icon: Icon(
+                    _isPlaying ? Icons.pause : Icons.play_arrow,
+                    size: 24.0,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    if (widget.audioPlayer.hasNext) {
+                      widget.audioPlayer.seekToNext();
+                    }
+                  },
+                  icon: const Icon(
+                    Icons.skip_next,
+                    size: 24.0,
+                  ),
+                ),
+              ],
+            )
+          ],
         ),
       ),
     );
@@ -288,16 +224,16 @@ String DynamicDurationToMs(dynamic time) {
   return "$minutes:$seconds";
 }
 
-class ArtworkWidget extends StatelessWidget {
+class ArtworkWidget extends ConsumerWidget {
   const ArtworkWidget({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     // 端末サイズから高さを指定
     double width = MediaQuery.of(context).size.width;
 
     return QueryArtworkWidget(
-      id: context.watch<SongModelProvider>().id,
+      id: ref.watch(SongModelProvider),
       format: ArtworkFormat.PNG,
       artworkQuality: FilterQuality.high,
       type: ArtworkType.AUDIO,
