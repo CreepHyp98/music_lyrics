@@ -9,10 +9,9 @@ class NowPlaying extends ConsumerStatefulWidget {
   // 定数コンストラクタ
   final List<SongModel> songModelList;
   final int songIndex;
-  final List<String> songLyricList;
   final AudioPlayer audioPlayer;
 
-  const NowPlaying({Key? key, required this.songModelList, required this.songIndex, required this.songLyricList, required this.audioPlayer}) : super(key: key);
+  const NowPlaying({Key? key, required this.songModelList, required this.songIndex, required this.audioPlayer}) : super(key: key);
 
   // stateの作成
   @override
@@ -29,8 +28,6 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
   List<AudioSource> audioSourceList = [];
   // 現在再生中のindexを入れる変数を宣言
   int currentIndex = 0;
-  // 現在の位置の歌詞を入れる変数を宣言
-  String currentLyric = 'テスト';
 
   // 初回表示時の処理
   @override
@@ -77,10 +74,13 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
       });
       // 現在の再生位置を取得
       widget.audioPlayer.positionStream.listen((position) {
-        ref.read(PositionProvider.notifier).update((state) => position);
+        // このmountedがないとエラーになる
+        if (mounted) {
+          ref.read(PositionProvider.notifier).state = position;
+        }
       });
-      listenToEvent();
-      // 再生中の曲のidを取得
+      //listenToEvent();
+      // これがないとメディア通知での操作が画面に反映されない
       listenToSongIndex();
     } on Exception catch (_) {
       // ページ遷移（戻る）
@@ -88,6 +88,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
     }
   }
 
+  /*
   void listenToEvent() {
     widget.audioPlayer.playerStateStream.listen((state) {
       if (state.playing) {
@@ -100,13 +101,17 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
       }
     });
   }
+  */
 
   void listenToSongIndex() {
     widget.audioPlayer.currentIndexStream.listen((event) {
-      if (event != null) {
-        currentIndex = event;
+      // このmountedがないとエラーになる
+      if (mounted) {
+        if (event != null) {
+          currentIndex = event;
+        }
+        ref.read(SongModelProvider.notifier).state = widget.songModelList[currentIndex].id;
       }
-      ref.read(SongModelProvider.notifier).update((state) => widget.songModelList[currentIndex].id);
     });
   }
 
@@ -119,158 +124,93 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
     double fontSizeS = width / 30;
     double fontSizeM = width / 25;
 
-    // OS側で出している上下のバーを避ける
-    return SafeArea(
-      minimum: const EdgeInsets.all(5.0),
-      // 画面を構成するUI構造
-      child: Scaffold(
-        body: Center(
-          child: Column(
-            // 中央寄せ
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Column(
-                    children: [
-                      // アートワーク
-                      const ArtworkWidget(),
+    return Scaffold(
+      // 子要素をカスタマイズするwidget
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // アートワーク
+            const ArtworkWidget(),
 
-                      // 再生リストの現在地
-                      Text(
-                        "${currentIndex + 1} / ${audioSourceList.length}",
-                        style: TextStyle(
-                          fontSize: fontSizeS,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      SizedBox(height: width / 13),
-
-                      // タイトル
-                      Text(
-                        widget.songModelList[currentIndex].title,
-                        overflow: TextOverflow.fade,
-                        maxLines: 1,
-                        style: TextStyle(
-                          fontSize: width / 20,
-                        ),
-                      ),
-                      SizedBox(height: sizedBoxM),
-
-                      // アーティスト
-                      Text(
-                        widget.songModelList[currentIndex].artist.toString(),
-                        overflow: TextOverflow.fade,
-                        maxLines: 1,
-                        style: TextStyle(
-                          fontSize: fontSizeM,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      SizedBox(height: sizedBoxM),
-
-                      // アルバム
-                      Text(
-                        widget.songModelList[currentIndex].album.toString(),
-                        overflow: TextOverflow.fade,
-                        maxLines: 1,
-                        style: TextStyle(
-                          fontSize: fontSizeM,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      SizedBox(height: sizedBoxM),
-                    ],
-                  ),
-
-                  // 歌詞表示
-                  Text(currentLyric),
-                ],
+            // 再生リストの現在地
+            Text(
+              "${currentIndex + 1} / ${audioSourceList.length}",
+              style: TextStyle(
+                fontSize: fontSizeS,
+                color: Colors.grey,
               ),
+            ),
+            SizedBox(height: width / 13),
 
-              // 再生時間/スライダー/全体時間
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    DynamicDurationToMs(ref.watch(PositionProvider)),
-                    style: TextStyle(
-                      fontSize: fontSizeS,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  Expanded(
-                    child: SliderTheme(
-                      data: const SliderThemeData(
-                        inactiveTrackColor: Colors.grey,
-                        trackHeight: 3,
-                      ),
-                      child: Slider(
-                        min: 0.0,
-                        value: ref.watch(PositionProvider).inSeconds.toDouble(),
-                        max: _duration.inSeconds.toDouble(),
-                        onChanged: (value) {
-                          ref.read(PositionProvider.notifier).update((state) => Duration(seconds: value.toInt()));
-                          widget.audioPlayer.seek(ref.watch(PositionProvider));
-                        },
-                      ),
-                    ),
-                  ),
-                  Text(
-                    DynamicDurationToMs(_duration),
-                    style: TextStyle(
-                      fontSize: fontSizeS,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
+            // タイトル
+            Text(
+              widget.songModelList[currentIndex].title,
+              overflow: TextOverflow.fade,
+              maxLines: 1,
+              style: TextStyle(
+                fontSize: width / 20,
               ),
+            ),
+            SizedBox(height: sizedBoxM),
 
-              // 戻る/再生・停止/進む
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      if (widget.audioPlayer.hasPrevious) {
-                        widget.audioPlayer.seekToPrevious();
-                      }
-                    },
-                    icon: const Icon(
-                      Icons.skip_previous,
-                      size: 24.0,
-                    ),
+            // アーティスト
+            Text(
+              widget.songModelList[currentIndex].artist.toString(),
+              overflow: TextOverflow.fade,
+              maxLines: 1,
+              style: TextStyle(
+                fontSize: fontSizeM,
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: sizedBoxM),
+
+            // アルバム
+            Text(
+              widget.songModelList[currentIndex].album.toString(),
+              overflow: TextOverflow.fade,
+              maxLines: 1,
+              style: TextStyle(
+                fontSize: fontSizeM,
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: sizedBoxM),
+
+            // 再生・停止/進む
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    if (_isPlaying) {
+                      widget.audioPlayer.pause();
+                    } else {
+                      widget.audioPlayer.play();
+                    }
+                    _isPlaying = !_isPlaying;
+                    setState(() {});
+                  },
+                  icon: Icon(
+                    _isPlaying ? Icons.pause : Icons.play_arrow,
+                    size: 24.0,
                   ),
-                  IconButton(
-                    onPressed: () {
-                      if (_isPlaying) {
-                        widget.audioPlayer.pause();
-                      } else {
-                        widget.audioPlayer.play();
-                      }
-                      _isPlaying = !_isPlaying;
-                    },
-                    icon: Icon(
-                      _isPlaying ? Icons.pause : Icons.play_arrow,
-                      size: 24.0,
-                    ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    if (widget.audioPlayer.hasNext) {
+                      widget.audioPlayer.seekToNext();
+                    }
+                  },
+                  icon: const Icon(
+                    Icons.skip_next,
+                    size: 24.0,
                   ),
-                  IconButton(
-                    onPressed: () {
-                      if (widget.audioPlayer.hasNext) {
-                        widget.audioPlayer.seekToNext();
-                      }
-                    },
-                    icon: const Icon(
-                      Icons.skip_next,
-                      size: 24.0,
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
+                ),
+              ],
+            )
+          ],
         ),
       ),
     );

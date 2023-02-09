@@ -53,11 +53,6 @@ class _AllSongsState extends ConsumerState<AllSongs> {
   Widget build(BuildContext context) {
     // 画面を構成するUI構造
     return Scaffold(
-      // 画面上部のバー
-      appBar: AppBar(
-        title: const Text('全曲'),
-      ),
-
       // 非同期かつ動的にwidgetを生成できるクラス
       body: FutureBuilder<List<SongModel>>(
         // buildのたびに呼ばれるメソッド
@@ -96,27 +91,24 @@ class _AllSongsState extends ConsumerState<AllSongs> {
               // Listに表示するwidgetのセット
               return ListTile(
                 onTap: () {
-                  // ProviderからSongModelのidを受け取る（受け取ったデータを元にUIの構築を行わない）
-                  ref.read(SongModelProvider.notifier).update(((state) => item.data![index].id));
-                  getLyric(item.data![index].data).then((dividedLineLyric) =>
-                      // ページ遷移（進む）
-                      Navigator.push(
-                        context,
-                        // マテリアルデザインに則ったアニメーションを行う
-                        MaterialPageRoute(
-                          // NowPlayingクラスの生成
-                          builder: (context) => NowPlaying(
-                            // 全曲リストを渡す
-                            songModelList: allSongs,
-                            // タッチされた曲のidを渡す
-                            songIndex: index,
-                            // タッチされた曲の歌詞データを渡す
-                            songLyricList: dividedLineLyric,
-                            // クラスのインスタンス化
-                            audioPlayer: _audioPlayer,
-                          ),
-                        ),
-                      ));
+                  // SongModelのidを更新
+                  ref.read(SongModelProvider.notifier).state = item.data![index].id;
+                  // ページ遷移（進む）
+                  Navigator.push(
+                    context,
+                    // マテリアルデザインに則ったアニメーションを行う
+                    MaterialPageRoute(
+                      // NowPlayingクラスの生成
+                      builder: (context) => NowPlaying(
+                        // 全曲リストを渡す
+                        songModelList: allSongs,
+                        // タッチされた曲のidを渡す
+                        songIndex: index,
+                        // クラスのインスタンス化
+                        audioPlayer: _audioPlayer,
+                      ),
+                    ),
+                  );
                 },
                 title: Text(
                   item.data![index].title,
@@ -136,7 +128,6 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                   onPressed: () {},
                   icon: const Icon(Icons.more_horiz),
                 ),
-
                 leading: QueryArtworkWidget(
                   id: item.data![index].id,
                   type: ArtworkType.AUDIO,
