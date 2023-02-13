@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
 import 'package:on_audio_query/on_audio_query.dart';
-import 'package:music_lyrics/provider/SongModelProvider.dart';
+import 'package:music_lyrics/provider/provider.dart';
 import 'NowPlaying.dart';
 
 class AllSongs extends ConsumerStatefulWidget {
@@ -91,8 +91,8 @@ class _AllSongsState extends ConsumerState<AllSongs> {
               // Listに表示するwidgetのセット
               return ListTile(
                 onTap: () {
-                  // SongModelのidを更新
-                  ref.read(SongModelProvider.notifier).state = item.data![index].id;
+                  // SongModelを更新
+                  ref.read(SongModelProvider.notifier).state = item.data![index];
                   // ページ遷移（進む）
                   Navigator.push(
                     context,

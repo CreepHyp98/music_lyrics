@@ -4,9 +4,6 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'screens/AllSongs.dart';
 
 Future<void> main() async {
-  // widget配置用のデバッグフラグ
-  //debugPaintSizeEnabled = true;
-
   // メディア通知のセットアップ
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',

@@ -34,5 +34,8 @@ flutter:
   fonts:
     - family: Noto Sans JP
       fonts:
-        - asset: fonts/Noto_Sans_JP/NotoSansJP-Regular.otf
+        - asset: assets/fonts/Noto_Sans_JP/NotoSansJP-Regular.otf
+    - family: shippori3
+      fonts: 
+        - asset: assets/fonts/shippori3/ShipporiMincho-OTF-Regular.otf
   # -----ここまで-----

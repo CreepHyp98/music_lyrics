@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
-import 'package:music_lyrics/provider/SongModelProvider.dart';
+import 'package:music_lyrics/provider/provider.dart';
+import 'package:music_lyrics/widgets/VerticalRotatedWriting.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class NowPlaying extends ConsumerStatefulWidget {
@@ -79,7 +80,6 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
           ref.read(PositionProvider.notifier).state = position;
         }
       });
-      //listenToEvent();
       // これがないとメディア通知での操作が画面に反映されない
       listenToSongIndex();
     } on Exception catch (_) {
@@ -88,21 +88,6 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
     }
   }
 
-  /*
-  void listenToEvent() {
-    widget.audioPlayer.playerStateStream.listen((state) {
-      if (state.playing) {
-        _isPlaying = true;
-      } else {
-        _isPlaying = false;
-      }
-      if (state.processingState == ProcessingState.completed) {
-        _isPlaying = false;
-      }
-    });
-  }
-  */
-
   void listenToSongIndex() {
     widget.audioPlayer.currentIndexStream.listen((event) {
       // このmountedがないとエラーになる
@@ -110,7 +95,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
         if (event != null) {
           currentIndex = event;
         }
-        ref.read(SongModelProvider.notifier).state = widget.songModelList[currentIndex].id;
+        ref.read(SongModelProvider.notifier).state = widget.songModelList[currentIndex];
       }
     });
   }
@@ -118,98 +103,87 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
   // widgetの生成
   @override
   Widget build(BuildContext context) {
-    // 端末サイズから高さを指定
-    double width = MediaQuery.of(context).size.width;
-    double sizedBoxM = width / 40;
-    double fontSizeS = width / 30;
-    double fontSizeM = width / 25;
+    // 端末サイズからフォントサイズを指定
+    double deviceWidth = MediaQuery.of(context).size.width;
+    double fontSizeM = deviceWidth / 24.5;
+    debugPrint("$deviceWidth, $fontSizeM");
 
     return Scaffold(
-      // 子要素をカスタマイズするwidget
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      body: SafeArea(
+        child: Stack(
           children: [
-            // アートワーク
-            const ArtworkWidget(),
-
-            // 再生リストの現在地
-            Text(
-              "${currentIndex + 1} / ${audioSourceList.length}",
-              style: TextStyle(
-                fontSize: fontSizeS,
-                color: Colors.grey,
+            // アルバム
+            Align(
+              alignment: const Alignment(-0.9, -0.95),
+              child: Text(
+                ref.watch(SongModelProvider).album.toString(),
+                style: const TextStyle(
+                  fontFamily: 'shippori3',
+                ),
               ),
             ),
-            SizedBox(height: width / 13),
 
             // タイトル
-            Text(
-              widget.songModelList[currentIndex].title,
-              overflow: TextOverflow.fade,
-              maxLines: 1,
-              style: TextStyle(
-                fontSize: width / 20,
+            Align(
+              alignment: const Alignment(0.9, -0.5),
+              child: VerticalRotatedWriting(
+                size: fontSizeM,
+                text: ref.watch(SongModelProvider).title,
               ),
             ),
-            SizedBox(height: sizedBoxM),
 
             // アーティスト
-            Text(
-              widget.songModelList[currentIndex].artist.toString(),
-              overflow: TextOverflow.fade,
-              maxLines: 1,
-              style: TextStyle(
-                fontSize: fontSizeM,
-                color: Colors.grey,
+            Align(
+              alignment: const Alignment(0.7, 0.2),
+              child: VerticalRotatedWriting(
+                size: fontSizeM,
+                text: ref.watch(SongModelProvider).artist.toString(),
               ),
             ),
-            SizedBox(height: sizedBoxM),
 
-            // アルバム
-            Text(
-              widget.songModelList[currentIndex].album.toString(),
-              overflow: TextOverflow.fade,
-              maxLines: 1,
-              style: TextStyle(
-                fontSize: fontSizeM,
-                color: Colors.grey,
+            // 歌詞
+            Align(
+              child: VerticalRotatedWriting(
+                size: fontSizeM,
+                text: '歌詞サンプル',
               ),
             ),
-            SizedBox(height: sizedBoxM),
 
-            // 再生・停止/進む
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    if (_isPlaying) {
-                      widget.audioPlayer.pause();
-                    } else {
-                      widget.audioPlayer.play();
-                    }
-                    _isPlaying = !_isPlaying;
-                    setState(() {});
-                  },
-                  icon: Icon(
-                    _isPlaying ? Icons.pause : Icons.play_arrow,
-                    size: 24.0,
-                  ),
+            // 再生・停止ボタン
+            Align(
+              alignment: const Alignment(0.7, 0.98),
+              child: IconButton(
+                onPressed: () {
+                  if (_isPlaying) {
+                    widget.audioPlayer.pause();
+                  } else {
+                    widget.audioPlayer.play();
+                  }
+                  _isPlaying = !_isPlaying;
+                  setState(() {});
+                },
+                icon: Icon(
+                  _isPlaying ? Icons.pause_outlined : Icons.play_arrow_outlined,
+                  size: fontSizeM,
                 ),
-                IconButton(
-                  onPressed: () {
-                    if (widget.audioPlayer.hasNext) {
-                      widget.audioPlayer.seekToNext();
-                    }
-                  },
-                  icon: const Icon(
-                    Icons.skip_next,
-                    size: 24.0,
-                  ),
+              ),
+            ),
+
+            // 進むボタン
+            Align(
+              alignment: const Alignment(0.95, 0.98),
+              child: IconButton(
+                onPressed: () {
+                  if (widget.audioPlayer.hasNext) {
+                    widget.audioPlayer.seekToNext();
+                  }
+                },
+                icon: Icon(
+                  Icons.skip_next_outlined,
+                  size: fontSizeM,
                 ),
-              ],
-            )
+              ),
+            ),
           ],
         ),
       ),
@@ -233,7 +207,7 @@ class ArtworkWidget extends ConsumerWidget {
     double width = MediaQuery.of(context).size.width;
 
     return QueryArtworkWidget(
-      id: ref.watch(SongModelProvider),
+      id: ref.watch(SongModelProvider).id,
       format: ArtworkFormat.PNG,
       artworkQuality: FilterQuality.high,
       type: ArtworkType.AUDIO,
