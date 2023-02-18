@@ -1,0 +1,114 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_lyrics/provider/provider.dart';
+import 'package:music_lyrics/widgets/VerticalRotatedWriting.dart';
+
+class LyricWidget extends ConsumerStatefulWidget {
+  const LyricWidget({super.key});
+
+  @override
+  ConsumerState<LyricWidget> createState() => _LyricWidgetState();
+}
+
+class _LyricWidgetState extends ConsumerState<LyricWidget> {
+  // 一行ごとに分割された歌詞Listのインデックス
+  int currentLyricIndex = 0;
+  // 再生時間（ミリ秒）を保持
+  int currentMilliSeconds = 0;
+
+  void getLyric() async {
+    // 再生中のオーディオファイルの絶対パスを取得
+    String audioPath = ref.watch(SongModelProvider).data;
+    // その絶対パスの拡張子のインデックスを取得
+    int extensionIndex = audioPath.lastIndexOf('.');
+
+    try {
+      // .lrcファイルのパスをセット
+      String lyricPath = '${audioPath.substring(0, extensionIndex)}.lrc';
+      // パス → ファイル
+      File lyricFile = File(lyricPath);
+      // ファイル → String
+      String lyricData = await lyricFile.readAsString();
+      // String → List<String>
+      ref.read(LyricProvider.notifier).state = lyricData.split('\n');
+    } catch (e) {
+      // .lrcファイルがない場合
+      ref.read(LyricProvider.notifier).state = ['歌詞データ(.lrc)が見つかりません'];
+    }
+  }
+
+  String syncLyric() {
+    String currentLyric = '';
+    int startTime, nextTime = 0;
+
+    // 保持している値が実際の再生時間を超える ⇒ 曲が変わった
+    if (currentMilliSeconds > ref.watch(PositionProvider).inMilliseconds) {
+      // 歌詞Listのインデックスを初期化
+      currentLyricIndex = 0;
+    }
+    // 再生時間を更新
+    currentMilliSeconds = ref.watch(PositionProvider).inMilliseconds;
+    // 歌詞データから歌いだし時間を取得
+    startTime = getLyricStartTime(ref.watch(LyricProvider)[currentLyricIndex]);
+
+    if (startTime >= 0) {
+      try {
+        // 最後のインデックスではないなら
+        if (currentLyricIndex != ref.watch(LyricProvider).length - 1) {
+          // 次の歌詞の歌いだし時間を取得
+          nextTime = getLyricStartTime(ref.watch(LyricProvider)[currentLyricIndex + 1]);
+          // 現在の再生時間がそれを超えたなら
+          if (currentMilliSeconds >= nextTime) {
+            // 歌詞Listのインデックスを次に進める
+            currentLyricIndex++;
+          }
+        }
+
+        if (currentMilliSeconds >= startTime) {
+          currentLyric = ref.watch(LyricProvider)[currentLyricIndex].substring(10);
+        }
+      } catch (e) {
+        // まだLyricProviderに値が入ってない
+      }
+    } else {
+      // .lrcファイルがない、もしくは.lrcファイルはあるが時間情報がない
+      // List<String>をStringに戻して返す
+      currentLyric = ref.watch(LyricProvider).join('\n');
+    }
+
+    return currentLyric;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // 端末サイズからフォントサイズを指定
+    double deviceWidth = MediaQuery.of(context).size.width;
+    double fontSizeL = deviceWidth / 19.6; //20pt
+
+    getLyric();
+    return VerticalRotatedWriting(text: syncLyric(), size: fontSizeL);
+  }
+}
+
+int getLyricStartTime(String lineLyric) {
+  // .lrcの時間情報[mm:ss.xx]から分・秒・センチ秒のインデックスを取得
+  int minuteIndex = lineLyric.indexOf(':');
+  int secondIndex = lineLyric.indexOf('.');
+  int centiSecondIndex = lineLyric.indexOf(']');
+
+  try {
+    // 分・秒・センチ秒をintで取得
+    int minutes = int.parse(lineLyric.substring(1, minuteIndex));
+    int seconds = int.parse(lineLyric.substring(minuteIndex + 1, secondIndex));
+    int centiSeconds = int.parse(lineLyric.substring(secondIndex + 1, centiSecondIndex));
+
+    // それらをミリ秒に変換
+    int milliSeconds = (minutes * 60000) + (seconds * 1000) + (centiSeconds * 10);
+    return milliSeconds;
+  } catch (e) {
+    // .lrcファイルがない、もしくは.lrcファイルはあるが時間情報がない
+    return -1;
+  }
+}

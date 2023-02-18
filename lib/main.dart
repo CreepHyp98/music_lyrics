@@ -16,7 +16,7 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   // 定数コンストラクタ
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   // widgetの生成
   @override

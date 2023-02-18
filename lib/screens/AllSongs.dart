@@ -9,7 +9,7 @@ import 'NowPlaying.dart';
 
 class AllSongs extends ConsumerStatefulWidget {
   // 定数コンストラクタ
-  const AllSongs({Key? key}) : super(key: key);
+  const AllSongs({super.key});
 
   // stateの作成
   @override
@@ -161,21 +161,4 @@ String IntDurationToMS(int? time) {
   }
 
   return result;
-}
-
-Future<List<String>> getLyric(String? audioPath) async {
-  String lyric;
-  List<String> dividedLineLyric = [];
-  int extensionIndex = audioPath!.lastIndexOf('.');
-
-  try {
-    String lyricPath = '${audioPath.substring(0, extensionIndex)}.lrc';
-    File file = File(lyricPath);
-    lyric = await file.readAsString();
-    dividedLineLyric = lyric.split('\n');
-  } catch (e) {
-    dividedLineLyric.add('歌詞データ(.lrc)が見つかりません');
-  }
-
-  return dividedLineLyric;
 }

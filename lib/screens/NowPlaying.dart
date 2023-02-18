@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:music_lyrics/provider/provider.dart';
+import 'package:music_lyrics/widgets/LyricWidget.dart';
 import 'package:music_lyrics/widgets/VerticalRotatedWriting.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
@@ -12,7 +13,7 @@ class NowPlaying extends ConsumerStatefulWidget {
   final int songIndex;
   final AudioPlayer audioPlayer;
 
-  const NowPlaying({Key? key, required this.songModelList, required this.songIndex, required this.audioPlayer}) : super(key: key);
+  const NowPlaying({super.key, required this.songModelList, required this.songIndex, required this.audioPlayer});
 
   // stateの作成
   @override
@@ -44,7 +45,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
       // 受け取った曲リストを音源ファイルに変換し再生リストに加える
       for (var element in widget.songModelList) {
         audioSourceList.add(
-          // URI文字列 → URIオブジェクト → 音源ファイル
+          // URI文字列 → URIオブジェクト → オーディオファイル
           AudioSource.uri(
             Uri.parse(element.uri!),
             tag: MediaItem(
@@ -103,10 +104,14 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
   // widgetの生成
   @override
   Widget build(BuildContext context) {
-    // 端末サイズからフォントサイズを指定
+    // 端末幅サイズからフォントサイズを指定
     double deviceWidth = MediaQuery.of(context).size.width;
-    double fontSizeM = deviceWidth / 24.5;
-    debugPrint("$deviceWidth, $fontSizeM");
+    double fontSizeM = deviceWidth / 21.8; //18pt
+    double fontSizeL = deviceWidth / 17.8; //22pt
+    // 歌詞描画エリアのために端末高さサイズも取得
+    double deviceHeight = MediaQuery.of(context).size.height;
+    double lyricAreaHeight = deviceHeight * 0.7;
+    double lyricAreaWidth = deviceWidth * 0.525;
 
     return Scaffold(
       body: SafeArea(
@@ -125,16 +130,16 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
 
             // タイトル
             Align(
-              alignment: const Alignment(0.9, -0.5),
+              alignment: const Alignment(0.85, -0.2),
               child: VerticalRotatedWriting(
-                size: fontSizeM,
+                size: fontSizeL,
                 text: ref.watch(SongModelProvider).title,
               ),
             ),
 
             // アーティスト
             Align(
-              alignment: const Alignment(0.7, 0.2),
+              alignment: const Alignment(0.6, 0.4),
               child: VerticalRotatedWriting(
                 size: fontSizeM,
                 text: ref.watch(SongModelProvider).artist.toString(),
@@ -142,16 +147,20 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
             ),
 
             // 歌詞
-            Align(
-              child: VerticalRotatedWriting(
-                size: fontSizeM,
-                text: '歌詞サンプル',
+            Positioned(
+              top: deviceHeight * 0.15,
+              left: 0,
+              child: Container(
+                alignment: Alignment.topRight,
+                height: lyricAreaHeight,
+                width: lyricAreaWidth,
+                child: const LyricWidget(),
               ),
             ),
 
             // 再生・停止ボタン
             Align(
-              alignment: const Alignment(0.7, 0.98),
+              alignment: const Alignment(0.65, 0.98),
               child: IconButton(
                 onPressed: () {
                   if (_isPlaying) {
@@ -171,7 +180,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
 
             // 進むボタン
             Align(
-              alignment: const Alignment(0.95, 0.98),
+              alignment: const Alignment(0.9, 0.98),
               child: IconButton(
                 onPressed: () {
                   if (widget.audioPlayer.hasNext) {
@@ -189,13 +198,6 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
       ),
     );
   }
-}
-
-String DynamicDurationToMs(dynamic time) {
-  String minutes = (time.toString().split(".")[0]).split(":")[1];
-  String seconds = (time.toString().split(".")[0]).split(":")[2];
-
-  return "$minutes:$seconds";
 }
 
 class ArtworkWidget extends ConsumerWidget {
