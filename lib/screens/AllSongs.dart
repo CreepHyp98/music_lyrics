@@ -2,10 +2,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:music_lyrics/widgets/SettingDialogWidget.dart';
 
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:music_lyrics/provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'NowPlaying.dart';
+import 'TextConvert.dart';
 
 class AllSongs extends ConsumerStatefulWidget {
   // 定数コンストラクタ
@@ -23,6 +26,8 @@ class _AllSongsState extends ConsumerState<AllSongs> {
 
   // 曲リストの初期化
   List<SongModel> allSongs = [];
+  // タイトルとそのフリガナのマップ
+  Map<String, String> furiganaMap = {};
 
   // 初回表示時の処理
   @override
@@ -43,21 +48,32 @@ class _AllSongsState extends ConsumerState<AllSongs> {
         // 許可のリクエスト
         await _audioQuery.permissionsRequest();
       }
-      // 画面の再描画
+
       setState(() {});
     }
   }
 
-  // widgetの生成
+  void sortAllSongs() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    for (int i = 0; i < allSongs.length; i++) {
+      // タイトルのフリガナを持ってくる
+      String? furigana = prefs.getString(allSongs[i].title);
+      furiganaMap[allSongs[i].title] = furigana!;
+    }
+
+    // フリガナで五十音順にソート
+    allSongs.sort(
+      (a, b) => furiganaMap[a.title]!.compareTo(furiganaMap[b.title]!),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // 画面を構成するUI構造
     return Scaffold(
       // 非同期かつ動的にwidgetを生成できるクラス
       body: FutureBuilder<List<SongModel>>(
-        // buildのたびに呼ばれるメソッド
         future: _audioQuery.querySongs(
-          sortType: null,
           orderType: OrderType.ASC_OR_SMALLER,
           uriType: UriType.EXTERNAL,
           ignoreCase: true,
@@ -80,7 +96,6 @@ class _AllSongsState extends ConsumerState<AllSongs> {
             return const Center(child: Text("曲が見つかりません"));
           }
 
-          // 箱型のwidget
           return ListView.builder(
             // Listの要素数
             itemCount: item.data!.length,
@@ -88,7 +103,11 @@ class _AllSongsState extends ConsumerState<AllSongs> {
             itemBuilder: (context, index) {
               // 全曲Listに取得した全てのitemをセット
               allSongs = item.data!;
-              // Listに表示するwidgetのセット
+              // フリガナがない曲はAPIを使って生成
+              setFuriganaAll(allSongs);
+              // 曲のフリガナで五十音順にソート
+              sortAllSongs();
+
               return ListTile(
                 onTap: () {
                   // SongModelを更新
@@ -96,12 +115,11 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                   // ページ遷移（進む）
                   Navigator.push(
                     context,
-                    // マテリアルデザインに則ったアニメーションを行う
                     MaterialPageRoute(
                       // NowPlayingクラスの生成
                       builder: (context) => NowPlaying(
                         // 全曲リストを渡す
-                        songModelList: allSongs,
+                        SongModelList: allSongs,
                         // タッチされた曲のidを渡す
                         songIndex: index,
                         // クラスのインスタンス化
@@ -125,7 +143,16 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                   ],
                 ),
                 trailing: IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    // ダイアログ表示
+                    showDialog(
+                      context: context,
+                      builder: (context) => furiganaSettingDialog(
+                        titleKey: item.data![index].title,
+                        defaultFurigana: furiganaMap[item.data![index].title],
+                      ),
+                    );
+                  },
                   icon: const Icon(Icons.more_horiz),
                 ),
                 leading: QueryArtworkWidget(

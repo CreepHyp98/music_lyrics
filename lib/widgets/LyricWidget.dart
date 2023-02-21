@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/widgets/VerticalRotatedWriting.dart';
+import 'package:wakelock/wakelock.dart';
 
 class LyricWidget extends ConsumerStatefulWidget {
   const LyricWidget({super.key});
@@ -54,9 +55,11 @@ class _LyricWidgetState extends ConsumerState<LyricWidget> {
     startTime = getLyricStartTime(ref.watch(LyricProvider)[currentLyricIndex]);
 
     if (startTime >= 0) {
+      // 歌詞同期時は自動スリープを無効にする
+      Wakelock.enable();
       try {
-        // 最後のインデックスではないなら
-        if (currentLyricIndex != ref.watch(LyricProvider).length - 1) {
+        // 最後のインデックスではないなら（EOFの分、要素数-2）
+        if (currentLyricIndex != ref.watch(LyricProvider).length - 2) {
           // 次の歌詞の歌いだし時間を取得
           nextTime = getLyricStartTime(ref.watch(LyricProvider)[currentLyricIndex + 1]);
           // 現在の再生時間がそれを超えたなら
@@ -74,6 +77,8 @@ class _LyricWidgetState extends ConsumerState<LyricWidget> {
       }
     } else {
       // .lrcファイルがない、もしくは.lrcファイルはあるが時間情報がない
+      // 歌詞同期はないので自動スリープを有効にする
+      Wakelock.disable();
       // List<String>をStringに戻して返す
       currentLyric = ref.watch(LyricProvider).join('\n');
     }
@@ -85,10 +90,10 @@ class _LyricWidgetState extends ConsumerState<LyricWidget> {
   Widget build(BuildContext context) {
     // 端末サイズからフォントサイズを指定
     double deviceWidth = MediaQuery.of(context).size.width;
-    double fontSizeL = deviceWidth / 19.6; //20pt
+    double fontSizeM = 18; //deviceWidth / 21.8; //18pt
 
     getLyric();
-    return VerticalRotatedWriting(text: syncLyric(), size: fontSizeL);
+    return VerticalRotatedWriting(text: syncLyric(), size: fontSizeM);
   }
 }
 
