@@ -2,12 +2,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:music_lyrics/class/MyAudioSourceClass.dart';
 import 'package:music_lyrics/widgets/SettingDialogWidget.dart';
 
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'NowPlaying.dart';
 import 'TextConvert.dart';
 
 class AllSongs extends ConsumerStatefulWidget {
@@ -62,10 +62,15 @@ class _AllSongsState extends ConsumerState<AllSongs> {
       furiganaMap[allSongs[i].title] = furigana!;
     }
 
-    // フリガナで五十音順にソート
-    allSongs.sort(
-      (a, b) => furiganaMap[a.title]!.compareTo(furiganaMap[b.title]!),
-    );
+    try {
+      // フリガナで五十音順にソート
+      allSongs.sort(
+        // TODO: アルファベットが大文字→小文字の順になってる
+        (a, b) => furiganaMap[a.title]!.compareTo(furiganaMap[b.title]!),
+      );
+    } catch (e) {
+      // タイトル取得中
+    }
   }
 
   @override
@@ -112,21 +117,23 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                 onTap: () {
                   // SongModelを更新
                   ref.read(SongModelProvider.notifier).state = item.data![index];
-                  // ページ遷移（進む）
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      // NowPlayingクラスの生成
-                      builder: (context) => NowPlaying(
-                        // 全曲リストを渡す
-                        SongModelList: allSongs,
-                        // タッチされた曲のidを渡す
-                        songIndex: index,
-                        // クラスのインスタンス化
-                        audioPlayer: _audioPlayer,
-                      ),
-                    ),
+
+                  // リスト・インデックス・プレイヤーをセットし、再生
+                  ref.read(AudioProvider.notifier).state = MyAudioSource(
+                    songModelList: allSongs,
+                    songIndex: index,
+                    audioPlayer: _audioPlayer,
                   );
+
+                  // オーディオファイルに変換し再生
+                  parseSong(
+                    ref.watch(AudioProvider).songModelList!,
+                    ref.watch(AudioProvider).songIndex!,
+                    ref.watch(AudioProvider).audioPlayer!,
+                  );
+
+                  // NowPlayingに遷移
+                  ptc.jumpToTab(1);
                 },
                 title: Text(
                   item.data![index].title,

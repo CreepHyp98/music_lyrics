@@ -338,6 +338,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.2"
+  persistent_bottom_nav_bar_v2:
+    dependency: "direct main"
+    description:
+      name: persistent_bottom_nav_bar_v2
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.2.6"
   platform:
     dependency: transitive
     description:

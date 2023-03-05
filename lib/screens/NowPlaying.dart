@@ -1,19 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/widgets/LyricWidget.dart';
 import 'package:music_lyrics/widgets/VerticalRotatedWriting.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class NowPlaying extends ConsumerStatefulWidget {
-  // 定数コンストラクタ
-  final List<SongModel> songModelList;
-  final int songIndex;
-  final AudioPlayer audioPlayer;
-
-  const NowPlaying({super.key, required this.songModelList, required this.songIndex, required this.audioPlayer});
+  const NowPlaying({super.key});
 
   // stateの作成
   @override
@@ -26,77 +19,49 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
 
   // 再生中かどうかのフラグをfalseで初期化
   bool _isPlaying = false;
-  // 再生リストの初期化
-  List<AudioSource> audioSourceList = [];
-  // 現在再生中のindexを入れる変数を宣言
-  int currentIndex = 0;
 
-  // 初回表示時の処理
-  @override
-  void initState() {
-    super.initState();
-    currentIndex = widget.songIndex;
-    // 曲の解析
-    parseSong();
-  }
-
-  void parseSong() {
-    try {
-      // 受け取った曲リストを音源ファイルに変換し再生リストに加える
-      for (var element in widget.songModelList) {
-        audioSourceList.add(
-          // URI文字列 → URIオブジェクト → オーディオファイル
-          AudioSource.uri(
-            Uri.parse(element.uri!),
-            tag: MediaItem(
-              id: element.id.toString(),
-              title: element.title,
-              artist: element.artist,
-            ),
-          ),
-        );
+  void listenToSongStream() {
+    // 音源ファイルの曲時間を取得
+    ref.watch(AudioProvider).audioPlayer!.durationStream.listen((duration) {
+      if (duration != null) {
+        _duration = duration;
       }
+    });
 
-      // 再生リストをプレイヤーにセット
-      widget.audioPlayer.setAudioSource(
-        ConcatenatingAudioSource(children: audioSourceList),
-        initialIndex: currentIndex,
-      );
+    // 現在の再生位置を取得
+    ref.watch(AudioProvider).audioPlayer!.positionStream.listen((position) {
+      // このmountedがないとエラーになる
+      if (mounted) {
+        ref.read(PositionProvider.notifier).state = position;
+      }
+    });
 
-      // 再生
-      widget.audioPlayer.play();
-      // 再生中のフラグをオン
-      _isPlaying = true;
-
-      // 音源ファイルの曲時間を取得
-      widget.audioPlayer.durationStream.listen((duration) {
-        if (duration != null) {
-          _duration = duration;
-        }
-      });
-      // 現在の再生位置を取得
-      widget.audioPlayer.positionStream.listen((position) {
-        // このmountedがないとエラーになる
-        if (mounted) {
-          ref.read(PositionProvider.notifier).state = position;
-        }
-      });
-      // これがないとメディア通知での操作が画面に反映されない
-      listenToSongIndex();
-    } on Exception catch (_) {
-      // ページ遷移（戻る）
-      Navigator.pop(context);
-    }
-  }
-
-  void listenToSongIndex() {
-    widget.audioPlayer.currentIndexStream.listen((event) {
+    ref.watch(AudioProvider).audioPlayer!.currentIndexStream.listen((event) {
       // このmountedがないとエラーになる
       if (mounted) {
         if (event != null) {
-          currentIndex = event;
+          ref.watch(AudioProvider).songIndex = event;
         }
-        ref.read(SongModelProvider.notifier).state = widget.songModelList[currentIndex];
+        ref.read(SongModelProvider.notifier).state = ref.watch(AudioProvider).songModelList![ref.watch(AudioProvider).songIndex!];
+      }
+    });
+  }
+
+  // 再生中か停止中か取得
+  void listenToEvent() {
+    ref.watch(AudioProvider).audioPlayer!.playerStateStream.listen((state) {
+      if (state.playing) {
+        if (mounted) {
+          setState(() {
+            _isPlaying = true;
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _isPlaying = false;
+          });
+        }
       }
     });
   }
@@ -110,8 +75,13 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
     double fontSizeL = 20; //deviceWidth / 19.6; //20pt
     // 歌詞描画エリアのために端末高さサイズも取得
     double deviceHeight = MediaQuery.of(context).size.height;
-    double lyricAreaHeight = deviceHeight * 0.7;
+    double lyricAreaHeight = deviceHeight * 0.65;
     double lyricAreaWidth = deviceWidth * 0.525;
+
+    // これがないとメディア通知での操作が画面に反映されない
+    listenToSongStream();
+    // 再生状況の取得
+    listenToEvent();
 
     return Scaffold(
       body: SafeArea(
@@ -164,12 +134,11 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
               child: IconButton(
                 onPressed: () {
                   if (_isPlaying) {
-                    widget.audioPlayer.pause();
+                    ref.watch(AudioProvider).audioPlayer!.pause();
                   } else {
-                    widget.audioPlayer.play();
+                    ref.watch(AudioProvider).audioPlayer!.play();
                   }
                   _isPlaying = !_isPlaying;
-                  setState(() {});
                 },
                 icon: Icon(
                   _isPlaying ? Icons.pause_outlined : Icons.play_arrow_outlined,
@@ -183,8 +152,8 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
               alignment: const Alignment(0.9, 0.98),
               child: IconButton(
                 onPressed: () {
-                  if (widget.audioPlayer.hasNext) {
-                    widget.audioPlayer.seekToNext();
+                  if (ref.watch(AudioProvider).audioPlayer!.hasNext) {
+                    ref.watch(AudioProvider).audioPlayer!.seekToNext();
                   }
                 },
                 icon: Icon(

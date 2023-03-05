@@ -22,6 +22,7 @@ dependencies:
   wakelock: ^0.6.2  #追加
   shared_preferences: ^2.0.17 #追加
   http: ^0.13.5 #追加
+  persistent_bottom_nav_bar_v2: ^4.2.6 #追加
 
 dev_dependencies:
   flutter_test:

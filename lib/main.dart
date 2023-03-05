@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio_background/just_audio_background.dart';
-import 'screens/AllSongs.dart';
+import 'package:music_lyrics/widgets/NavBarWidget.dart';
 
 Future<void> main() async {
   // メディア通知のセットアップ
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         fontFamily: "Noto Sans JP",
       ),
       // 初期表示のクラス
-      home: const AllSongs(),
+      home: const NavBarWidget(),
     );
   }
 }
