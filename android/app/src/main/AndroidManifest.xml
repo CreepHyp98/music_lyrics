@@ -6,8 +6,13 @@
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/> <!--追加-->
 
    <application
+<<<<<<< HEAD
         android:label="かしかしか"
         android:name="${applicationName}"
+=======
+        android:label="music_lyrics"
+        android:name="かしかしか"
+>>>>>>> 31fba6c (アプリ名変更)
         android:icon="@mipmap/ic_launcher">
         <activity
            android:name="com.ryanheise.audioservice.AudioServiceActivity"
