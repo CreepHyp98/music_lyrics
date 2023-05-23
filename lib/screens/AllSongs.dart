@@ -19,7 +19,11 @@ class AllSongs extends ConsumerStatefulWidget {
   ConsumerState<AllSongs> createState() => _AllSongsState();
 }
 
-class _AllSongsState extends ConsumerState<AllSongs> {
+class _AllSongsState extends ConsumerState<AllSongs> with AutomaticKeepAliveClientMixin {
+  // タブを移動してもstateが保存されているための処理
+  @override
+  bool get wantKeepAlive => true;
+
   // クラスのインスタンス化
   final OnAudioQuery _audioQuery = OnAudioQuery();
   final AudioPlayer _audioPlayer = AudioPlayer();

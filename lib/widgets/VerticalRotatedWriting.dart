@@ -33,6 +33,7 @@ class VerticalRotatedWriting extends StatelessWidget {
     double boxSize = size * 1.1;
 
     if (VerticalRotatedSymbols.map[char] != null) {
+      // 記号なら
       return SizedBox(
         width: boxSize,
         height: boxSize,
