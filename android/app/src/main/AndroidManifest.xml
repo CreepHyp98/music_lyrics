@@ -1,9 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.music_lyrics">
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/> <!--追加-->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/> <!--追加-->
+    <!-- Android 12 or below  -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <!-- Android 13 or greater  -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
+
     <uses-permission android:name="android.permission.WAKE_LOCK"/> <!--追加-->
-  <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/> <!--追加-->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/> <!--追加-->
+    <uses-permission android:name="android.permission.INTERNET"/> <!--追加-->
 
    <application
         android:label="かしかしか"
