@@ -23,6 +23,19 @@ dependencies:
   shared_preferences: ^2.1.2 #追加
   http: ^0.13.6 #追加（just_audio_backgroundと競合するため1.0.0には更新しない）
   persistent_bottom_nav_bar_v2: ^4.2.8 #追加
+  flutter_native_splash: ^2.3.1 #追加
+
+#追加
+flutter_native_splash:
+  image: assets/splash_white.png
+  color: '#ffffff'
+  image_dark: assets/splash_white.png
+  color_dark: '#ffffff'
+  android_12:
+    image: 'assets/splash_white.png'
+    color: '#ffffff'
+    image_dark: assets/splash_white.png
+    color_dark: '#ffffff'
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:music_lyrics/provider/provider.dart';
 
 class furiganaSettingDialog extends StatelessWidget {
   final String titleKey;
@@ -40,8 +40,6 @@ class furiganaSettingDialog extends StatelessWidget {
             // 保存ボタン
             ElevatedButton(
               onPressed: () async {
-                // SharedPreferencesのインスタンスを取得
-                final prefs = await SharedPreferences.getInstance();
                 // 入力されたフリガナの保存
                 prefs.setString(titleKey, furiganaController.text);
                 // ダイアログを閉じる

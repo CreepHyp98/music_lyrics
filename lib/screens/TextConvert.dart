@@ -1,17 +1,15 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:music_lyrics/provider/provider.dart';
 
 import 'package:on_audio_query/on_audio_query.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void setFuriganaAll(List<SongModel> songModelList) async {
   // gooひらがな化APIのリクエストURLとappIDを設定
   String apiUrl = 'https://labs.goo.ne.jp/api/hiragana';
   String appId = '9eb7aa7cd9680f9c2d8cb2d8422d980b175889f32a5fd73ac591c3e99f1e1545';
 
-  // インスタンス生成
-  final prefs = await SharedPreferences.getInstance();
   // 曲のフリガナを保持するString
   String? furigana;
 

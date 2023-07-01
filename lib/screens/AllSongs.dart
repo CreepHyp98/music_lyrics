@@ -6,7 +6,6 @@ import 'package:music_lyrics/widgets/SettingDialogWidget.dart';
 
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:music_lyrics/provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AllSongs extends ConsumerStatefulWidget {
   // 定数コンストラクタ
@@ -70,8 +69,6 @@ class _AllSongsState extends ConsumerState<AllSongs> {
   }
 
   void sortAllSongs() async {
-    final prefs = await SharedPreferences.getInstance();
-
     try {
       for (int i = 0; i < allSongs.length; i++) {
         // タイトルのフリガナを持ってくる
@@ -141,6 +138,13 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                           onTap: () {
                             // SongModelを更新
                             ref.read(SongModelProvider.notifier).state = item.data![index];
+
+                            // TODO: 仮のスプラッシュ画面のためにタップした曲の情報を保存
+                            prefs.setStringList('splash', [
+                              '',
+                              item.data![index].title,
+                              '${item.data![index].artist}',
+                            ]);
 
                             // リスト・インデックス・プレイヤーをセットし、再生
                             ref.read(AudioProvider.notifier).state = MyAudioSource(

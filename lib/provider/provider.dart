@@ -2,6 +2,7 @@ import 'package:music_lyrics/class/MyAudioSourceClass.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:riverpod/riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // SongModelの状態を管理
 final StateProvider<SongModel> SongModelProvider = StateProvider<SongModel>((ref) => SongModel({}));
@@ -13,3 +14,7 @@ final StateProvider<List<String>> LyricProvider = StateProvider<List<String>>(((
 final PersistentTabController ptc = PersistentTabController();
 // 再生リスト・再生リストのインデックス・プレイヤーの状態を管理
 final StateProvider<MyAudioSource> AudioProvider = StateProvider<MyAudioSource>(((ref) => MyAudioSource()));
+// 保存されたデータを参照
+late final SharedPreferences prefs;
+// スプラッシュ画面に表示する[歌詞, 曲名, アーティスト名]のリスト
+List<String> SplashTextList = ['', '', ''];
