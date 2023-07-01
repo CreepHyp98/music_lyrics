@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:music_lyrics/provider/provider.dart';
+import 'package:music_lyrics/screens/AllSongs.dart';
 import 'package:music_lyrics/screens/NowPlaying.dart';
-import 'package:music_lyrics/widgets/TabBarWidget.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 class NavBarWidget extends StatelessWidget {
@@ -10,8 +10,8 @@ class NavBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pages = [
-      // 上タブウィジェット→曲リスト画面
-      const TabBarWidget(),
+      // 曲リスト画面
+      const AllSongs(),
       // 再生画面
       const NowPlaying(),
     ];
