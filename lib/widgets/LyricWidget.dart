@@ -89,7 +89,6 @@ class _LyricWidgetState extends ConsumerState<LyricWidget> {
   @override
   Widget build(BuildContext context) {
     // 端末サイズからフォントサイズを指定
-    double deviceWidth = MediaQuery.of(context).size.width;
     double fontSizeM = 18; //deviceWidth / 21.8; //18pt
 
     getLyric();

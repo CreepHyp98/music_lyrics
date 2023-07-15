@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:just_audio_background/just_audio_background.dart';
+import 'package:music_lyrics/screens/LyricEdit.dart';
 import 'package:music_lyrics/widgets/NavBarWidget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'provider/provider.dart';
@@ -17,11 +17,13 @@ Future<void> main() async {
   await getSplashText();
 
   // メディア通知のセットアップ
-  await JustAudioBackground.init(
-    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
-    androidNotificationChannelName: 'Audio playback',
-    androidNotificationOngoing: true,
-  );
+  // TODO: 歌詞編集用の再生でもMediaItemを指定しなくちゃいけなくなっちゃう
+  // TODO: 曲リストから再生するときのみメディア通知を出したい
+  //await JustAudioBackground.init(
+  //  androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+  //  androidNotificationChannelName: 'Audio playback',
+  //  androidNotificationOngoing: true,
+  //);
 
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -33,6 +35,10 @@ class MyApp extends StatelessWidget {
   // widgetの生成
   @override
   Widget build(BuildContext context) {
+    // 端末のサイズを取得
+    deviceHeight = MediaQuery.of(context).size.height;
+    deviceWidth = MediaQuery.of(context).size.width;
+
     // アプリケーション全体
     return MaterialApp(
       // テーマデータ
@@ -40,10 +46,11 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: "Noto Sans JP",
       ),
-      // 初期表示のクラス
+      // 構成画面
       routes: <String, WidgetBuilder>{
         '/': (_) => const Splash(),
         '/home': (_) => const NavBarWidget(),
+        '/edit': (_) => const LyricEdit(),
       },
     );
   }

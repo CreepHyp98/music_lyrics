@@ -69,12 +69,9 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
   // widgetの生成
   @override
   Widget build(BuildContext context) {
-    // 端末幅サイズからフォントサイズを指定
-    double deviceWidth = MediaQuery.of(context).size.width;
     double fontSizeM = 18; //deviceWidth / 21.8; //18pt
     double fontSizeL = 20; //deviceWidth / 19.6; //20pt
     // 歌詞描画エリアのために端末高さサイズも取得
-    double deviceHeight = MediaQuery.of(context).size.height;
     double lyricAreaHeight = deviceHeight * 0.65;
     double lyricAreaWidth = deviceWidth * 0.525;
 

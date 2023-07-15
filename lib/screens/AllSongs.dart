@@ -179,11 +179,12 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                           ),
                           trailing: IconButton(
                             onPressed: () {
+                              // 歌詞編集用SongModelに今開いてる曲をセット
+                              ref.read(EditSMProvider.notifier).state = item.data![index];
                               // ダイアログ表示
                               showDialog(
                                 context: context,
-                                builder: (context) => furiganaSettingDialog(
-                                  titleKey: item.data![index].title,
+                                builder: (context) => SettingDialog(
                                   defaultFurigana: furiganaMap[item.data![index].title],
                                 ),
                               );

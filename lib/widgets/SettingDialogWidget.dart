@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
 
-class furiganaSettingDialog extends StatelessWidget {
-  final String titleKey;
+class SettingDialog extends ConsumerWidget {
   final String? defaultFurigana;
-  const furiganaSettingDialog({super.key, required this.titleKey, this.defaultFurigana});
+  const SettingDialog({super.key, this.defaultFurigana});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // フリガナ保存用のタイトルキー
+    final String titleKey = ref.watch(EditSMProvider).title;
     // TextFieldの入力text
     final furiganaController = TextEditingController(text: defaultFurigana);
 
     return AlertDialog(
       content: SizedBox(
-        height: 150,
+        height: 200,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             // タイトル（左寄せ）
             SizedBox(
@@ -26,6 +29,25 @@ class furiganaSettingDialog extends StatelessWidget {
                 maxLines: 1,
               ),
             ),
+
+            // 歌詞データの編集
+            GestureDetector(
+              child: Text(
+                '歌詞データの編集',
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontSize: 16,
+                  letterSpacing: 2.0,
+                  decoration: TextDecoration.underline,
+                  decorationColor: Theme.of(context).primaryColor,
+                ),
+              ),
+              onTap: () {
+                // 編集画面に遷移
+                Navigator.pushNamed(context, '/edit');
+              },
+            ),
+
             // 曲のフリガナTextField
             TextField(
               controller: furiganaController,
@@ -37,6 +59,7 @@ class furiganaSettingDialog extends StatelessWidget {
               // TextFieldに最初からフォーカスをあてる
               autofocus: true,
             ),
+
             // 保存ボタン
             ElevatedButton(
               onPressed: () async {
