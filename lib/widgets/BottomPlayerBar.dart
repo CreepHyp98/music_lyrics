@@ -10,22 +10,39 @@ class BottomPlayerBar extends ConsumerStatefulWidget {
 }
 
 class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
-  Duration _duration = const Duration();
+  int? _duration;
   bool _isPlaying = false;
 
   void listenToSongStream2() {
     // 音源ファイルの曲時間を取得
-    ref.watch(EditAPProvider).durationStream.listen((duration) {
-      if (duration != null) {
-        _duration = duration;
-      }
-    });
+    _duration = ref.watch(EditSMProvider).duration;
 
     // 現在の再生位置を取得
     ref.watch(EditAPProvider).positionStream.listen((position) {
       // このmountedがないとエラーになる
       if (mounted) {
-        ref.read(EditPosiProvider.notifier).state = position;
+        if (_duration! >= position.inMilliseconds) {
+          ref.read(EditPosiProvider.notifier).state = position;
+        } else {
+          // 再生位置が曲時間を超えたら曲を止める
+          _isPlaying = false;
+          ref.watch(EditAPProvider).pause();
+        }
+      }
+    });
+  }
+
+  // 再生中か停止中か取得
+  void listenToEvent() {
+    ref.watch(EditAPProvider).playerStateStream.listen((state) {
+      if (state.playing) {
+        if (mounted) {
+          _isPlaying = true;
+        }
+      } else {
+        if (mounted) {
+          _isPlaying = false;
+        }
       }
     });
   }
@@ -34,16 +51,19 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
   Widget build(BuildContext context) {
     // 再生位置などの取得
     listenToSongStream2();
+    // 再生状況の取得
+    listenToEvent();
 
     return BottomAppBar(
-      height: deviceHeight * 0.2,
+      // 画面スクロールで色が変わるのを防ぐ
+      elevation: 0,
+      height: deviceHeight * 0.15,
       child: Column(
         children: [
           // スライダー
           Slider(
-            //min: Duration.zero.inMilliseconds.toDouble(),
             value: ref.watch(EditPosiProvider).inMilliseconds.toDouble(),
-            max: _duration.inMilliseconds.toDouble(),
+            max: _duration!.toDouble(),
             onChanged: (value) {
               ref.watch(EditAPProvider).seek(Duration(milliseconds: value.toInt()));
             },
@@ -90,11 +110,10 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
                 onPressed: () {
                   // 10秒進めて再生時間が曲時間を超えないかチェック
                   Duration tmp = ref.watch(EditPosiProvider) + const Duration(seconds: 10);
-                  if (tmp < _duration) {
+                  if (tmp.inMilliseconds < _duration!) {
                     ref.watch(EditAPProvider).seek(tmp);
                   } else {
-                    // 超えてたら再生時間を0に戻して曲を止める
-                    ref.watch(EditAPProvider).seek(Duration.zero);
+                    // 超えてたら曲を止める
                     _isPlaying = false;
                     ref.watch(EditAPProvider).pause();
                   }

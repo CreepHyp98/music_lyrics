@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:music_lyrics/class/MyAudioSourceClass.dart';
+import 'package:music_lyrics/widgets/LyricWidget.dart';
 import 'package:music_lyrics/widgets/SettingDialogWidget.dart';
 
 import 'package:on_audio_query/on_audio_query.dart';
@@ -181,6 +182,9 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                             onPressed: () {
                               // 歌詞編集用SongModelに今開いてる曲をセット
                               ref.read(EditSMProvider.notifier).state = item.data![index];
+                              // 歌詞データの取得
+                              getLyric(ref, EditSMProvider, EditLrcProvider);
+
                               // ダイアログ表示
                               showDialog(
                                 context: context,

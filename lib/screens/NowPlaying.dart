@@ -16,9 +16,8 @@ class NowPlaying extends ConsumerStatefulWidget {
 class _NowPlayingState extends ConsumerState<NowPlaying> {
   // クラスのインスタンス化
   Duration _duration = const Duration();
-
-  // 再生中かどうかのフラグをfalseで初期化
-  bool _isPlaying = false;
+  // 再生中かどうかのフラグをtrueで初期化
+  bool _isPlaying = true;
 
   void listenToSongStream() {
     // 音源ファイルの曲時間を取得
@@ -52,15 +51,11 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
     ref.watch(AudioProvider).audioPlayer!.playerStateStream.listen((state) {
       if (state.playing) {
         if (mounted) {
-          setState(() {
-            _isPlaying = true;
-          });
+          _isPlaying = true;
         }
       } else {
         if (mounted) {
-          setState(() {
-            _isPlaying = false;
-          });
+          _isPlaying = false;
         }
       }
     });
@@ -131,9 +126,13 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
               child: IconButton(
                 onPressed: () {
                   if (_isPlaying) {
-                    ref.watch(AudioProvider).audioPlayer!.pause();
+                    setState(() {
+                      ref.watch(AudioProvider).audioPlayer!.pause();
+                    });
                   } else {
-                    ref.watch(AudioProvider).audioPlayer!.play();
+                    setState(() {
+                      ref.watch(AudioProvider).audioPlayer!.play();
+                    });
                   }
                   _isPlaying = !_isPlaying;
                 },

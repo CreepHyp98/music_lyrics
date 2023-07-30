@@ -36,6 +36,7 @@ class NavBarWidget extends StatelessWidget {
           ),
         ],
         navBarStyle: NavBarStyle.style3,
+        backgroundColor: const Color(0xfffffbfe),
         // 画面遷移のアニメーション
         screenTransitionAnimation: const ScreenTransitionAnimation(
           animateTabTransition: true,

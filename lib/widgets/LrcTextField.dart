@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
 
-class LrcTextField extends StatelessWidget {
-  final String? data;
-  const LrcTextField({super.key, this.data});
+class LrcTextField extends ConsumerStatefulWidget {
+  const LrcTextField({super.key});
 
+  @override
+  ConsumerState<LrcTextField> createState() => _LrcTextFieldState();
+}
+
+class _LrcTextFieldState extends ConsumerState<LrcTextField> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: deviceWidth * 0.9,
       child: TextField(
-        controller: TextEditingController(text: data),
+        controller: tec,
         scrollController: ScrollController(),
-        maxLines: 20,
+        maxLines: 22,
         decoration: const InputDecoration(
           labelText: '歌詞データ',
           // ラベルテキストを常に浮かす

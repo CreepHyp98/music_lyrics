@@ -32,17 +32,24 @@ class SettingDialog extends ConsumerWidget {
 
             // 歌詞データの編集
             GestureDetector(
-              child: Text(
+              child: const Text(
                 '歌詞データの編集',
                 style: TextStyle(
-                  color: Theme.of(context).primaryColor,
+                  color: Colors.blue,
                   fontSize: 16,
                   letterSpacing: 2.0,
                   decoration: TextDecoration.underline,
-                  decorationColor: Theme.of(context).primaryColor,
+                  decorationColor: Colors.blue,
                 ),
               ),
               onTap: () {
+                // 編集する曲を取得
+                String filePath = ref.watch(EditSMProvider).data;
+                // パスを使ってプレイヤーにセット
+                ref.watch(EditAPProvider).setFilePath(filePath);
+                // 歌詞編集のテキストフィールドに対象の歌詞をセット
+                tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
+
                 // 編集画面に遷移
                 Navigator.pushNamed(context, '/edit');
               },
@@ -56,8 +63,6 @@ class SettingDialog extends ConsumerWidget {
                 // ラベルテキストを常に浮かす
                 floatingLabelBehavior: FloatingLabelBehavior.always,
               ),
-              // TextFieldに最初からフォーカスをあてる
-              autofocus: true,
             ),
 
             // 保存ボタン

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/widgets/VerticalRotatedWriting.dart';
+import 'package:on_audio_query/on_audio_query.dart';
 import 'package:wakelock/wakelock.dart';
 
 class LyricWidget extends ConsumerStatefulWidget {
@@ -18,27 +19,6 @@ class _LyricWidgetState extends ConsumerState<LyricWidget> {
   int currentLyricIndex = 0;
   // 再生時間（ミリ秒）を保持
   int currentMilliSeconds = 0;
-
-  void getLyric() async {
-    // 再生中のオーディオファイルの絶対パスを取得
-    String audioPath = ref.watch(SongModelProvider).data;
-    // その絶対パスの拡張子のインデックスを取得
-    int extensionIndex = audioPath.lastIndexOf('.');
-
-    try {
-      // .lrcファイルのパスをセット
-      String lyricPath = '${audioPath.substring(0, extensionIndex)}.lrc';
-      // パス → ファイル
-      File lyricFile = File(lyricPath);
-      // ファイル → String
-      String lyricData = await lyricFile.readAsString();
-      // String → List<String>
-      ref.read(LyricProvider.notifier).state = lyricData.split('\n');
-    } catch (e) {
-      // .lrcファイルがない場合
-      ref.read(LyricProvider.notifier).state = ['歌詞データ(.lrc)が見つかりません'];
-    }
-  }
 
   String syncLyric() {
     String currentLyric = '';
@@ -91,7 +71,7 @@ class _LyricWidgetState extends ConsumerState<LyricWidget> {
     // 端末サイズからフォントサイズを指定
     double fontSizeM = 18; //deviceWidth / 21.8; //18pt
 
-    getLyric();
+    getLyric(ref, SongModelProvider, LyricProvider);
     return VerticalRotatedWriting(text: syncLyric(), size: fontSizeM);
   }
 }
@@ -114,5 +94,26 @@ int getLyricStartTime(String lineLyric) {
   } catch (e) {
     // .lrcファイルがない、もしくは.lrcファイルはあるが時間情報がない
     return -1;
+  }
+}
+
+void getLyric(WidgetRef ref, StateProvider<SongModel> sm, StateProvider<List<String>> lrc) async {
+  // 再生中のオーディオファイルの絶対パスを取得
+  String audioPath = ref.watch(sm).data;
+  // その絶対パスの拡張子のインデックスを取得
+  int extensionIndex = audioPath.lastIndexOf('.');
+
+  try {
+    // .lrcファイルのパスをセット
+    String lyricPath = '${audioPath.substring(0, extensionIndex)}.lrc';
+    // パス → ファイル
+    File lyricFile = File(lyricPath);
+    // ファイル → String
+    String lyricData = await lyricFile.readAsString();
+    // String → List<String>
+    ref.read(lrc.notifier).state = lyricData.split('\n');
+  } catch (e) {
+    // .lrcファイルがない場合
+    ref.read(lrc.notifier).state = [''];
   }
 }
