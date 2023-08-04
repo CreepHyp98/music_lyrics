@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/screens/LyricEdit.dart';
 import 'package:music_lyrics/widgets/NavBarWidget.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'provider/provider.dart';
 import 'screens/Splash.dart';
@@ -14,6 +15,7 @@ Future<void> main() async {
 
   // インスタンス生成
   prefs = await SharedPreferences.getInstance();
+  directory = await getApplicationDocumentsDirectory();
   await getSplashText();
 
   // メディア通知のセットアップ

@@ -98,14 +98,9 @@ int getLyricStartTime(String lineLyric) {
 }
 
 void getLyric(WidgetRef ref, StateProvider<SongModel> sm, StateProvider<List<String>> lrc) async {
-  // 再生中のオーディオファイルの絶対パスを取得
-  String audioPath = ref.watch(sm).data;
-  // その絶対パスの拡張子のインデックスを取得
-  int extensionIndex = audioPath.lastIndexOf('.');
-
   try {
     // .lrcファイルのパスをセット
-    String lyricPath = '${audioPath.substring(0, extensionIndex)}.lrc';
+    String lyricPath = '${directory.path}/${ref.watch(sm).artist!}/${ref.watch(sm).album!}/${ref.watch(sm).displayNameWOExt}.lrc';
     // パス → ファイル
     File lyricFile = File(lyricPath);
     // ファイル → String

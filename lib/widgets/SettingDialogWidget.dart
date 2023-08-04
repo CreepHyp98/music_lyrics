@@ -65,7 +65,7 @@ class SettingDialog extends ConsumerWidget {
               ),
             ),
 
-            // 保存ボタン
+            // 閉じるボタン
             ElevatedButton(
               onPressed: () async {
                 // 入力されたフリガナの保存
@@ -73,7 +73,7 @@ class SettingDialog extends ConsumerWidget {
                 // ダイアログを閉じる
                 Navigator.pop(context);
               },
-              child: const Text('保存'),
+              child: const Text('閉じる'),
             ),
           ],
         ),

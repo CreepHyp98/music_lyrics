@@ -50,19 +50,22 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
           child: ToggleButtons(
             isSelected: _isSelected,
             onPressed: (index) {
-              // 切り替えるたびにテキストフィールドのコントローラーと歌詞プロバイダーを更新
-              tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
-              ref.read(EditLrcProvider.notifier).state = tec.text.split('\n');
+              // 「全体」がタップされたら
+              if (index == 0) {
+                // TextFieldのコントローラーに歌詞プロバイダーをセット
+                tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
+                _isSelected[0] = true;
+                _isSelected[1] = false;
+                setState(() {});
 
-              setState(() {
-                if (index == 0) {
-                  _isSelected[0] = true;
-                  _isSelected[1] = false;
-                } else {
-                  _isSelected[0] = false;
-                  _isSelected[1] = true;
-                }
-              });
+                // 「同期」がタップされたら
+              } else {
+                // 歌詞プロバイダーにTextFieldの入力をセット
+                ref.read(EditLrcProvider.notifier).state = tec.text.split('\n');
+                _isSelected[0] = false;
+                _isSelected[1] = true;
+                setState(() {});
+              }
             },
             selectedBorderColor: Theme.of(context).primaryColor,
             borderRadius: const BorderRadius.all(Radius.circular(5.0)),
@@ -86,14 +89,14 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
           IconButton(
             icon: const Icon(Icons.check),
             onPressed: () {
-              // 再生中のオーディオファイルの絶対パスを取得
-              String audioPath = ref.watch(EditSMProvider).data;
-              // その絶対パスの拡張子のインデックスを取得
-              int extensionIndex = audioPath.lastIndexOf('.');
-              // .lrcファイルのパスをセット
-              String lyricPath = '${audioPath.substring(0, extensionIndex)}.lrc';
+              // 保存先のディレクトリを取得
+              Directory destinationFolder = Directory('${directory.path}/${ref.watch(EditSMProvider).artist!}/${ref.watch(EditSMProvider).album!}');
+              // ディレクトリが存在しない場合は作成
+              if (destinationFolder.existsSync() == false) {
+                destinationFolder.createSync(recursive: true);
+              }
               // パス → ファイル
-              File lyricFile = File(lyricPath);
+              File lyricFile = File('${destinationFolder.path}/${ref.watch(EditSMProvider).displayNameWOExt}.lrc');
               // ファイル書き込み
               lyricFile.writeAsStringSync(tec.text);
               // ダイアログに戻る

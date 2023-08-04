@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
@@ -133,7 +135,7 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                         // TODO: HandShakeExceptionが発生するため一時的にコメントアウト
                         //setFuriganaAll(allSongs);
                         // 曲のフリガナで五十音順にソート
-                        sortAllSongs();
+                        //sortAllSongs();
 
                         return ListTile(
                           onTap: () {
@@ -160,6 +162,9 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                               ref.watch(AudioProvider).songIndex!,
                               ref.watch(AudioProvider).audioPlayer!,
                             );
+
+                            // TODO: コピータイミングは検討必要
+                            copyLyricFile(item.data![index]);
 
                             // NowPlayingに遷移
                             ptc.jumpToTab(1);
@@ -230,4 +235,24 @@ String IntDurationToMS(int? time) {
   }
 
   return result;
+}
+
+void copyLyricFile(SongModel sm) async {
+  // 絶対パスの拡張子のインデックスを取得
+  int extensionIndex = sm.data.lastIndexOf('.');
+
+  try {
+    // コピー元となる.lrcファイルのパスをセット
+    String sourcePath = '${sm.data.substring(0, extensionIndex)}.lrc';
+    // コピー先のディレクトリを取得
+    Directory destinationFolder = Directory('${directory.path}/${sm.artist!}/${sm.album!}');
+    // ディレクトリが存在しない場合は作成
+    if (destinationFolder.existsSync() == false) {
+      destinationFolder.createSync(recursive: true);
+    }
+    // ファイルのコピー
+    File(sourcePath).copySync('${destinationFolder.path}/${sm.displayNameWOExt}.lrc');
+  } catch (e) {
+    // .lrcファイルがない場合、何もしない
+  }
 }

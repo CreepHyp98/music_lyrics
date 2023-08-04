@@ -25,6 +25,7 @@ dependencies:
   persistent_bottom_nav_bar_v2: ^4.2.8 #追加
   flutter_native_splash: ^2.3.1 #追加
   url_launcher: ^6.1.12 #追加
+  path_provider: ^2.0.15 #追加
 
 #追加
 flutter_native_splash:
