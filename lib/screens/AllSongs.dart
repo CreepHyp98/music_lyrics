@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:music_lyrics/class/MyAudioSourceClass.dart';
+import 'package:music_lyrics/class/SongClass.dart';
 import 'package:music_lyrics/widgets/LyricWidget.dart';
 import 'package:music_lyrics/widgets/SettingDialogWidget.dart';
 
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:music_lyrics/provider/provider.dart';
+import 'package:music_lyrics/class/SongDB.dart';
 
 class AllSongs extends ConsumerStatefulWidget {
   // 定数コンストラクタ
@@ -28,7 +30,7 @@ class _AllSongsState extends ConsumerState<AllSongs> {
   bool _hasPermission = false;
 
   // 曲リストの初期化
-  List<SongModel> allSongs = [];
+  List<Song> allSongs = [];
   // タイトルとそのフリガナのマップ
   Map<String, String> furiganaMap = {};
 
@@ -71,6 +73,25 @@ class _AllSongsState extends ConsumerState<AllSongs> {
     );
   }
 
+  // List<SongModel>から楽曲データベースの作成
+  Future<void> createSongDB(List<SongModel> smList) async {
+    for (int i = 0; i < smList.length; i++) {
+      if (smList[i].isMusic == true) {
+        final song = Song(
+          id: smList[i].id,
+          title: smList[i].title,
+          artist: smList[i].artist,
+          album: smList[i].album,
+          duration: smList[i].duration,
+          path: smList[i].data,
+        );
+
+        await songsDB.instance.insertSong(song);
+      }
+    }
+  }
+
+  /* TODO: フリガナ復活までソートはコメントアウト
   void sortAllSongs() async {
     try {
       for (int i = 0; i < allSongs.length; i++) {
@@ -87,22 +108,27 @@ class _AllSongsState extends ConsumerState<AllSongs> {
       // タイトル取得中
     }
   }
+  */
 
   @override
   Widget build(BuildContext context) {
+    // TODO: データベース作成のタイミングは要検討
+    _audioQuery
+        .querySongs(
+          orderType: OrderType.ASC_OR_SMALLER,
+          uriType: UriType.EXTERNAL,
+          ignoreCase: true,
+        )
+        .then((list) => createSongDB(list));
+
     return SafeArea(
       child: Scaffold(
         // 非同期かつ動的にwidgetを生成できるクラス
         body: Center(
           child: !_hasPermission
               ? noAccessToLibraryWidget()
-              : FutureBuilder<List<SongModel>>(
-                  future: _audioQuery.querySongs(
-                    orderType: OrderType.ASC_OR_SMALLER,
-                    uriType: UriType.EXTERNAL,
-                    ignoreCase: true,
-                    path: 'Music',
-                  ),
+              : FutureBuilder<List<Song>>(
+                  future: songsDB.instance.getAllSongs(),
 
                   // widgetの生成
                   builder: (context, item) {
@@ -140,68 +166,61 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                         return ListTile(
                           onTap: () {
                             // SongModelを更新
-                            ref.read(SongModelProvider.notifier).state = item.data![index];
-
-                            // TODO: 仮のスプラッシュ画面のためにタップした曲の情報を保存
-                            prefs.setStringList('splash', [
-                              '',
-                              item.data![index].title,
-                              '${item.data![index].artist}',
-                            ]);
+                            ref.read(SongProvider.notifier).state = allSongs[index];
 
                             // リスト・インデックス・プレイヤーをセットし、再生
                             ref.read(AudioProvider.notifier).state = MyAudioSource(
-                              songModelList: allSongs,
+                              songList: allSongs,
                               songIndex: index,
                               audioPlayer: _audioPlayer,
                             );
 
                             // オーディオファイルに変換し再生
                             parseSong(
-                              ref.watch(AudioProvider).songModelList!,
+                              ref.watch(AudioProvider).songList!,
                               ref.watch(AudioProvider).songIndex!,
                               ref.watch(AudioProvider).audioPlayer!,
                             );
 
                             // TODO: コピータイミングは検討必要
-                            copyLyricFile(item.data![index]);
+                            copyLyricFile(allSongs[index]);
 
                             // NowPlayingに遷移
                             ptc.jumpToTab(1);
                           },
                           title: Text(
-                            item.data![index].title,
+                            allSongs[index].title!,
                             maxLines: 1,
                           ),
                           subtitle: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "${item.data![index].artist}",
+                                "${allSongs[index].artist}",
                                 maxLines: 1,
                               ),
-                              Text(IntDurationToMS(item.data![index].duration)),
+                              Text(IntDurationToMS(allSongs[index].duration)),
                             ],
                           ),
                           trailing: IconButton(
                             onPressed: () {
                               // 歌詞編集用SongModelに今開いてる曲をセット
-                              ref.read(EditSMProvider.notifier).state = item.data![index];
+                              ref.read(EditSongProvider.notifier).state = allSongs[index];
                               // 歌詞データの取得
-                              getLyric(ref, EditSMProvider, EditLrcProvider);
+                              getLyric(ref, EditSongProvider, EditLrcProvider);
 
                               // ダイアログ表示
                               showDialog(
                                 context: context,
                                 builder: (context) => SettingDialog(
-                                  defaultFurigana: furiganaMap[item.data![index].title],
+                                  defaultFurigana: furiganaMap[allSongs[index].title],
                                 ),
                               );
                             },
                             icon: const Icon(Icons.more_horiz),
                           ),
                           leading: QueryArtworkWidget(
-                            id: item.data![index].id,
+                            id: allSongs[index].id!,
                             type: ArtworkType.AUDIO,
                             artworkBorder: BorderRadius.circular(0),
                             artworkFit: BoxFit.contain,
@@ -237,21 +256,21 @@ String IntDurationToMS(int? time) {
   return result;
 }
 
-void copyLyricFile(SongModel sm) async {
+void copyLyricFile(Song song) async {
   // 絶対パスの拡張子のインデックスを取得
-  int extensionIndex = sm.data.lastIndexOf('.');
+  int extensionIndex = song.path!.lastIndexOf('.');
 
   try {
     // コピー元となる.lrcファイルのパスをセット
-    String sourcePath = '${sm.data.substring(0, extensionIndex)}.lrc';
+    String sourcePath = '${song.path!.substring(0, extensionIndex)}.lrc';
     // コピー先のディレクトリを取得
-    Directory destinationFolder = Directory('${directory.path}/${sm.artist!}/${sm.album!}');
+    Directory destinationFolder = Directory('${directory.path}/${song.artist!}/${song.album!}');
     // ディレクトリが存在しない場合は作成
     if (destinationFolder.existsSync() == false) {
       destinationFolder.createSync(recursive: true);
     }
     // ファイルのコピー
-    File(sourcePath).copySync('${destinationFolder.path}/${sm.displayNameWOExt}.lrc');
+    File(sourcePath).copySync('${destinationFolder.path}/${song.title}.lrc');
   } catch (e) {
     // .lrcファイルがない場合、何もしない
   }

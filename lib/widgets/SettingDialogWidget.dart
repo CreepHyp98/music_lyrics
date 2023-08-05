@@ -9,7 +9,7 @@ class SettingDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // フリガナ保存用のタイトルキー
-    final String titleKey = ref.watch(EditSMProvider).title;
+    final String titleKey = ref.watch(EditSongProvider).title!;
     // TextFieldの入力text
     final furiganaController = TextEditingController(text: defaultFurigana);
 
@@ -44,7 +44,7 @@ class SettingDialog extends ConsumerWidget {
               ),
               onTap: () {
                 // 編集する曲を取得
-                String filePath = ref.watch(EditSMProvider).data;
+                String filePath = ref.watch(EditSongProvider).path!;
                 // パスを使ってプレイヤーにセット
                 ref.watch(EditAPProvider).setFilePath(filePath);
                 // 歌詞編集のテキストフィールドに対象の歌詞をセット

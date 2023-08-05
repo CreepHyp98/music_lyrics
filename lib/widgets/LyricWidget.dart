@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_lyrics/class/SongClass.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/widgets/VerticalRotatedWriting.dart';
-import 'package:on_audio_query/on_audio_query.dart';
 import 'package:wakelock/wakelock.dart';
 
 class LyricWidget extends ConsumerStatefulWidget {
@@ -71,7 +71,7 @@ class _LyricWidgetState extends ConsumerState<LyricWidget> {
     // 端末サイズからフォントサイズを指定
     double fontSizeM = 18; //deviceWidth / 21.8; //18pt
 
-    getLyric(ref, SongModelProvider, LyricProvider);
+    getLyric(ref, SongProvider, LyricProvider);
     return VerticalRotatedWriting(text: syncLyric(), size: fontSizeM);
   }
 }
@@ -97,10 +97,10 @@ int getLyricStartTime(String lineLyric) {
   }
 }
 
-void getLyric(WidgetRef ref, StateProvider<SongModel> sm, StateProvider<List<String>> lrc) async {
+void getLyric(WidgetRef ref, StateProvider<Song> song, StateProvider<List<String>> lrc) async {
   try {
     // .lrcファイルのパスをセット
-    String lyricPath = '${directory.path}/${ref.watch(sm).artist!}/${ref.watch(sm).album!}/${ref.watch(sm).displayNameWOExt}.lrc';
+    String lyricPath = '${directory.path}/${ref.watch(song).artist!}/${ref.watch(song).album!}/${ref.watch(song).title}.lrc';
     // パス → ファイル
     File lyricFile = File(lyricPath);
     // ファイル → String

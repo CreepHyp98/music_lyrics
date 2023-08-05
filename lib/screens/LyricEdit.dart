@@ -90,13 +90,13 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
             icon: const Icon(Icons.check),
             onPressed: () {
               // 保存先のディレクトリを取得
-              Directory destinationFolder = Directory('${directory.path}/${ref.watch(EditSMProvider).artist!}/${ref.watch(EditSMProvider).album!}');
+              Directory destinationFolder = Directory('${directory.path}/${ref.watch(EditSongProvider).artist!}/${ref.watch(EditSongProvider).album!}');
               // ディレクトリが存在しない場合は作成
               if (destinationFolder.existsSync() == false) {
                 destinationFolder.createSync(recursive: true);
               }
               // パス → ファイル
-              File lyricFile = File('${destinationFolder.path}/${ref.watch(EditSMProvider).displayNameWOExt}.lrc');
+              File lyricFile = File('${destinationFolder.path}/${ref.watch(EditSongProvider).title}.lrc');
               // ファイル書き込み
               lyricFile.writeAsStringSync(tec.text);
               // ダイアログに戻る
@@ -138,7 +138,7 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                     ),
                     onPressed: () {
                       // 検索キーワード
-                      String keyword = "${ref.watch(EditSMProvider).title} ${ref.watch(EditSMProvider).artist!} 歌詞";
+                      String keyword = "${ref.watch(EditSongProvider).title} ${ref.watch(EditSongProvider).artist!} 歌詞";
                       // 検索エンジンを開く
                       launchUrl(Uri.parse('https://www.google.com/search?q=$keyword'));
                     },

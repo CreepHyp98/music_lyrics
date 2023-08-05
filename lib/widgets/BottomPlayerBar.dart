@@ -15,7 +15,7 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
 
   void listenToSongStream2() {
     // 音源ファイルの曲時間を取得
-    _duration = ref.watch(EditSMProvider).duration;
+    _duration = ref.watch(EditSongProvider).duration;
 
     // 現在の再生位置を取得
     ref.watch(EditAPProvider).positionStream.listen((position) {

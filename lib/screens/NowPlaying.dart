@@ -41,7 +41,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
         if (event != null) {
           ref.watch(AudioProvider).songIndex = event;
         }
-        ref.read(SongModelProvider.notifier).state = ref.watch(AudioProvider).songModelList![ref.watch(AudioProvider).songIndex!];
+        ref.read(SongProvider.notifier).state = ref.watch(AudioProvider).songList![ref.watch(AudioProvider).songIndex!];
       }
     });
   }
@@ -83,7 +83,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
             Align(
               alignment: const Alignment(-0.9, -0.95),
               child: Text(
-                ref.watch(SongModelProvider).album.toString(),
+                ref.watch(SongProvider).album.toString(),
                 style: const TextStyle(
                   fontFamily: 'shippori3',
                 ),
@@ -95,7 +95,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
               alignment: const Alignment(0.85, -0.2),
               child: VerticalRotatedWriting(
                 size: fontSizeL,
-                text: ref.watch(SongModelProvider).title,
+                text: ref.watch(SongProvider).title!,
               ),
             ),
 
@@ -104,7 +104,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
               alignment: const Alignment(0.6, 0.4),
               child: VerticalRotatedWriting(
                 size: fontSizeM,
-                text: ref.watch(SongModelProvider).artist.toString(),
+                text: ref.watch(SongProvider).artist.toString(),
               ),
             ),
 
@@ -174,7 +174,7 @@ class ArtworkWidget extends ConsumerWidget {
     double width = MediaQuery.of(context).size.width;
 
     return QueryArtworkWidget(
-      id: ref.watch(SongModelProvider).id,
+      id: ref.watch(SongProvider).id!,
       format: ArtworkFormat.PNG,
       artworkQuality: FilterQuality.high,
       type: ArtworkType.AUDIO,
