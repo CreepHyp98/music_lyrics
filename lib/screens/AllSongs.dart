@@ -112,14 +112,16 @@ class _AllSongsState extends ConsumerState<AllSongs> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: データベース作成のタイミングは要検討
-    _audioQuery
-        .querySongs(
-          orderType: OrderType.ASC_OR_SMALLER,
-          uriType: UriType.EXTERNAL,
-          ignoreCase: true,
-        )
-        .then((list) => createSongDB(list));
+    if (_hasPermission == true) {
+      // TODO: データベース作成のタイミングは要検討
+      _audioQuery
+          .querySongs(
+            orderType: OrderType.ASC_OR_SMALLER,
+            uriType: UriType.EXTERNAL,
+            ignoreCase: true,
+          )
+          .then((list) => createSongDB(list));
+    }
 
     return SafeArea(
       child: Scaffold(
@@ -145,9 +147,6 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                           ],
                         ),
                       );
-                    }
-                    if (item.data!.isEmpty) {
-                      return const Center(child: Text("曲が見つかりません"));
                     }
 
                     return ListView.builder(

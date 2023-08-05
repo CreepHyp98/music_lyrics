@@ -27,15 +27,15 @@ class _SplashState extends State<Splash> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xfffffbfe),
       body: Center(
         child: SplashTextList[1] == ''
             // 空なら
             ? const Align(
-                alignment: Alignment(0.85, -0.2),
+                alignment: Alignment(0.0, -0.4),
                 child: VerticalRotatedWriting(
-                  size: 20,
-                  text: 'かしか',
+                  size: 24,
+                  text: 'あなたの歌詞が',
                 ),
               )
             // 登録データがあるなら
