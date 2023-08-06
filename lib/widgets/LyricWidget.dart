@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_lyrics/class/SongClass.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/widgets/VerticalRotatedWriting.dart';
 import 'package:wakelock/wakelock.dart';
@@ -15,6 +12,8 @@ class LyricWidget extends ConsumerStatefulWidget {
 }
 
 class _LyricWidgetState extends ConsumerState<LyricWidget> {
+  // 一行ごとの歌詞list
+  List<String> lineLyric = [];
   // 一行ごとに分割された歌詞Listのインデックス
   int currentLyricIndex = 0;
   // 再生時間（ミリ秒）を保持
@@ -59,8 +58,6 @@ class _LyricWidgetState extends ConsumerState<LyricWidget> {
       // .lrcファイルがない、もしくは.lrcファイルはあるが時間情報がない
       // 歌詞同期はないので自動スリープを有効にする
       Wakelock.disable();
-      // List<String>をStringに戻して返す
-      currentLyric = ref.watch(LyricProvider).join('\n');
     }
 
     return currentLyric;
@@ -71,7 +68,6 @@ class _LyricWidgetState extends ConsumerState<LyricWidget> {
     // 端末サイズからフォントサイズを指定
     double fontSizeM = 18; //deviceWidth / 21.8; //18pt
 
-    getLyric(ref, SongProvider, LyricProvider);
     return VerticalRotatedWriting(text: syncLyric(), size: fontSizeM);
   }
 }
@@ -94,21 +90,5 @@ int getLyricStartTime(String lineLyric) {
   } catch (e) {
     // .lrcファイルがない、もしくは.lrcファイルはあるが時間情報がない
     return -1;
-  }
-}
-
-void getLyric(WidgetRef ref, StateProvider<Song> song, StateProvider<List<String>> lrc) async {
-  try {
-    // .lrcファイルのパスをセット
-    String lyricPath = '${directory.path}/${ref.watch(song).artist!}/${ref.watch(song).album!}/${ref.watch(song).title}.lrc';
-    // パス → ファイル
-    File lyricFile = File(lyricPath);
-    // ファイル → String
-    String lyricData = await lyricFile.readAsString();
-    // String → List<String>
-    ref.read(lrc.notifier).state = lyricData.split('\n');
-  } catch (e) {
-    // .lrcファイルがない場合
-    ref.read(lrc.notifier).state = [''];
   }
 }

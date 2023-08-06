@@ -1,8 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:music_lyrics/class/SongDB.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/widgets/BottomPlayerBar.dart';
 import 'package:music_lyrics/widgets/LrcListView.dart';
@@ -89,18 +88,20 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
           IconButton(
             icon: const Icon(Icons.check),
             onPressed: () {
-              // 保存先のディレクトリを取得
-              Directory destinationFolder = Directory('${directory.path}/${ref.watch(EditSongProvider).artist!}/${ref.watch(EditSongProvider).album!}');
-              // ディレクトリが存在しない場合は作成
-              if (destinationFolder.existsSync() == false) {
-                destinationFolder.createSync(recursive: true);
-              }
-              // パス → ファイル
-              File lyricFile = File('${destinationFolder.path}/${ref.watch(EditSongProvider).title}.lrc');
-              // ファイル書き込み
-              lyricFile.writeAsStringSync(tec.text);
+              // 編集用AudioPlayerを初期化
+              ref.watch(EditAPProvider).dispose();
+              ref.read(EditAPProvider.notifier).state = AudioPlayer();
+              // 編集用再生位置も初期化
+              ref.read(EditPosiProvider.notifier).state = Duration.zero;
+
+              // 編集用プロバイダーのlyricにtextfieldの値をセット
+              ref.read(EditSongProvider.notifier).state.lyric = tec.text;
+              // データベースを更新
+              songsDB.instance.updateSong(ref.watch(EditSongProvider));
+
               // ダイアログに戻る
-              Navigator.pop(context);
+              //Navigator.pop(context);
+              Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => route.isCurrent);
             },
           ),
         ],

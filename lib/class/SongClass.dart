@@ -5,6 +5,7 @@ class Song {
   String? album; // アルバム
   int? duration; // 曲時間
   String? path; // ファイルパス
+  String? lyric; // 歌詞
 
   Song({
     this.id,
@@ -13,6 +14,7 @@ class Song {
     this.album,
     this.duration,
     this.path,
+    this.lyric,
   });
 
   Map<String, dynamic> toMap() {
@@ -23,6 +25,7 @@ class Song {
       'album': album,
       'duration': duration,
       'path': path,
+      'lyric': lyric,
     };
   }
 }

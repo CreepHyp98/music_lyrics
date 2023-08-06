@@ -51,11 +51,15 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
     ref.watch(AudioProvider).audioPlayer!.playerStateStream.listen((state) {
       if (state.playing) {
         if (mounted) {
-          _isPlaying = true;
+          setState(() {
+            _isPlaying = true;
+          });
         }
       } else {
         if (mounted) {
-          _isPlaying = false;
+          setState(() {
+            _isPlaying = false;
+          });
         }
       }
     });
@@ -126,13 +130,9 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
               child: IconButton(
                 onPressed: () {
                   if (_isPlaying) {
-                    setState(() {
-                      ref.watch(AudioProvider).audioPlayer!.pause();
-                    });
+                    ref.watch(AudioProvider).audioPlayer!.pause();
                   } else {
-                    setState(() {
-                      ref.watch(AudioProvider).audioPlayer!.play();
-                    });
+                    ref.watch(AudioProvider).audioPlayer!.play();
                   }
                   _isPlaying = !_isPlaying;
                 },

@@ -27,7 +27,7 @@ class songsDB {
   }
 
   Future<void> _onCreate(Database db, int version) async {
-    await db.execute('CREATE TABLE songs(id INTEGER PRIMARY KEY, title TEXT, artist TEXT, album TEXT, duration INTEGER, path TEXT)');
+    await db.execute('CREATE TABLE songs(id INTEGER PRIMARY KEY, title TEXT, artist TEXT, album TEXT, duration INTEGER, path TEXT, lyric TEXT)');
   }
 
   // データの挿入
@@ -55,6 +55,7 @@ class songsDB {
         album: maps[i]['album'],
         duration: maps[i]['duration'],
         path: maps[i]['path'],
+        lyric: maps[i]['lyric'],
       );
     });
   }

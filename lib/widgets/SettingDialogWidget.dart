@@ -50,6 +50,11 @@ class SettingDialog extends ConsumerWidget {
                 // 歌詞編集のテキストフィールドに対象の歌詞をセット
                 tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
 
+                // 再生中なら止める
+                if (ref.watch(AudioProvider).audioPlayer != null) {
+                  ref.watch(AudioProvider).audioPlayer!.pause();
+                }
+
                 // 編集画面に遷移
                 Navigator.pushNamed(context, '/edit');
               },

@@ -81,12 +81,21 @@ class LrcListView extends ConsumerWidget {
 
             // 右タップでそこから再生
             trailing: IconButton(
-              icon: const Icon(Icons.play_arrow),
-              onPressed: () {
-                // LyricWidgetと同じ関数で時間情報を取得
-                int value = getLyricStartTime(ref.watch(EditLrcProvider)[index]);
-                ref.watch(EditAPProvider).seek(Duration(milliseconds: value));
-              },
+              // 時間情報がなければグレーアウト
+              icon: checkStartTime(ref.watch(EditLrcProvider)[index])
+                  ? const Icon(Icons.play_arrow)
+                  : const Icon(
+                      Icons.play_arrow,
+                      color: Colors.grey,
+                    ),
+              // 時間情報がなければタップ無効
+              onPressed: checkStartTime(ref.watch(EditLrcProvider)[index])
+                  ? () {
+                      // LyricWidgetと同じ関数で時間情報を取得
+                      int value = getLyricStartTime(ref.watch(EditLrcProvider)[index]);
+                      ref.watch(EditAPProvider).seek(Duration(milliseconds: value));
+                    }
+                  : null,
             ),
           );
         },
