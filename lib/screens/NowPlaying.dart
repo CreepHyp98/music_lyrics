@@ -74,92 +74,96 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
     double lyricAreaHeight = deviceHeight * 0.65;
     double lyricAreaWidth = deviceWidth * 0.525;
 
-    // これがないとメディア通知での操作が画面に反映されない
-    listenToSongStream();
-    // 再生状況の取得
-    listenToEvent();
+    if (ref.watch(AudioProvider).audioPlayer != null) {
+      // これがないとメディア通知での操作が画面に反映されない
+      listenToSongStream();
+      // 再生状況の取得
+      listenToEvent();
+    }
 
     return Scaffold(
       body: SafeArea(
-        child: Stack(
-          children: [
-            // アルバム
-            Align(
-              alignment: const Alignment(-0.9, -0.95),
-              child: Text(
-                ref.watch(SongProvider).album.toString(),
-                style: const TextStyle(
-                  fontFamily: 'shippori3',
-                ),
-              ),
-            ),
+        child: ref.watch(SongProvider) != null
+            ? Container()
+            : Stack(
+                children: [
+                  // アルバム
+                  Align(
+                    alignment: const Alignment(-0.9, -0.95),
+                    child: Text(
+                      ref.watch(SongProvider).album.toString(),
+                      style: const TextStyle(
+                        fontFamily: 'shippori3',
+                      ),
+                    ),
+                  ),
 
-            // タイトル
-            Align(
-              alignment: const Alignment(0.85, -0.2),
-              child: VerticalRotatedWriting(
-                size: fontSizeL,
-                text: ref.watch(SongProvider).title!,
-              ),
-            ),
+                  // タイトル
+                  Align(
+                    alignment: const Alignment(0.85, -0.2),
+                    child: VerticalRotatedWriting(
+                      size: fontSizeL,
+                      text: ref.watch(SongProvider).title!,
+                    ),
+                  ),
 
-            // アーティスト
-            Align(
-              alignment: const Alignment(0.6, 0.4),
-              child: VerticalRotatedWriting(
-                size: fontSizeM,
-                text: ref.watch(SongProvider).artist.toString(),
-              ),
-            ),
+                  // アーティスト
+                  Align(
+                    alignment: const Alignment(0.6, 0.4),
+                    child: VerticalRotatedWriting(
+                      size: fontSizeM,
+                      text: ref.watch(SongProvider).artist.toString(),
+                    ),
+                  ),
 
-            // 歌詞
-            Positioned(
-              top: deviceHeight * 0.15,
-              left: 0,
-              child: Container(
-                alignment: Alignment.topRight,
-                height: lyricAreaHeight,
-                width: lyricAreaWidth,
-                child: const LyricWidget(),
-              ),
-            ),
+                  // 歌詞
+                  Positioned(
+                    top: deviceHeight * 0.15,
+                    left: 0,
+                    child: Container(
+                      alignment: Alignment.topRight,
+                      height: lyricAreaHeight,
+                      width: lyricAreaWidth,
+                      child: const LyricWidget(),
+                    ),
+                  ),
 
-            // 再生・停止ボタン
-            Align(
-              alignment: const Alignment(0.65, 0.98),
-              child: IconButton(
-                onPressed: () {
-                  if (_isPlaying) {
-                    ref.watch(AudioProvider).audioPlayer!.pause();
-                  } else {
-                    ref.watch(AudioProvider).audioPlayer!.play();
-                  }
-                  _isPlaying = !_isPlaying;
-                },
-                icon: Icon(
-                  _isPlaying ? Icons.pause_outlined : Icons.play_arrow_outlined,
-                  size: fontSizeM,
-                ),
-              ),
-            ),
+                  // 再生・停止ボタン
+                  Align(
+                    alignment: const Alignment(0.65, 0.98),
+                    child: IconButton(
+                      onPressed: () {
+                        if (_isPlaying) {
+                          ref.watch(AudioProvider).audioPlayer!.pause();
+                        } else {
+                          ref.watch(AudioProvider).audioPlayer!.play();
+                        }
+                        _isPlaying = !_isPlaying;
+                      },
+                      icon: Icon(
+                        _isPlaying ? Icons.pause_outlined : Icons.play_arrow_outlined,
+                        size: fontSizeM,
+                      ),
+                    ),
+                  ),
 
-            // 進むボタン
-            Align(
-              alignment: const Alignment(0.9, 0.98),
-              child: IconButton(
-                onPressed: () {
-                  if (ref.watch(AudioProvider).audioPlayer!.hasNext) {
-                    ref.watch(AudioProvider).audioPlayer!.seekToNext();
-                  }
-                },
-                icon: Icon(
-                  Icons.skip_next_outlined,
-                  size: fontSizeM,
-                ),
+                  // 進むボタン
+                  Align(
+                    alignment: const Alignment(0.9, 0.98),
+                    child: IconButton(
+                      onPressed: () {
+                        if (ref.watch(AudioProvider).audioPlayer!.hasNext) {
+                          ref.watch(AudioProvider).audioPlayer!.seekToNext();
+                        }
+                      },
+                      icon: Icon(
+                        Icons.skip_next_outlined,
+                        size: fontSizeM,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }

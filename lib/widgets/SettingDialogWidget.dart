@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
+import 'package:music_lyrics/class/SongDB.dart';
 
 class SettingDialog extends ConsumerWidget {
   final String? defaultFurigana;
@@ -8,10 +9,10 @@ class SettingDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // フリガナ保存用のタイトルキー
-    final String titleKey = ref.watch(EditSongProvider).title!;
     // TextFieldの入力text
-    final furiganaController = TextEditingController(text: defaultFurigana);
+    final furiController = TextEditingController(text: defaultFurigana);
+    // カーソルの位置を末尾に設定
+    furiController.selection = TextSelection.fromPosition(TextPosition(offset: furiController.text.length));
 
     return AlertDialog(
       content: SizedBox(
@@ -23,7 +24,7 @@ class SettingDialog extends ConsumerWidget {
             SizedBox(
               width: double.infinity,
               child: Text(
-                titleKey,
+                ref.watch(EditSongProvider).title!,
                 style: const TextStyle(fontSize: 18),
                 textAlign: TextAlign.left,
                 maxLines: 1,
@@ -62,19 +63,24 @@ class SettingDialog extends ConsumerWidget {
 
             // 曲のフリガナTextField
             TextField(
-              controller: furiganaController,
+              controller: furiController,
               decoration: const InputDecoration(
                 labelText: '曲のフリガナ',
                 // ラベルテキストを常に浮かす
                 floatingLabelBehavior: FloatingLabelBehavior.always,
+                // 入力文字と下線の隙間を埋める
+                contentPadding: EdgeInsets.zero,
               ),
             ),
 
             // 閉じるボタン
             ElevatedButton(
               onPressed: () async {
-                // 入力されたフリガナの保存
-                prefs.setString(titleKey, furiganaController.text);
+                // 入力されたフリガナの保存編集用プロバイダーにセット
+                ref.read(EditSongProvider.notifier).state.title_furi = furiController.text;
+                // データベースを更新
+                songsDB.instance.updateSong(ref.watch(EditSongProvider));
+
                 // ダイアログを閉じる
                 Navigator.pop(context);
               },

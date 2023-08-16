@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:music_lyrics/class/MyAudioSourceClass.dart';
 import 'package:music_lyrics/class/SongClass.dart';
+import 'package:music_lyrics/screens/TextConvert.dart';
 import 'package:music_lyrics/widgets/SettingDialogWidget.dart';
 
 import 'package:on_audio_query/on_audio_query.dart';
@@ -32,8 +33,6 @@ class _AllSongsState extends ConsumerState<AllSongs> {
 
   // 曲リストの初期化
   List<Song> allSongs = [];
-  // タイトルとそのフリガナのマップ
-  Map<String, String> furiganaMap = {};
 
   // 初回表示時の処理
   @override
@@ -93,6 +92,7 @@ class _AllSongsState extends ConsumerState<AllSongs> {
           final song = Song(
             id: smList[i].id,
             title: smList[i].title,
+            title_furi: await getFurigana(smList[i].title),
             artist: smList[i].artist,
             album: smList[i].album,
             duration: smList[i].duration,
@@ -114,28 +114,17 @@ class _AllSongsState extends ConsumerState<AllSongs> {
     if (_hasList == false) {
       allSongs = await songsDB.instance.getAllSongs();
       _hasList = true;
-      setState(() {});
+      sortFurigana(allSongs);
     }
   }
 
-  /* TODO: フリガナ復活までソートはコメントアウト
-  void sortAllSongs() async {
-    try {
-      for (int i = 0; i < allSongs.length; i++) {
-        // タイトルのフリガナを持ってくる
-        String? furigana = prefs.getString(allSongs[i].title);
-        furiganaMap[allSongs[i].title] = furigana!;
-      }
-      // フリガナで五十音順にソート
-      allSongs.sort(
-        // TODO: アルファベットが大文字→小文字の順になってる
-        (a, b) => furiganaMap[a.title]!.compareTo(furiganaMap[b.title]!),
-      );
-    } catch (e) {
-      // タイトル取得中
-    }
+  void sortFurigana(List<Song> s) async {
+    // フリガナで五十音順にソート
+    s.sort(
+      (a, b) => (a.title_furi!.toLowerCase()).compareTo(b.title_furi!.toLowerCase()),
+    );
+    setState(() {});
   }
-  */
 
   @override
   Widget build(BuildContext context) {
@@ -158,93 +147,92 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                           Text("ロード中"),
                         ],
                       )
-                    : ListView.builder(
-                        // Listの要素数
-                        itemCount: allSongs.length,
-                        // Listの生成
-                        itemBuilder: (context, index) {
-                          // フリガナがない曲はAPIを使って生成
-                          // TODO: HandShakeExceptionが発生するため一時的にコメントアウト
-                          //setFuriganaAll(allSongs);
-                          // 曲のフリガナで五十音順にソート
-                          //sortAllSongs();
-
-                          return ListTile(
-                            onTap: () {
-                              // SongProviderを更新
-                              ref.read(SongProvider.notifier).state = allSongs[index];
-                              // LyricProviderを更新
-                              if (allSongs[index].lyric != null) {
-                                ref.read(LyricProvider.notifier).state = allSongs[index].lyric!.split('\n');
-                              } else {
-                                ref.read(LyricProvider.notifier).state = [''];
-                              }
-
-                              // リスト・インデックス・プレイヤーをセットし、再生
-                              ref.read(AudioProvider.notifier).state = MyAudioSource(
-                                songList: allSongs,
-                                songIndex: index,
-                                audioPlayer: _audioPlayer,
-                              );
-
-                              // オーディオファイルに変換し再生
-                              parseSong(
-                                ref.watch(AudioProvider).songList!,
-                                ref.watch(AudioProvider).songIndex!,
-                                ref.watch(AudioProvider).audioPlayer!,
-                              );
-
-                              // NowPlayingに遷移
-                              ptc.jumpToTab(1);
-                            },
-                            title: Text(
-                              allSongs[index].title!,
-                              maxLines: 1,
-                            ),
-                            subtitle: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "${allSongs[index].artist}",
-                                  maxLines: 1,
-                                ),
-                                Text(IntDurationToMS(allSongs[index].duration)),
-                              ],
-                            ),
-                            trailing: IconButton(
-                              onPressed: () {
-                                // 歌詞編集用SongModelに今開いてる曲をセット
-                                ref.read(EditSongProvider.notifier).state = allSongs[index];
-                                // EditLrcProviderを更新
+                    : Scrollbar(
+                        thickness: 15.0,
+                        radius: const Radius.circular(15.0),
+                        interactive: true,
+                        child: ListView.builder(
+                          // Listの要素数
+                          itemCount: allSongs.length,
+                          // Listの生成
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              onTap: () {
+                                // SongProviderを更新
+                                ref.read(SongProvider.notifier).state = allSongs[index];
+                                // LyricProviderを更新
                                 if (allSongs[index].lyric != null) {
-                                  ref.read(EditLrcProvider.notifier).state = allSongs[index].lyric!.split('\n');
+                                  ref.read(LyricProvider.notifier).state = allSongs[index].lyric!.split('\n');
                                 } else {
-                                  ref.read(EditLrcProvider.notifier).state = [''];
+                                  ref.read(LyricProvider.notifier).state = [''];
                                 }
 
-                                // ダイアログ表示
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => SettingDialog(
-                                    defaultFurigana: furiganaMap[allSongs[index].title],
-                                  ),
+                                // リスト・インデックス・プレイヤーをセットし、再生
+                                ref.read(AudioProvider.notifier).state = MyAudioSource(
+                                  songList: allSongs,
+                                  songIndex: index,
+                                  audioPlayer: _audioPlayer,
                                 );
+
+                                // オーディオファイルに変換し再生
+                                parseSong(
+                                  ref.watch(AudioProvider).songList!,
+                                  ref.watch(AudioProvider).songIndex!,
+                                  ref.watch(AudioProvider).audioPlayer!,
+                                );
+
+                                // NowPlayingに遷移
+                                ptc.jumpToTab(1);
                               },
-                              icon: const Icon(Icons.more_horiz),
-                            ),
-                            leading: QueryArtworkWidget(
-                              id: allSongs[index].id!,
-                              type: ArtworkType.AUDIO,
-                              artworkBorder: BorderRadius.circular(0),
-                              artworkFit: BoxFit.contain,
-                              nullArtworkWidget: const Icon(Icons.music_note),
-                            ),
-                            // leadingとtitleの幅
-                            horizontalTitleGap: 5,
-                            // ListTile両端の余白
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 5),
-                          );
-                        },
+                              title: Text(
+                                allSongs[index].title!,
+                                maxLines: 1,
+                              ),
+                              subtitle: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "${allSongs[index].artist}",
+                                    maxLines: 1,
+                                  ),
+                                  Text(IntDurationToMS(allSongs[index].duration)),
+                                ],
+                              ),
+                              trailing: IconButton(
+                                onPressed: () {
+                                  // 歌詞編集用SongModelに今開いてる曲をセット
+                                  ref.read(EditSongProvider.notifier).state = allSongs[index];
+                                  // EditLrcProviderを更新
+                                  if (allSongs[index].lyric != null) {
+                                    ref.read(EditLrcProvider.notifier).state = allSongs[index].lyric!.split('\n');
+                                  } else {
+                                    ref.read(EditLrcProvider.notifier).state = [''];
+                                  }
+
+                                  // ダイアログ表示
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => SettingDialog(
+                                      defaultFurigana: allSongs[index].title_furi,
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.more_horiz),
+                              ),
+                              leading: QueryArtworkWidget(
+                                id: allSongs[index].id!,
+                                type: ArtworkType.AUDIO,
+                                artworkBorder: BorderRadius.circular(0),
+                                artworkFit: BoxFit.contain,
+                                nullArtworkWidget: const Icon(Icons.music_note),
+                              ),
+                              // leadingとtitleの幅
+                              horizontalTitleGap: 5,
+                              // ListTile両端の余白
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 5),
+                            );
+                          },
+                        ),
                       )),
       ),
     );
