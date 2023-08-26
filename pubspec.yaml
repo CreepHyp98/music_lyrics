@@ -27,17 +27,26 @@ dependencies:
   flutter_native_splash: ^2.3.1 #追加
   url_launcher: ^6.1.12 #追加
   path_provider: ^2.0.15 #追加
+  flutter_launcher_icons: ^0.13.1 #追加
+
+#追加
+flutter_icons:       
+  android: true
+  ios: true
+  image_path: "assets/images/app_icon.png"
+  adaptive_icon_background: "assets/images/splash_white.png"
+  adaptive_icon_foreground: "assets/images/app_icon.png"
 
 #追加
 flutter_native_splash:
-  image: assets/splash_white.png
+  image: assets/images/splash_white.png
   color: '#fffbfe'
-  image_dark: assets/splash_white.png
+  image_dark: assets/images/splash_white.png
   color_dark: '#fffbfe'
   android_12:
-    image: 'assets/splash_white.png'
+    image: 'assets/images/splash_white.png'
     color: '#fffbfe'
-    image_dark: assets/splash_white.png
+    image_dark: assets/images/splash_white.png
     color_dark: '#fffbfe'
 
 dev_dependencies:
