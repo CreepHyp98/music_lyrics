@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/screens/AllSongs.dart';
 import 'package:music_lyrics/screens/NowPlaying.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
-class NavBarWidget extends StatelessWidget {
+class NavBarWidget extends ConsumerWidget {
   const NavBarWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final pages = [
       // 曲リスト画面
       const AllSongs(),
@@ -33,6 +34,13 @@ class NavBarWidget extends StatelessWidget {
             icon: const Icon(Icons.play_circle),
             activeColorPrimary: Colors.black,
             inactiveColorPrimary: Colors.grey,
+            onPressed: (p0) {
+              if (ref.watch(SongProvider).title == null) {
+                return null;
+              } else {
+                ptc.jumpToTab(1);
+              }
+            },
           ),
         ],
         navBarStyle: NavBarStyle.style3,

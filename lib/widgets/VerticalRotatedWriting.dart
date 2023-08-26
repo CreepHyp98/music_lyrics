@@ -4,7 +4,8 @@ class VerticalRotatedWriting extends StatelessWidget {
   final String text;
   final double size;
 
-  const VerticalRotatedWriting({super.key, 
+  const VerticalRotatedWriting({
+    super.key,
     required this.text,
     required this.size,
   });
@@ -20,6 +21,7 @@ class VerticalRotatedWriting extends StatelessWidget {
         for (var rune in splitText)
           Row(
             children: [
+              const SizedBox(width: 14),
               _character(rune),
             ],
           )

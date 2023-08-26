@@ -16,7 +16,7 @@ class _SplashState extends State<Splash> {
     super.initState();
 
     // スプラッシュ画面を表示
-    Future.delayed(const Duration(seconds: 3, milliseconds: 5), () {
+    Future.delayed(const Duration(seconds: 2, milliseconds: 0), () {
       // 遷移元の画面を破棄してホーム画面へ
       Navigator.of(context).pushReplacementNamed("/home");
       // ステータスバーとナビゲーションバーの非表示終了

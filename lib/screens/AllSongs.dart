@@ -134,10 +134,9 @@ class _AllSongsState extends ConsumerState<AllSongs> {
       setAllSongs();
     }
 
-    return SafeArea(
-      child: Scaffold(
-        // 非同期かつ動的にwidgetを生成できるクラス
-        body: Center(
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
             child: (_hasPermission == false)
                 ? noAccessToLibraryWidget()
                 : (_hasList == false)

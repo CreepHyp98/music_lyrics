@@ -37,8 +37,8 @@ class _LyricWidgetState extends ConsumerState<LyricWidget> {
       // 歌詞同期時は自動スリープを無効にする
       Wakelock.enable();
       try {
-        // 最後のインデックスではないなら（EOFの分、要素数-2）
-        if (currentLyricIndex != ref.watch(LyricProvider).length - 2) {
+        // 最後のインデックスではないなら
+        if (currentLyricIndex != ref.watch(LyricProvider).length - 1) {
           // 次の歌詞の歌いだし時間を取得
           nextTime = getLyricStartTime(ref.watch(LyricProvider)[currentLyricIndex + 1]);
           // 現在の再生時間がそれを超えたなら
@@ -66,7 +66,7 @@ class _LyricWidgetState extends ConsumerState<LyricWidget> {
   @override
   Widget build(BuildContext context) {
     // 端末サイズからフォントサイズを指定
-    double fontSizeM = 18; //deviceWidth / 21.8; //18pt
+    double fontSizeM = 18;
 
     return VerticalRotatedWriting(text: syncLyric(), size: fontSizeM);
   }
