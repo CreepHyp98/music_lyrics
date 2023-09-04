@@ -15,22 +15,18 @@ class SettingDialog extends ConsumerWidget {
     furiController.selection = TextSelection.fromPosition(TextPosition(offset: furiController.text.length));
 
     return AlertDialog(
+      // タイトル（左寄せ）
+      title: Text(
+        ref.watch(EditSongProvider).title!,
+        style: const TextStyle(fontSize: 18),
+        textAlign: TextAlign.left,
+        maxLines: 1,
+      ),
       content: SizedBox(
-        height: 200,
+        height: 150,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            // タイトル（左寄せ）
-            SizedBox(
-              width: double.infinity,
-              child: Text(
-                ref.watch(EditSongProvider).title!,
-                style: const TextStyle(fontSize: 18),
-                textAlign: TextAlign.left,
-                maxLines: 1,
-              ),
-            ),
-
             // 歌詞データの編集
             GestureDetector(
               child: const Text(

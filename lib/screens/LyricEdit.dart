@@ -86,7 +86,10 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
         // 完了ボタン
         actions: [
           IconButton(
-            icon: const Icon(Icons.check),
+            icon: Icon(
+              Icons.check_circle,
+              color: Theme.of(context).primaryColor,
+            ),
             onPressed: () {
               // 編集用AudioPlayerを初期化
               ref.watch(EditAPProvider).dispose();
@@ -95,13 +98,13 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
               ref.read(EditPosiProvider.notifier).state = Duration.zero;
 
               // 編集用プロバイダーのlyricにtextfieldの値をセット
+              tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
               ref.read(EditSongProvider.notifier).state.lyric = tec.text;
               // データベースを更新
               songsDB.instance.updateSong(ref.watch(EditSongProvider));
 
               // ダイアログに戻る
-              //Navigator.pop(context);
-              Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => route.isCurrent);
+              Navigator.pop(context);
             },
           ),
         ],
@@ -139,7 +142,7 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                     ),
                     onPressed: () {
                       // 検索キーワード
-                      String keyword = "${ref.watch(EditSongProvider).title} ${ref.watch(EditSongProvider).artist!} 歌詞";
+                      String keyword = "${ref.watch(EditSongProvider).title} ${ref.watch(EditSongProvider).artist!} lyricjp";
                       // 検索エンジンを開く
                       launchUrl(Uri.parse('https://www.google.com/search?q=$keyword'));
                     },

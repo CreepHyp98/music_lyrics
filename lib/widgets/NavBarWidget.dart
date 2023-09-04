@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/screens/AllSongs.dart';
 import 'package:music_lyrics/screens/NowPlaying.dart';
+import 'package:music_lyrics/screens/Settings.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 class NavBarWidget extends ConsumerWidget {
@@ -15,6 +16,8 @@ class NavBarWidget extends ConsumerWidget {
       const AllSongs(),
       // 再生画面
       const NowPlaying(),
+      // 設定画面
+      const Settings(),
     ];
 
     return Scaffold(
@@ -41,6 +44,12 @@ class NavBarWidget extends ConsumerWidget {
                 ptc.jumpToTab(1);
               }
             },
+          ),
+          // 3番目のタブ
+          PersistentBottomNavBarItem(
+            icon: const Icon(Icons.settings),
+            activeColorPrimary: Colors.black,
+            inactiveColorPrimary: Colors.grey,
           ),
         ],
         navBarStyle: NavBarStyle.style3,

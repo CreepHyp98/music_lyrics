@@ -13,8 +13,7 @@ class LrcListView extends ConsumerWidget {
     return SizedBox(
       width: deviceWidth * 0.9,
       child: ListView.separated(
-        // .lrcの末尾は空行なのでその分-1
-        itemCount: ref.watch(EditLrcProvider).length - 1,
+        itemCount: ref.watch(EditLrcProvider).length,
         itemBuilder: (context, index) {
           return ListTile(
             // ListTileの設定
@@ -29,6 +28,7 @@ class LrcListView extends ConsumerWidget {
 
             // 左側タップで歌いだし時間の取得
             leading: FloatingActionButton(
+              heroTag: 'btn$index',
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
