@@ -54,6 +54,7 @@ class MyApp extends StatelessWidget {
         '/home': (_) => const NavBarWidget(),
         '/edit': (_) => const LyricEdit(),
       },
+      debugShowCheckedModeBanner: false,
     );
   }
 }

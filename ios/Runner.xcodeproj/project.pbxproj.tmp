@@ -161,7 +161,7 @@
 					<string>@executable_path/Frameworks</string>
 				</array>
 				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
-				<string>com.example.musicLyrics</string>
+				<string>CreepHyp.musicLyrics</string>
 				<key>PRODUCT_NAME</key>
 				<string>$(TARGET_NAME)</string>
 				<key>SWIFT_OBJC_BRIDGING_HEADER</key>
@@ -876,7 +876,7 @@
 					<string>@executable_path/Frameworks</string>
 				</array>
 				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
-				<string>com.example.musicLyrics</string>
+				<string>CreepHyp.musicLyrics</string>
 				<key>PRODUCT_NAME</key>
 				<string>$(TARGET_NAME)</string>
 				<key>SWIFT_OBJC_BRIDGING_HEADER</key>
@@ -915,7 +915,7 @@
 					<string>@executable_path/Frameworks</string>
 				</array>
 				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
-				<string>com.example.musicLyrics</string>
+				<string>CreepHyp.musicLyrics</string>
 				<key>PRODUCT_NAME</key>
 				<string>$(TARGET_NAME)</string>
 				<key>SWIFT_OBJC_BRIDGING_HEADER</key>
