@@ -1,4 +1,4 @@
-package CreepHyp.music_lyrics
+package com.CreepHyp.music_lyrics
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -18,10 +18,10 @@ if (flutterRoot == null) {
     throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
 }
 
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
+//def flutterVersionCode = localProperties.getProperty('flutter.//versionCode')
+//if (flutterVersionCode == null) {
+//    flutterVersionCode = '2'
+//}
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
@@ -51,10 +51,10 @@ android {
     }
 
     defaultConfig {
-        applicationId "CreepHyp.music_lyrics"
+        applicationId "com.CreepHyp.music_lyrics"
         minSdkVersion 21 // flutter.minSdkVersion → 21
         targetSdkVersion flutter.targetSdkVersion
-        versionCode flutterVersionCode.toInteger()
+        versionCode 2   // エラーが治らないので直接指定
         versionName flutterVersionName
     }
 
