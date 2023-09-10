@@ -4,7 +4,7 @@
 	<dict>
 		<!--追加-->
     	<key>NSAppleMusicUsageDescription</key>
-		<string>$(PROJECT_NAME) requires access to media library</string>
+		<string>このアプリではデバイス内の音楽ファイルを再生するため上記のアクセスが必要です</string>
 		<key>LSApplicationQueriesSchemes</key>
   		<array>
     		<string>https</string>
@@ -14,7 +14,7 @@
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
-		<string>Music Lyrics</string>
+		<string>あなたの歌詞が</string>
 		<key>CFBundleExecutable</key>
 		<string>$(EXECUTABLE_NAME)</string>
 		<key>CFBundleIdentifier</key>
