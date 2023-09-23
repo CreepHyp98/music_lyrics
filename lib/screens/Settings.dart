@@ -4,6 +4,7 @@ import 'package:music_lyrics/class/SongDB.dart';
 import 'package:music_lyrics/provider/provider.dart';
 
 import 'package:on_audio_query/on_audio_query.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'AllSongs.dart';
 import 'TextConvert.dart';
 
@@ -107,6 +108,7 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     return ListView(
       children: [
+        // 楽曲ライブラリの更新
         ListTile(
           leading: const Icon(Icons.autorenew),
           title: const Text('楽曲ライブラリの更新'),
@@ -114,7 +116,17 @@ class _SettingsState extends State<Settings> {
             // ダイアログ表示
             showFutureLoader(context, createSongDB());
           },
-        )
+        ),
+
+        // お問い合わせフォーム
+        ListTile(
+          leading: const Icon(Icons.send),
+          title: const Text('お問い合わせフォーム'),
+          onTap: () {
+            // Google フォームを開く
+            launchUrl(Uri.parse('https://docs.google.com/forms/d/e/1FAIpQLSesGixlIAXYNodmKWg3jBOLPFVPvLylXKRzAskOtDDtYWGtOA/viewform?usp=sf_link'));
+          },
+        ),
       ],
     );
   }
