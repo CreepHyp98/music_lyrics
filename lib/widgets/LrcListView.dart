@@ -64,6 +64,7 @@ class LrcListView extends ConsumerWidget {
                     // 時間情報があれば10文字目から切り出す、なければそのまま
                     checkStartTime(ref.watch(EditLrcProvider)[index]) ? ref.watch(EditLrcProvider)[index].substring(10) : ref.watch(EditLrcProvider)[index],
                     maxLines: 2,
+                    style: const TextStyle(fontSize: 14),
                   ),
                 ),
               ),

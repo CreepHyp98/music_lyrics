@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:music_lyrics/class/MyAudioSourceClass.dart';
 import 'package:music_lyrics/class/SongClass.dart';
-import 'package:music_lyrics/widgets/SettingDialogWidget.dart';
+import 'package:music_lyrics/widgets/SettingDialog.dart';
 
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:music_lyrics/provider/provider.dart';

@@ -28,7 +28,7 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
       appBar: AppBar(
         // 画面スクロールで色が変わるのを防ぐ
         scrolledUnderElevation: 0,
-        // 閉じるボタン
+        // ×ボタン
         leading: IconButton(
           icon: const Icon(Icons.cancel),
           onPressed: () {
