@@ -25,7 +25,7 @@ class SettingDialog extends ConsumerWidget {
       content: SizedBox(
         height: 150,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // 歌詞データの編集
             GestureDetector(

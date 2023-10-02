@@ -30,11 +30,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
     List<Song> currentAllSong = await songsDB.instance.getAllSongs();
 
     // デバイス内の楽曲ファイルを取得
-    List<SongModel> smList = await audioQuery.querySongs(
-      orderType: OrderType.ASC_OR_SMALLER,
-      uriType: UriType.EXTERNAL,
-      ignoreCase: true,
-    );
+    List<SongModel> smList = await audioQuery.querySongs();
 
     for (int i = 0; i < smList.length; i++) {
       // 曲登録済みかフラグを初期化
@@ -89,7 +85,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
         child: _done
             // 更新完了
             ? Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('更新が終わりました'),
                   ElevatedButton(
@@ -105,7 +101,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
 
             // 更新中
             : Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text("更新中..."),
                   LinearProgressIndicator(

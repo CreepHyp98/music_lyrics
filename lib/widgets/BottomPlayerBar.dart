@@ -60,13 +60,18 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
       height: deviceHeight * 0.15,
       child: Column(
         children: [
-          // スライダー
-          Slider(
-            value: ref.watch(EditPosiProvider).inMilliseconds.toDouble(),
-            max: _duration!.toDouble(),
-            onChanged: (value) {
-              ref.watch(EditAPProvider).seek(Duration(milliseconds: value.toInt()));
-            },
+          // SliderThemeでスライダーをラップ
+          SliderTheme(
+            // 上下のパディングをなくす
+            data: SliderThemeData(overlayShape: SliderComponentShape.noOverlay),
+
+            child: Slider(
+              value: ref.watch(EditPosiProvider).inMilliseconds.toDouble(),
+              max: _duration!.toDouble(),
+              onChanged: (value) {
+                ref.watch(EditAPProvider).seek(Duration(milliseconds: value.toInt()));
+              },
+            ),
           ),
           Row(
             children: [

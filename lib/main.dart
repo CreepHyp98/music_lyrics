@@ -16,7 +16,7 @@ Future<void> main() async {
   // インスタンス生成
   prefs = await SharedPreferences.getInstance();
   directory = await getApplicationDocumentsDirectory();
-  await getSplashText();
+  getSplashText();
 
   // メディア通知のセットアップ
   // TODO: 歌詞編集用の再生でもMediaItemを指定しなくちゃいけなくなっちゃう
