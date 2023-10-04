@@ -50,7 +50,7 @@ class _SettingsState extends State<Settings> {
         // バージョン情報
         const Align(
           alignment: Alignment.bottomCenter,
-          child: Text('developed by 35'),
+          child: Text('developed by 40'),
         ),
       ],
     );
