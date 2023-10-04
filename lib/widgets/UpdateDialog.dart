@@ -45,7 +45,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
       }
 
       // 登録済みフラグがfalseのままだったらその曲を追加
-      if ((exist == false) && (smList[i].isMusic == true)) {
+      if ((exist == false) /*&& (smList[i].isMusic == true)*/) {
         final song = Song(
           id: smList[i].id,
           title: smList[i].title,

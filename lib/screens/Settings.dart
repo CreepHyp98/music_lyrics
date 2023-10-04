@@ -13,33 +13,44 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return Stack(
       children: [
-        // 楽曲ライブラリの更新
-        ListTile(
-            leading: const Icon(Icons.autorenew),
-            title: const Text('楽曲ライブラリの更新'),
-            onTap: () {
-              // ダイアログ表示
-              showDialog(
-                context: context,
-                builder: (context) => UpdateDialog(
-                  progress: 0.0,
-                  doneOnce: true,
-                ),
-              );
-            }),
+        ListView(
+          children: [
+            // ライブラリ更新
+            ListTile(
+              leading: const Icon(Icons.autorenew),
+              title: const Text('楽曲ライブラリの更新'),
+              onTap: () {
+                // ダイアログ表示
+                showDialog(
+                  context: context,
+                  builder: (context) => UpdateDialog(
+                    progress: 0.0,
+                    doneOnce: true,
+                  ),
+                );
+              },
+            ),
 
-        // お問い合わせフォーム
-        ListTile(
-          leading: const Icon(Icons.send),
-          title: const Text('お問い合わせフォーム'),
-          onTap: () {
-            // Google フォームを開く
-            launchUrl(
-              Uri.parse('https://docs.google.com/forms/d/e/1FAIpQLSesGixlIAXYNodmKWg3jBOLPFVPvLylXKRzAskOtDDtYWGtOA/viewform?usp=sf_link'),
-            );
-          },
+            // お問い合わせフォーム
+            ListTile(
+              leading: const Icon(Icons.send),
+              title: const Text('お問い合わせフォーム'),
+              onTap: () {
+                // Google フォームを開く
+                launchUrl(
+                  Uri.parse('https://docs.google.com/forms/d/e/1FAIpQLSesGixlIAXYNodmKWg3jBOLPFVPvLylXKRzAskOtDDtYWGtOA/viewform?usp=sf_link'),
+                );
+              },
+            ),
+          ],
+        ),
+
+        // バージョン情報
+        const Align(
+          alignment: Alignment.bottomCenter,
+          child: Text('developed by 35'),
         ),
       ],
     );
