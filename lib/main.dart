@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:music_lyrics/screens/LyricEdit.dart';
 import 'package:music_lyrics/widgets/NavigatonBar.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'provider/provider.dart';
 import 'screens/Splash.dart';
@@ -15,7 +15,8 @@ Future<void> main() async {
 
   // インスタンス生成
   prefs = await SharedPreferences.getInstance();
-  directory = await getApplicationDocumentsDirectory();
+  MobileAds.instance.initialize();
+
   getSplashText();
 
   // メディア通知のセットアップ

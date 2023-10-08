@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:music_lyrics/class/BannerAdManager.dart';
 import 'package:music_lyrics/provider/provider.dart';
 
 class BottomPlayerBar extends ConsumerStatefulWidget {
@@ -49,6 +51,10 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
 
   @override
   Widget build(BuildContext context) {
+    // バナー広告の読み込み
+    BannerAd myBanner = createBannerAd();
+    myBanner.load();
+
     // 再生位置などの取得
     listenToSongStream2();
     // 再生状況の取得
@@ -57,8 +63,12 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
     return BottomAppBar(
       // 画面スクロールで色が変わるのを防ぐ
       elevation: 0,
-      height: deviceHeight * 0.15,
+      // 下側の余白のみ削除
+      padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
+      height: deviceHeight * 0.16,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // SliderThemeでスライダーをラップ
           SliderTheme(
@@ -131,7 +141,16 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
               // 再生時間のテキスト
               Text(MilliToMS(ref.watch(EditPosiProvider).inMilliseconds)),
             ],
-          )
+          ),
+
+          // バナー広告
+          const SizedBox(height: 5),
+          Container(
+            color: Colors.white,
+            height: myBanner.size.height.toDouble(),
+            width: myBanner.size.width.toDouble(),
+            child: AdWidget(ad: myBanner),
+          ),
         ],
       ),
     );

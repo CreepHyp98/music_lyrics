@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:music_lyrics/class/BannerAdManager.dart';
 import 'package:music_lyrics/class/SongDB.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/widgets/BottomPlayerBar.dart';
@@ -21,6 +23,10 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
 
   @override
   Widget build(BuildContext context) {
+    // バナー広告の読み込み
+    BannerAd myBanner = createBannerAd();
+    myBanner.load();
+
     return Scaffold(
       // TextField入力時、上にずれてしまうのを防ぐ
       //resizeToAvoidBottomInset: false,
@@ -126,47 +132,65 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
           ? BottomAppBar(
               // 画面スクロールで色が変わるのを防ぐ
               elevation: 0,
-              child: Row(
+              // 下側の余白のみ削除
+              padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
+              height: deviceHeight * 0.14,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // 検索ボタン
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                  Row(
+                    children: [
+                      // 検索ボタン
+                      OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                          ),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.search),
+                            Text('検索'),
+                          ],
+                        ),
+                        onPressed: () {
+                          // 検索キーワード
+                          String keyword = "${ref.watch(EditSongProvider).title} ${ref.watch(EditSongProvider).artist!} lyricjp";
+                          // 検索エンジンを開く
+                          launchUrl(Uri.parse('https://www.google.com/search?q=$keyword'));
+                        },
                       ),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.search),
-                        Text('検索'),
-                      ],
-                    ),
-                    onPressed: () {
-                      // 検索キーワード
-                      String keyword = "${ref.watch(EditSongProvider).title} ${ref.watch(EditSongProvider).artist!} lyricjp";
-                      // 検索エンジンを開く
-                      launchUrl(Uri.parse('https://www.google.com/search?q=$keyword'));
-                    },
+
+                      // 空行削除ボタン
+                      OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                          ),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.remove_circle_outline),
+                            Text('空行削除'),
+                          ],
+                        ),
+                        onPressed: () {
+                          List<String> lines = tec.text.split('\n');
+                          lines.removeWhere((line) => line.isEmpty);
+                          tec.text = lines.join('\n');
+                        },
+                      ),
+                    ],
                   ),
 
-                  // 空行削除ボタン
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                      ),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.remove_circle_outline),
-                        Text('空行削除'),
-                      ],
-                    ),
-                    onPressed: () {
-                      List<String> lines = tec.text.split('\n');
-                      lines.removeWhere((line) => line.isEmpty);
-                      tec.text = lines.join('\n');
-                    },
+                  // バナー広告
+                  const SizedBox(height: 5),
+                  Container(
+                    color: Colors.white,
+                    height: myBanner.size.height.toDouble(),
+                    width: myBanner.size.width.toDouble(),
+                    child: AdWidget(ad: myBanner),
                   ),
                 ],
               ),

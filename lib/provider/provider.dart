@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:music_lyrics/class/MyAudioSourceClass.dart';
@@ -14,8 +12,6 @@ double deviceWidth = 0;
 double deviceHeight = 0;
 // 保存されたデータを参照
 late final SharedPreferences prefs;
-// アプリ専用フォルダを参照
-late final Directory directory;
 // SongModelの状態を管理
 final StateProvider<Song> SongProvider = StateProvider<Song>((ref) => Song());
 // 再生時間を管理

@@ -80,6 +80,12 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
     // 歌詞描画エリアのために端末高さサイズも取得
     double lyricAreaHeight = deviceHeight * 0.65;
     double lyricAreaWidth = deviceWidth * 0.525;
+    // bluetooth接続履歴の取得
+    bool? isConnected = prefs.getBool('isConnected');
+    if (isConnected == null) {
+      prefs.setBool('isConnected', false);
+      isConnected = false;
+    }
 
     if (ref.watch(AudioProvider).audioPlayer != null) {
       // これがないとメディア通知での操作が画面に反映されない
@@ -169,6 +175,26 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
                 },
                 icon: Icon(
                   Icons.skip_next_outlined,
+                  size: fontSizeM,
+                ),
+              ),
+            ),
+
+            // ワイヤレス接続中ボタン
+            Align(
+              alignment: const Alignment(-0.95, 0.98),
+              child: IconButton(
+                onPressed: () {
+                  if (isConnected == false) {
+                    prefs.setBool('isConnected', true);
+                    isConnected = true;
+                  } else {
+                    prefs.setBool('isConnected', false);
+                    isConnected = false;
+                  }
+                },
+                icon: Icon(
+                  isConnected ? Icons.media_bluetooth_on : Icons.media_bluetooth_off,
                   size: fontSizeM,
                 ),
               ),
