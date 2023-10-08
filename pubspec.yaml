@@ -19,10 +19,9 @@ dependencies:
   permission_handler: ^10.3.0 #追加
   just_audio: ^0.9.34 #追加
   flutter_riverpod: ^2.3.6  #追加
-  just_audio_background: ^0.0.1-beta.10  #追加
   wakelock: ^0.6.2  #追加
   shared_preferences: ^2.1.2 #追加
-  http: ^0.13.6 #追加（just_audio_backgroundと競合するため1.0.0には更新しない）
+  http: ^1.1.0
   persistent_bottom_nav_bar_v2: ^4.2.8 #追加
   flutter_native_splash: ^2.3.1 #追加
   url_launcher: ^6.1.12 #追加

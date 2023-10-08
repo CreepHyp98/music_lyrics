@@ -17,19 +17,9 @@ void parseSong(List<Song> songList, int songIndex, AudioPlayer audioPlayer) {
   // 受け取った曲リストを音源ファイルに変換し再生リストに加える
   for (var element in songList) {
     audioSourceList.add(
-        // URI文字列 → URIオブジェクト → オーディオファイル
-        AudioSource.file(element.path!)
-        /*
-      AudioSource.uri(
-        Uri.parse(element.uri!),
-        tag: MediaItem(
-          id: element.id.toString(),
-          title: element.title!,
-          artist: element.artist,
-        ),
-      ),
-      */
-        );
+      // URI文字列 → URIオブジェクト → オーディオファイル
+      AudioSource.file(element.path!),
+    );
   }
 
   // 再生リストをプレイヤーにセット

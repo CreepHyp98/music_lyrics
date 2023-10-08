@@ -13,7 +13,7 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
   int? _duration;
   bool _isPlaying = false;
 
-  void listenToSongStream2() {
+  void listenToSongStream() {
     // 音源ファイルの曲時間を取得
     _duration = ref.watch(EditSongProvider).duration;
 
@@ -49,9 +49,8 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
 
   @override
   Widget build(BuildContext context) {
-    // 再生位置などの取得
-    listenToSongStream2();
     // 再生状況の取得
+    listenToSongStream();
     listenToEvent();
 
     return BottomAppBar(

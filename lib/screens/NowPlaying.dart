@@ -82,9 +82,8 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
     double lyricAreaWidth = deviceWidth * 0.525;
 
     if (ref.watch(AudioProvider).audioPlayer != null) {
-      // これがないとメディア通知での操作が画面に反映されない
-      listenToSongStream();
       // 再生状況の取得
+      listenToSongStream();
       listenToEvent();
     }
 

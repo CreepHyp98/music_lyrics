@@ -18,15 +18,6 @@ Future<void> main() async {
   directory = await getApplicationDocumentsDirectory();
   getSplashText();
 
-  // メディア通知のセットアップ
-  // TODO: 歌詞編集用の再生でもMediaItemを指定しなくちゃいけなくなっちゃう
-  // TODO: 曲リストから再生するときのみメディア通知を出したい
-  //await JustAudioBackground.init(
-  //  androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
-  //  androidNotificationChannelName: 'Audio playback',
-  //  androidNotificationOngoing: true,
-  //);
-
   runApp(const ProviderScope(child: MyApp()));
 }
 
