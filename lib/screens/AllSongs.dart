@@ -144,7 +144,7 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                                   );
 
                                   // オーディオファイルに変換し再生
-                                  parseSong(
+                                  playSong(
                                     ref.watch(AudioProvider).songList!,
                                     ref.watch(AudioProvider).songIndex!,
                                     ref.watch(AudioProvider).audioPlayer!,
@@ -158,47 +158,49 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                                   maxLines: 1,
                                 ),
                                 subtitle: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      "${allSongs[index].artist}",
+                                      "${allSongs[index].path}",
+                                      style: const TextStyle(fontSize: 9),
                                       maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    Text(IntDurationToMS(allSongs[index].duration)),
+                                    //Text(IntDurationToMS(allSongs[index].duration)),
                                   ],
                                 ),
-                                trailing: IconButton(
-                                  onPressed: () {
-                                    // 歌詞編集用SongModelに今開いてる曲をセット
-                                    ref.read(EditSongProvider.notifier).state = allSongs[index];
-                                    // EditLrcProviderを更新
-                                    if (allSongs[index].lyric != null) {
-                                      ref.read(EditLrcProvider.notifier).state = allSongs[index].lyric!.split('\n');
-                                    } else {
-                                      ref.read(EditLrcProvider.notifier).state = [''];
-                                    }
-
-                                    // ダイアログ表示
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => SettingDialog(
-                                        defaultFurigana: allSongs[index].title_furi,
-                                      ),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.more_horiz),
-                                ),
-                                leading: QueryArtworkWidget(
-                                  id: allSongs[index].id!,
-                                  type: ArtworkType.AUDIO,
-                                  artworkBorder: BorderRadius.circular(0),
-                                  artworkFit: BoxFit.contain,
-                                  nullArtworkWidget: const Icon(Icons.music_note),
-                                ),
-                                // leadingとtitleの幅
-                                horizontalTitleGap: 5,
-                                // ListTile両端の余白
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 5),
+                                //trailing: IconButton(
+                                //  onPressed: () {
+                                //    // 歌詞編集用SongModelに今開いてる曲をセット
+                                //    ref.read(EditSongProvider.notifier).state = allSongs[index];
+                                //    // EditLrcProviderを更新
+                                //    if (allSongs[index].lyric != null) {
+                                //      ref.read(EditLrcProvider.notifier).state = allSongs[index].lyric!.split//('\n');
+                                //    } else {
+                                //      ref.read(EditLrcProvider.notifier).state = [''];
+                                //    }
+//
+                                //    // ダイアログ表示
+                                //    showDialog(
+                                //      context: context,
+                                //      builder: (context) => SettingDialog(
+                                //        defaultFurigana: allSongs[index].title_furi,
+                                //      ),
+                                //    );
+                                //  },
+                                //  icon: const Icon(Icons.more_horiz),
+                                //),
+                                //leading: QueryArtworkWidget(
+                                //  id: allSongs[index].id!,
+                                //  type: ArtworkType.AUDIO,
+                                //  artworkBorder: BorderRadius.circular(0),
+                                //  artworkFit: BoxFit.contain,
+                                //  nullArtworkWidget: const Icon(Icons.music_note),
+                                //),
+                                //// leadingとtitleの幅
+                                //horizontalTitleGap: 5,
+                                //// ListTile両端の余白
+                                //contentPadding: const EdgeInsets.symmetric(horizontal: 5),
                               );
                             },
                           ),

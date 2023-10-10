@@ -10,7 +10,7 @@ class MyAudioSource {
   MyAudioSource({this.songList, this.songIndex, this.audioPlayer});
 }
 
-void parseSong(List<Song> songList, int songIndex, AudioPlayer audioPlayer) {
+void playSong(List<Song> songList, int songIndex, AudioPlayer audioPlayer) async {
   // 再生リストの初期化
   List<AudioSource> audioSourceList = [];
 
