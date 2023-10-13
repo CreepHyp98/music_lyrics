@@ -1,5 +1,6 @@
 import 'package:just_audio/just_audio.dart';
 import 'package:music_lyrics/class/SongClass.dart';
+import 'package:music_lyrics/provider/provider.dart';
 
 class MyAudioSource {
   // 定数コンストラクタ
@@ -27,6 +28,10 @@ void playSong(List<Song> songList, int songIndex, AudioPlayer audioPlayer) async
     ConcatenatingAudioSource(children: audioSourceList),
     initialIndex: songIndex,
   );
+
+  if (audioPlayer.hasNext == false) {
+    ptc.jumpToTab(2);
+  }
 
   // 再生
   audioPlayer.play();

@@ -50,7 +50,7 @@ class _SettingsState extends State<Settings> {
         // バージョン情報
         const Align(
           alignment: Alignment.bottomCenter,
-          child: Text('developed by 曲名の下にパスを記載'),
+          child: Text('プレイヤーに曲がセットされてないと設定タブに飛ぶよ'),
         ),
       ],
     );
