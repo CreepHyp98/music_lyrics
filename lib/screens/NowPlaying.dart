@@ -85,6 +85,12 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
       // 再生状況の取得
       listenToSongStream();
       listenToEvent();
+    } else {
+      ptc.jumpToTab(2);
+    }
+
+    if (ref.watch(AudioProvider).audioPlayer!.hasNext == false) {
+      ptc.jumpToTab(2);
     }
 
     return Scaffold(

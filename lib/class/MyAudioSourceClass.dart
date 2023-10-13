@@ -29,10 +29,6 @@ void playSong(List<Song> songList, int songIndex, AudioPlayer audioPlayer) async
     initialIndex: songIndex,
   );
 
-  if (audioPlayer.hasNext == false) {
-    ptc.jumpToTab(2);
-  }
-
   // 再生
   audioPlayer.play();
 }
