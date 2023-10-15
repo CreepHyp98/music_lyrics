@@ -13,7 +13,7 @@ import MediaPlayer
     // ーーーーー追加ーーーーー
     do {
         if #available(iOS 10.0, *){
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, mode: AVAudioSessionModeDefault)
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.Playback, mode: AVAudioSession.Mode.Default)
             try AVAudioSession.sharedInstance().setActive(true)
         }
     } catch {
