@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:music_lyrics/class/SongDB.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/widgets/BottomPlayerBar.dart';

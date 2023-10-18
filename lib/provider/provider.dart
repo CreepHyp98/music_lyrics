@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:music_lyrics/class/MyAudioSourceClass.dart';
 import 'package:music_lyrics/class/SongClass.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class BottomPlayerBar extends ConsumerStatefulWidget {
   const BottomPlayerBar({super.key});
@@ -18,30 +19,28 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
     _duration = ref.watch(EditSongProvider).duration;
 
     // 現在の再生位置を取得
-    ref.watch(EditAPProvider).positionStream.listen((position) {
-      // このmountedがないとエラーになる
-      if (mounted) {
-        if (_duration! >= position.inMilliseconds) {
-          ref.read(EditPosiProvider.notifier).state = position;
-        } else {
-          // 再生位置が曲時間を超えたら曲を止める
-          _isPlaying = false;
-          ref.watch(EditAPProvider).pause();
-        }
-      }
-    });
+    //ref.watch(EditAPProvider).audioPlayer!.onPositionChanged.listen((position) {
+    //  // このmountedがないとエラーになる
+    //  if (mounted) {
+    //    ref.read(PositionProvider.notifier).state = position;
+    //  }
+    //});
   }
 
   // 再生中か停止中か取得
   void listenToEvent() {
-    ref.watch(EditAPProvider).playerStateStream.listen((state) {
-      if (state.playing) {
+    ref.watch(AudioProvider).audioPlayer!.onPlayerStateChanged.listen((state) {
+      if (state == PlayerState.playing) {
         if (mounted) {
-          _isPlaying = true;
+          setState(() {
+            _isPlaying = true;
+          });
         }
       } else {
         if (mounted) {
-          _isPlaying = false;
+          setState(() {
+            _isPlaying = false;
+          });
         }
       }
     });
@@ -83,7 +82,7 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
                     });
                   } else {
                     setState(() {
-                      ref.watch(EditAPProvider).play();
+                      ref.watch(EditAPProvider).play(UrlSource(ref.watch(EditSongProvider).path!));
                     });
                   }
                   _isPlaying = !_isPlaying;

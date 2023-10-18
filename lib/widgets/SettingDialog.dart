@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/class/SongDB.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class SettingDialog extends ConsumerWidget {
   final String? defaultFurigana;
@@ -43,7 +44,7 @@ class SettingDialog extends ConsumerWidget {
                 // 編集する曲を取得
                 String filePath = ref.watch(EditSongProvider).path!;
                 // パスを使ってプレイヤーにセット
-                ref.watch(EditAPProvider).setFilePath(filePath);
+                //ref.watch(EditAPProvider).open(filePath);
                 // 歌詞編集のテキストフィールドに対象の歌詞をセット
                 tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
 

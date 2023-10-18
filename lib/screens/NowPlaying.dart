@@ -4,6 +4,7 @@ import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/widgets/LyricWidget.dart';
 import 'package:music_lyrics/widgets/VerticalRotatedWriting.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class NowPlaying extends ConsumerStatefulWidget {
   const NowPlaying({super.key});
@@ -14,33 +15,24 @@ class NowPlaying extends ConsumerStatefulWidget {
 }
 
 class _NowPlayingState extends ConsumerState<NowPlaying> {
-  // クラスのインスタンス化
-  Duration _duration = const Duration();
   // 再生中かどうかのフラグをtrueで初期化
   bool _isPlaying = true;
 
   void listenToSongStream() {
-    // 音源ファイルの曲時間を取得
-    ref.watch(AudioProvider).audioPlayer!.durationStream.listen((duration) {
-      if (duration != null) {
-        _duration = duration;
-      }
-    });
-
     // 現在の再生位置を取得
-    ref.watch(AudioProvider).audioPlayer!.positionStream.listen((position) {
+    ref.watch(AudioProvider).audioPlayer!.onPositionChanged.listen((position) {
       // このmountedがないとエラーになる
       if (mounted) {
         ref.read(PositionProvider.notifier).state = position;
       }
     });
 
-    ref.watch(AudioProvider).audioPlayer!.currentIndexStream.listen((event) {
+    ref.watch(AudioProvider).audioPlayer!.onPlayerComplete.listen((event) {
       // このmountedがないとエラーになる
       if (mounted) {
-        if (event != null) {
-          ref.watch(AudioProvider).songIndex = event;
-        }
+        // 次のインデックスへ
+        ref.watch(AudioProvider).songIndex != ref.watch(AudioProvider).songIndex! + 1;
+
         ref.read(SongProvider.notifier).state = ref.watch(AudioProvider).songList![ref.watch(AudioProvider).songIndex!];
 
         // LyricProviderを更新
@@ -55,8 +47,8 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
 
   // 再生中か停止中か取得
   void listenToEvent() {
-    ref.watch(AudioProvider).audioPlayer!.playerStateStream.listen((state) {
-      if (state.playing) {
+    ref.watch(AudioProvider).audioPlayer!.onPlayerStateChanged.listen((state) {
+      if (state == PlayerState.playing) {
         if (mounted) {
           setState(() {
             _isPlaying = true;
@@ -146,7 +138,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
                   if (_isPlaying) {
                     ref.watch(AudioProvider).audioPlayer!.pause();
                   } else {
-                    ref.watch(AudioProvider).audioPlayer!.play();
+                    ref.watch(AudioProvider).audioPlayer!.play(UrlSource(ref.watch(SongProvider).path!));
                   }
                   _isPlaying = !_isPlaying;
                 },
@@ -162,9 +154,9 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
               alignment: const Alignment(0.9, 0.98),
               child: IconButton(
                 onPressed: () {
-                  if (ref.watch(AudioProvider).audioPlayer!.hasNext) {
-                    ref.watch(AudioProvider).audioPlayer!.seekToNext();
-                  }
+                  ref.watch(AudioProvider).audioPlayer!.onPlayerComplete.listen((event) {
+                    //ref.watch(AudioProvider).audioPlayer!.seekToNext();
+                  });
                 },
                 icon: Icon(
                   Icons.skip_next_outlined,

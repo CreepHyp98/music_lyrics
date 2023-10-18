@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:music_lyrics/class/MyAudioSourceClass.dart';
 import 'package:music_lyrics/class/SongClass.dart';
 import 'package:music_lyrics/widgets/SettingDialog.dart';
@@ -143,12 +143,15 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                                     audioPlayer: _audioPlayer,
                                   );
 
+                                  /*
                                   // オーディオファイルに変換し再生
                                   playSong(
                                     ref.watch(AudioProvider).songList!,
                                     ref.watch(AudioProvider).songIndex!,
                                     ref.watch(AudioProvider).audioPlayer!,
                                   );
+                                  */
+                                  ref.watch(AudioProvider).audioPlayer!.play(DeviceFileSource(ref.watch(SongProvider).path!));
 
                                   // NowPlayingに遷移
                                   ptc.jumpToTab(1);
