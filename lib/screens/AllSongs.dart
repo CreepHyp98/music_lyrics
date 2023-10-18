@@ -90,14 +90,14 @@ class _AllSongsState extends ConsumerState<AllSongs> {
 
     // SongProviderを更新
     ref.read(SongProvider.notifier).state = SongList[currentIndex];
-    // AudioPlayerProviderを更新
-    ref.watch(APProvider).play(DeviceFileSource(ref.watch(SongProvider).path!));
     // LyricProviderを更新
     if (SongList[currentIndex].lyric != null) {
       ref.read(LyricProvider.notifier).state = SongList[currentIndex].lyric!.split('\n');
     } else {
       ref.read(LyricProvider.notifier).state = [''];
     }
+    // AudioPlayerProviderを更新
+    ref.watch(APProvider).play(DeviceFileSource(ref.watch(SongProvider).path!));
   }
 
   @override

@@ -50,7 +50,7 @@ class _SettingsState extends State<Settings> {
         // バージョン情報
         const Align(
           alignment: Alignment.bottomCenter,
-          child: Text('パッケージ移行完了？'),
+          child: Text('iosで再生されない'),
         ),
       ],
     );
