@@ -49,9 +49,7 @@ class SettingDialog extends ConsumerWidget {
                 tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
 
                 // 再生中なら止める
-                if (ref.watch(AudioProvider).audioPlayer != null) {
-                  ref.watch(AudioProvider).audioPlayer!.pause();
-                }
+                  ref.watch(APProvider).pause();
 
                 // 編集画面に遷移
                 Navigator.pushNamed(context, '/edit');

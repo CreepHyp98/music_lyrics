@@ -19,17 +19,17 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
     _duration = ref.watch(EditSongProvider).duration;
 
     // 現在の再生位置を取得
-    //ref.watch(EditAPProvider).audioPlayer!.onPositionChanged.listen((position) {
-    //  // このmountedがないとエラーになる
-    //  if (mounted) {
-    //    ref.read(PositionProvider.notifier).state = position;
-    //  }
-    //});
+    ref.watch(EditAPProvider).onPositionChanged.listen((position) {
+      // このmountedがないとエラーになる
+      if (mounted) {
+        ref.read(EditPosiProvider.notifier).state = position;
+      }
+    });
   }
 
   // 再生中か停止中か取得
   void listenToEvent() {
-    ref.watch(AudioProvider).audioPlayer!.onPlayerStateChanged.listen((state) {
+    ref.watch(APProvider).onPlayerStateChanged.listen((state) {
       if (state == PlayerState.playing) {
         if (mounted) {
           setState(() {
@@ -82,7 +82,7 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
                     });
                   } else {
                     setState(() {
-                      ref.watch(EditAPProvider).play(UrlSource(ref.watch(EditSongProvider).path!));
+                      ref.watch(EditAPProvider).play(DeviceFileSource(ref.watch(EditSongProvider).path!));
                     });
                   }
                   _isPlaying = !_isPlaying;

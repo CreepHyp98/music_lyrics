@@ -5,6 +5,7 @@ import 'package:music_lyrics/widgets/LyricWidget.dart';
 import 'package:music_lyrics/widgets/VerticalRotatedWriting.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:music_lyrics/class/SongClass.dart';
 
 class NowPlaying extends ConsumerStatefulWidget {
   const NowPlaying({super.key});
@@ -18,36 +19,45 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
   // 再生中かどうかのフラグをtrueで初期化
   bool _isPlaying = true;
 
+  void playSong() {
+    int currentIndex = ref.watch(IndexProvider);
+
+    // SongProviderを更新
+    ref.read(SongProvider.notifier).state = SongList[currentIndex];
+    // AudioPlayerProviderを更新
+    ref.watch(APProvider).play(DeviceFileSource(ref.watch(SongProvider).path!));
+    // LyricProviderを更新
+    if (SongList[currentIndex].lyric != null) {
+      ref.read(LyricProvider.notifier).state = SongList[currentIndex].lyric!.split('\n');
+    } else {
+      ref.read(LyricProvider.notifier).state = [''];
+    }
+  }
+
   void listenToSongStream() {
     // 現在の再生位置を取得
-    ref.watch(AudioProvider).audioPlayer!.onPositionChanged.listen((position) {
+    ref.watch(APProvider).onPositionChanged.listen((position) {
       // このmountedがないとエラーになる
       if (mounted) {
         ref.read(PositionProvider.notifier).state = position;
       }
     });
 
-    ref.watch(AudioProvider).audioPlayer!.onPlayerComplete.listen((event) {
+    ref.watch(APProvider).onPlayerComplete.listen((event) {
       // このmountedがないとエラーになる
       if (mounted) {
         // 次のインデックスへ
-        ref.watch(AudioProvider).songIndex != ref.watch(AudioProvider).songIndex! + 1;
+        ref.read(IndexProvider.notifier).state = ref.watch(IndexProvider) + 1;
 
-        ref.read(SongProvider.notifier).state = ref.watch(AudioProvider).songList![ref.watch(AudioProvider).songIndex!];
-
-        // LyricProviderを更新
-        if (ref.watch(SongProvider).lyric != null) {
-          ref.read(LyricProvider.notifier).state = ref.watch(SongProvider).lyric!.split('\n');
-        } else {
-          ref.read(LyricProvider.notifier).state = [''];
-        }
+        // 再生
+        playSong();
       }
     });
   }
 
   // 再生中か停止中か取得
   void listenToEvent() {
-    ref.watch(AudioProvider).audioPlayer!.onPlayerStateChanged.listen((state) {
+    ref.watch(APProvider).onPlayerStateChanged.listen((state) {
       if (state == PlayerState.playing) {
         if (mounted) {
           setState(() {
@@ -73,11 +83,9 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
     double lyricAreaHeight = deviceHeight * 0.65;
     double lyricAreaWidth = deviceWidth * 0.525;
 
-    if (ref.watch(AudioProvider).audioPlayer != null) {
-      // 再生状況の取得
-      listenToSongStream();
-      listenToEvent();
-    }
+    // 再生状況の取得
+    listenToSongStream();
+    listenToEvent();
 
     return Scaffold(
       body: SafeArea(
@@ -136,9 +144,9 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
               child: IconButton(
                 onPressed: () {
                   if (_isPlaying) {
-                    ref.watch(AudioProvider).audioPlayer!.pause();
+                    ref.watch(APProvider).pause();
                   } else {
-                    ref.watch(AudioProvider).audioPlayer!.play(UrlSource(ref.watch(SongProvider).path!));
+                    ref.watch(APProvider).resume();
                   }
                   _isPlaying = !_isPlaying;
                 },
@@ -154,8 +162,11 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
               alignment: const Alignment(0.9, 0.98),
               child: IconButton(
                 onPressed: () {
-                  ref.watch(AudioProvider).audioPlayer!.onPlayerComplete.listen((event) {
-                    //ref.watch(AudioProvider).audioPlayer!.seekToNext();
+                  setState(() {
+                    // 次のインデックスへ
+                    ref.read(IndexProvider.notifier).state = ref.watch(IndexProvider) + 1;
+                    // 再生
+                    playSong();
                   });
                 },
                 icon: Icon(
