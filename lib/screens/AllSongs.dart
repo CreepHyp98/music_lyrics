@@ -29,6 +29,9 @@ class _AllSongsState extends ConsumerState<AllSongs> {
   // 曲リスト取得したかのフラグ
   bool _hasList = false;
 
+  // 曲リストの初期化
+  List<Song> allSongs = [];
+
   // 初回表示時の処理
   @override
   void initState() {
@@ -71,9 +74,9 @@ class _AllSongsState extends ConsumerState<AllSongs> {
   // データベースから全曲リスト取得
   Future<void> setAllSongs() async {
     if (_hasList == false) {
-      SongList = await songsDB.instance.getAllSongs();
+      allSongs = await songsDB.instance.getAllSongs();
       _hasList = true;
-      sortFurigana(SongList);
+      sortFurigana(allSongs);
     }
   }
 
@@ -119,7 +122,7 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                         Text("ロード中"),
                       ],
                     )
-                  : (SongList.isEmpty == true)
+                  : (allSongs.isEmpty == true)
                       ? const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -133,41 +136,61 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                           interactive: true,
                           child: ListView.builder(
                             // Listの要素数
-                            itemCount: SongList.length,
+                            itemCount: allSongs.length,
                             // Listの生成
                             itemBuilder: (context, index) {
                               return ListTile(
                                 onTap: () {
-                                  // リストインデックス更新
-                                  ref.read(IndexProvider.notifier).state = index;
+                                  // SongProviderを更新
+                                  ref.read(SongProvider.notifier).state = SongList[index];
+                                  // LyricProviderを更新
+                                  if (SongList[index].lyric != null) {
+                                    ref.read(LyricProvider.notifier).state = SongList[index].lyric!.split('\n');
+                                  } else {
+                                    ref.read(LyricProvider.notifier).state = [''];
+                                  }
 
-                                  // 再生
-                                  playSong();
+                                  // リスト・インデックス・プレイヤーをセットし、再生
+                                  ref.read(AudioProvider.notifier).state = MyAudioSource(
+                                    songList: allSongs,
+                                    songIndex: index,
+                                    audioPlayer: _audioPlayer,
+                                  );
+
+                                  /*
+                                  // オーディオファイルに変換し再生
+                                  playSong(
+                                    ref.watch(AudioProvider).songList!,
+                                    ref.watch(AudioProvider).songIndex!,
+                                    ref.watch(AudioProvider).audioPlayer!,
+                                  );
+                                  */
+                                  ref.watch(AudioProvider).audioPlayer!.play(DeviceFileSource(ref.watch(SongProvider).path!));
 
                                   // NowPlayingに遷移
                                   ptc.jumpToTab(1);
                                 },
                                 title: Text(
-                                  SongList[index].title!,
+                                  allSongs[index].title!,
                                   maxLines: 1,
                                 ),
                                 subtitle: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      "${SongList[index].artist}",
+                                      "${allSongs[index].artist}",
                                       maxLines: 1,
                                     ),
-                                    Text(IntDurationToMS(SongList[index].duration)),
+                                    Text(IntDurationToMS(allSongs[index].duration)),
                                   ],
                                 ),
                                 trailing: IconButton(
                                   onPressed: () {
                                     // 歌詞編集用SongModelに今開いてる曲をセット
-                                    ref.read(EditSongProvider.notifier).state = SongList[index];
+                                    ref.read(EditSongProvider.notifier).state = allSongs[index];
                                     // EditLrcProviderを更新
-                                    if (SongList[index].lyric != null) {
-                                      ref.read(EditLrcProvider.notifier).state = SongList[index].lyric!.split('\n');
+                                    if (allSongs[index].lyric != null) {
+                                      ref.read(EditLrcProvider.notifier).state = allSongs[index].lyric!.split('\n');
                                     } else {
                                       ref.read(EditLrcProvider.notifier).state = [''];
                                     }
@@ -176,14 +199,14 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                                     showDialog(
                                       context: context,
                                       builder: (context) => SettingDialog(
-                                        defaultFurigana: SongList[index].title_furi,
+                                        defaultFurigana: allSongs[index].title_furi,
                                       ),
                                     );
                                   },
                                   icon: const Icon(Icons.more_horiz),
                                 ),
                                 leading: QueryArtworkWidget(
-                                  id: SongList[index].id!,
+                                  id: allSongs[index].id!,
                                   type: ArtworkType.AUDIO,
                                   artworkBorder: BorderRadius.circular(0),
                                   artworkFit: BoxFit.contain,
