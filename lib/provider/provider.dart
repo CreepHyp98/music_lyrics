@@ -36,3 +36,7 @@ final StateProvider<List<String>> EditLrcProvider = StateProvider<List<String>>(
 TextEditingController tec = TextEditingController();
 // スプラッシュ画面に表示する[歌詞, 曲名, アーティスト名]のリスト
 List<String> SplashTextList = ['', '', ''];
+// 再生曲リスト
+List<Song> SongList = [];
+// リストインデックス
+final StateProvider<int> IndexProvider = StateProvider<int>((ref) => 0);

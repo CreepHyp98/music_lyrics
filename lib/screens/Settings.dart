@@ -50,7 +50,7 @@ class _SettingsState extends State<Settings> {
         // バージョン情報
         const Align(
           alignment: Alignment.bottomCenter,
-          child: Text('iosで再生されない'),
+          child: Text('AudioPlayerグローバル設定'),
         ),
       ],
     );

@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/screens/LyricEdit.dart';
@@ -17,6 +18,28 @@ Future<void> main() async {
   prefs = await SharedPreferences.getInstance();
   directory = await getApplicationDocumentsDirectory();
   getSplashText();
+
+  // AudioPlayerのグローバル設定
+  const AudioContext audioContext = AudioContext(
+    iOS: AudioContextIOS(
+      category: AVAudioSessionCategory.playback,
+      options: [
+        AVAudioSessionOptions.defaultToSpeaker,
+        AVAudioSessionOptions.mixWithOthers,
+        AVAudioSessionOptions.allowAirPlay,
+        AVAudioSessionOptions.allowBluetooth,
+        AVAudioSessionOptions.allowBluetoothA2DP,
+      ],
+    ),
+    android: AudioContextAndroid(
+      isSpeakerphoneOn: true,
+      contentType: AndroidContentType.music,
+      usageType: AndroidUsageType.media,
+      audioFocus: AndroidAudioFocus.gain,
+    ),
+  );
+
+  AudioPlayer.global.setAudioContext(audioContext);
 
   runApp(const ProviderScope(child: MyApp()));
 }
