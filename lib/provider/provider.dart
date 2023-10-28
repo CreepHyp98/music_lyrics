@@ -13,11 +13,13 @@ double deviceWidth = 0;
 double deviceHeight = 0;
 // 保存されたデータを参照
 late final SharedPreferences prefs;
-// アプリ専用フォルダを参照
-late final Directory directory;
 // SongModelの状態を管理
 final StateProvider<Song> SongProvider = StateProvider<Song>((ref) => Song());
-final StateProvider<AudioPlayer> APProvider = StateProvider<AudioPlayer>((ref) => AudioPlayer());
+AudioPlayer audioPlayer = AudioPlayer();
+// 再生曲リスト
+List<Song> SongList = [];
+// リストインデックス
+final StateProvider<int> IndexProvider = StateProvider<int>((ref) => 0);
 // 再生時間を管理
 final StateProvider<Duration> PositionProvider = StateProvider<Duration>((ref) => const Duration());
 // 再生中の歌詞データを管理
@@ -27,7 +29,7 @@ final PersistentTabController ptc = PersistentTabController();
 // 歌詞編集用SongModel
 final StateProvider<Song> EditSongProvider = StateProvider<Song>((ref) => Song());
 // 歌詞編集用AudioPlayer
-final StateProvider<AudioPlayer> EditAPProvider = StateProvider<AudioPlayer>((ref) => AudioPlayer());
+AudioPlayer EditAudioPlayer = AudioPlayer();
 // 歌詞編集用再生時間
 final StateProvider<Duration> EditPosiProvider = StateProvider<Duration>((ref) => const Duration());
 // 歌詞編集用歌詞データ
@@ -36,7 +38,3 @@ final StateProvider<List<String>> EditLrcProvider = StateProvider<List<String>>(
 TextEditingController tec = TextEditingController();
 // スプラッシュ画面に表示する[歌詞, 曲名, アーティスト名]のリスト
 List<String> SplashTextList = ['', '', ''];
-// 再生曲リスト
-List<Song> SongList = [];
-// リストインデックス
-final StateProvider<int> IndexProvider = StateProvider<int>((ref) => 0);

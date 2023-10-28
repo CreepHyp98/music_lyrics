@@ -22,7 +22,6 @@ class AllSongs extends ConsumerStatefulWidget {
 class _AllSongsState extends ConsumerState<AllSongs> {
   // クラスのインスタンス化
   final OnAudioQuery _audioQuery = OnAudioQuery();
-  final AudioPlayer _audioPlayer = AudioPlayer();
 
   // アクセス許可のフラグ
   bool _hasPermission = false;
@@ -86,9 +85,8 @@ class _AllSongsState extends ConsumerState<AllSongs> {
   }
 
   void playSong() {
-    int currentIndex = ref.watch(IndexProvider);
-
     // SongProviderを更新
+    int currentIndex = ref.watch(IndexProvider);
     ref.read(SongProvider.notifier).state = SongList[currentIndex];
     // LyricProviderを更新
     if (SongList[currentIndex].lyric != null) {
@@ -96,8 +94,12 @@ class _AllSongsState extends ConsumerState<AllSongs> {
     } else {
       ref.read(LyricProvider.notifier).state = [''];
     }
-    // AudioPlayerProviderを更新
-    ref.watch(APProvider).play(DeviceFileSource(ref.watch(SongProvider).path!));
+    // 再生
+    if (Platform.isAndroid == true) {
+      audioPlayer.play(DeviceFileSource(ref.watch(SongProvider).path!));
+    } else {
+      audioPlayer.play(UrlSource(ref.watch(SongProvider).path!));
+    }
   }
 
   @override

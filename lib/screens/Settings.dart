@@ -50,7 +50,7 @@ class _SettingsState extends State<Settings> {
         // バージョン情報
         const Align(
           alignment: Alignment.bottomCenter,
-          child: Text('AudioPlayerグローバル設定'),
+          child: Text('DeviceFile → Url'),
         ),
       ],
     );

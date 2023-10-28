@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
@@ -5,7 +7,6 @@ import 'package:music_lyrics/widgets/LyricWidget.dart';
 import 'package:music_lyrics/widgets/VerticalRotatedWriting.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:music_lyrics/class/SongClass.dart';
 
 class NowPlaying extends ConsumerStatefulWidget {
   const NowPlaying({super.key});
@@ -20,9 +21,8 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
   bool _isPlaying = true;
 
   void playSong() {
-    int currentIndex = ref.watch(IndexProvider);
-
     // SongProviderを更新
+    int currentIndex = ref.watch(IndexProvider);
     ref.read(SongProvider.notifier).state = SongList[currentIndex];
     // LyricProviderを更新
     if (SongList[currentIndex].lyric != null) {
@@ -30,20 +30,24 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
     } else {
       ref.read(LyricProvider.notifier).state = [''];
     }
-    // AudioPlayerProviderを更新
-    ref.watch(APProvider).play(DeviceFileSource(ref.watch(SongProvider).path!));
+    // 再生
+    if (Platform.isAndroid == true) {
+      audioPlayer.play(DeviceFileSource(ref.watch(SongProvider).path!));
+    } else {
+      audioPlayer.play(UrlSource(ref.watch(SongProvider).path!));
+    }
   }
 
   void listenToSongStream() {
     // 現在の再生位置を取得
-    ref.watch(APProvider).onPositionChanged.listen((position) {
+    audioPlayer.onPositionChanged.listen((position) {
       // このmountedがないとエラーになる
       if (mounted) {
         ref.read(PositionProvider.notifier).state = position;
       }
     });
 
-    ref.watch(APProvider).onPlayerComplete.listen((event) {
+    audioPlayer.onPlayerComplete.listen((event) {
       // このmountedがないとエラーになる
       if (mounted) {
         // 次のインデックスへ
@@ -57,7 +61,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
 
   // 再生中か停止中か取得
   void listenToEvent() {
-    ref.watch(APProvider).onPlayerStateChanged.listen((state) {
+    audioPlayer.onPlayerStateChanged.listen((state) {
       if (state == PlayerState.playing) {
         if (mounted) {
           setState(() {
@@ -144,9 +148,9 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
               child: IconButton(
                 onPressed: () {
                   if (_isPlaying) {
-                    ref.watch(APProvider).pause();
+                    audioPlayer.pause();
                   } else {
-                    ref.watch(APProvider).resume();
+                    audioPlayer.resume();
                   }
                   _isPlaying = !_isPlaying;
                 },

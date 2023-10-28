@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
@@ -19,7 +21,7 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
     _duration = ref.watch(EditSongProvider).duration;
 
     // 現在の再生位置を取得
-    ref.watch(EditAPProvider).onPositionChanged.listen((position) {
+    EditAudioPlayer.onPositionChanged.listen((position) {
       // このmountedがないとエラーになる
       if (mounted) {
         ref.read(EditPosiProvider.notifier).state = position;
@@ -29,7 +31,7 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
 
   // 再生中か停止中か取得
   void listenToEvent() {
-    ref.watch(APProvider).onPlayerStateChanged.listen((state) {
+    audioPlayer.onPlayerStateChanged.listen((state) {
       if (state == PlayerState.playing) {
         if (mounted) {
           setState(() {
@@ -67,7 +69,7 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
               value: ref.watch(EditPosiProvider).inMilliseconds.toDouble(),
               max: _duration!.toDouble(),
               onChanged: (value) {
-                ref.watch(EditAPProvider).seek(Duration(milliseconds: value.toInt()));
+                EditAudioPlayer.seek(Duration(milliseconds: value.toInt()));
               },
             ),
           ),
@@ -78,11 +80,15 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
                 onPressed: () {
                   if (_isPlaying) {
                     setState(() {
-                      ref.watch(EditAPProvider).pause();
+                      EditAudioPlayer.pause();
                     });
                   } else {
                     setState(() {
-                      ref.watch(EditAPProvider).play(DeviceFileSource(ref.watch(EditSongProvider).path!));
+                      if (Platform.isAndroid == true) {
+                        EditAudioPlayer.play(DeviceFileSource(ref.watch(EditSongProvider).path!));
+                      } else {
+                        EditAudioPlayer.play(UrlSource(ref.watch(EditSongProvider).path!));
+                      }
                     });
                   }
                   _isPlaying = !_isPlaying;
@@ -98,9 +104,9 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
                   Duration tmp = ref.watch(EditPosiProvider) - const Duration(seconds: 10);
                   // 10秒戻して再生時間がマイナスにならないかチェック
                   if (tmp.inMilliseconds > 0) {
-                    ref.watch(EditAPProvider).seek(tmp);
+                    EditAudioPlayer.seek(tmp);
                   } else {
-                    ref.watch(EditAPProvider).seek(Duration.zero);
+                    EditAudioPlayer.seek(Duration.zero);
                   }
                 },
                 icon: const Icon(
@@ -114,11 +120,11 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
                   // 10秒進めて再生時間が曲時間を超えないかチェック
                   Duration tmp = ref.watch(EditPosiProvider) + const Duration(seconds: 10);
                   if (tmp.inMilliseconds < _duration!) {
-                    ref.watch(EditAPProvider).seek(tmp);
+                    EditAudioPlayer.seek(tmp);
                   } else {
                     // 超えてたら曲を止める
                     _isPlaying = false;
-                    ref.watch(EditAPProvider).pause();
+                    EditAudioPlayer.pause();
                   }
                 },
                 icon: const Icon(

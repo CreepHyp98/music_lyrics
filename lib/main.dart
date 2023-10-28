@@ -16,7 +16,6 @@ Future<void> main() async {
 
   // インスタンス生成
   prefs = await SharedPreferences.getInstance();
-  directory = await getApplicationDocumentsDirectory();
   getSplashText();
 
   // AudioPlayerのグローバル設定
@@ -26,9 +25,9 @@ Future<void> main() async {
       options: [
         AVAudioSessionOptions.defaultToSpeaker,
         AVAudioSessionOptions.mixWithOthers,
-        AVAudioSessionOptions.allowAirPlay,
-        AVAudioSessionOptions.allowBluetooth,
-        AVAudioSessionOptions.allowBluetoothA2DP,
+        //AVAudioSessionOptions.allowAirPlay,
+        //AVAudioSessionOptions.allowBluetooth,
+        //AVAudioSessionOptions.allowBluetoothA2DP,
       ],
     ),
     android: AudioContextAndroid(
@@ -38,7 +37,6 @@ Future<void> main() async {
       audioFocus: AndroidAudioFocus.gain,
     ),
   );
-
   AudioPlayer.global.setAudioContext(audioContext);
 
   runApp(const ProviderScope(child: MyApp()));
