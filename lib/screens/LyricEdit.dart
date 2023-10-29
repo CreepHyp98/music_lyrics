@@ -4,6 +4,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:music_lyrics/class/BannerAdManager.dart';
 import 'package:music_lyrics/class/SongDB.dart';
 import 'package:music_lyrics/provider/provider.dart';
+import 'package:music_lyrics/screens/Tutorial.dart';
 import 'package:music_lyrics/widgets/BottomPlayerBar.dart';
 import 'package:music_lyrics/widgets/LrcListView.dart';
 import 'package:music_lyrics/widgets/LrcTextField.dart';
@@ -18,21 +19,45 @@ class LyricEdit extends ConsumerStatefulWidget {
 
 class _LyricEditState extends ConsumerState<LyricEdit> {
   // ToggleButton選択中かどうか
-  final List<bool> _isSelected = <bool>[true, false];
+  List<bool> _isSelected = <bool>[true, false];
+
+  @override
+  void initState() {
+    // 初めての編集ならチュートリアル画面に遷移
+    bool? firstEdit_1 = prefs.getBool('tutorial_1');
+
+    if (firstEdit_1 == null || firstEdit_1 == true) {
+      prefs.setBool('tutorial_1', true);
+      WidgetsBinding.instance.addPostFrameCallback(
+        (Duration duration) {
+          showTutorial(context, 1);
+        },
+      );
+    }
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     // バナー広告の読み込み
     BannerAd myBanner = createBannerAd();
     myBanner.load();
+
     return WillPopScope(
       // デバイスのバックイベント時の処理
       onWillPop: () async {
         // 再生ストップ
         EditAudioPlayer.stop();
-
         // 編集用再生位置も初期化
         ref.read(EditPosiProvider.notifier).state = Duration.zero;
+
+        // チュートリアル画面終了
+        if (tcm != null) {
+          if (prefs.getBool('tutorial_1') == true || prefs.getBool('tutorial_2') == true) {
+            tcm!.finish();
+          }
+        }
 
         return true;
       },
@@ -50,9 +75,9 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
             onPressed: () {
               // 再生ストップ
               EditAudioPlayer.stop();
-
               // 編集用再生位置も初期化
               ref.read(EditPosiProvider.notifier).state = Duration.zero;
+
               // ダイアログに戻る
               Navigator.pop(context);
             },
@@ -69,16 +94,26 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                 if (index == 0) {
                   // TextFieldのコントローラーに歌詞プロバイダーをセット
                   tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
-                  _isSelected[0] = true;
-                  _isSelected[1] = false;
+                  _isSelected = [true, false];
                   setState(() {});
 
                   // 「同期」がタップされたら
                 } else {
                   // 歌詞プロバイダーにTextFieldの入力をセット
                   ref.read(EditLrcProvider.notifier).state = tec.text.split('\n');
-                  _isSelected[0] = false;
-                  _isSelected[1] = true;
+                  _isSelected = [false, true];
+
+                  // 初めての編集ならチュートリアル画面に遷移
+                  bool? firstEdit_2 = prefs.getBool('tutorial_2');
+                  if (firstEdit_2 == null || firstEdit_2 == true) {
+                    prefs.setBool('tutorial_2', true);
+                    WidgetsBinding.instance.addPostFrameCallback(
+                      (Duration duration) {
+                        showTutorial(context, 2);
+                      },
+                    );
+                  }
+
                   setState(() {});
                 }
               },
@@ -91,6 +126,7 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                   child: const Text('全体'),
                 ),
                 Container(
+                  key: key[2],
                   alignment: Alignment.center,
                   width: 120,
                   child: const Text('同期'),
@@ -102,6 +138,8 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
           // 完了ボタン
           actions: [
             IconButton(
+              key: key[5],
+              padding: EdgeInsets.all(deviceWidth / 40),
               icon: Icon(
                 Icons.check_circle,
                 color: Theme.of(context).primaryColor,
@@ -126,13 +164,9 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
         ),
 
         // 中央にはTextFieldもしくはListViewの歌詞
-        body: Stack(
-          children: [
-            Align(
-              alignment: Alignment.center,
-              child: _isSelected[0] ? const LrcTextField() : const LrcListView(),
-            ),
-          ],
+        body: Align(
+          alignment: Alignment.center,
+          child: _isSelected[0] ? LrcTextField(key: key[0]) : const LrcListView(),
         ),
 
         // 下バーは"全体"なら検索などのボタン、"同期"なら再生バー
@@ -151,6 +185,7 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                       children: [
                         // 検索ボタン
                         OutlinedButton(
+                          key: key[1],
                           style: OutlinedButton.styleFrom(
                             shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.all(Radius.circular(5.0)),
@@ -189,13 +224,29 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                             tec.text = lines.join('\n');
                           },
                         ),
+
+                        // インフォメーションマーク
+                        const Spacer(),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.info_outline,
+                          ),
+                          onPressed: () {
+                            // 一時的にフラグオン
+                            prefs.setBool('tutorial_1', true);
+                            WidgetsBinding.instance.addPostFrameCallback(
+                              (Duration duration) {
+                                showTutorial(context, 1);
+                              },
+                            );
+                          },
+                        ),
                       ],
                     ),
 
                     // バナー広告
                     const SizedBox(height: 5),
-                    Container(
-                      color: Colors.white,
+                    SizedBox(
                       height: myBanner.size.height.toDouble(),
                       width: myBanner.size.width.toDouble(),
                       child: AdWidget(ad: myBanner),

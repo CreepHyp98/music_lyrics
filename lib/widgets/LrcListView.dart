@@ -28,6 +28,7 @@ class LrcListView extends ConsumerWidget {
 
             // 左側タップで歌いだし時間の取得
             leading: FloatingActionButton(
+              key: index == 0 ? key[4] : null,
               heroTag: 'btn$index',
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,

@@ -4,6 +4,7 @@ import 'package:music_lyrics/class/SongClass.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 // 端末の横サイズ
 double deviceWidth = 0;
@@ -13,7 +14,7 @@ double deviceHeight = 0;
 late final SharedPreferences prefs;
 // SongModelの状態を管理
 final StateProvider<Song> SongProvider = StateProvider<Song>((ref) => Song());
-AudioPlayer audioPlayer = AudioPlayer();
+final AudioPlayer audioPlayer = AudioPlayer();
 // 再生曲リスト
 List<Song> SongList = [];
 // リストインデックス
@@ -27,7 +28,7 @@ final PersistentTabController ptc = PersistentTabController();
 // 歌詞編集用SongModel
 final StateProvider<Song> EditSongProvider = StateProvider<Song>((ref) => Song());
 // 歌詞編集用AudioPlayer
-AudioPlayer EditAudioPlayer = AudioPlayer();
+final AudioPlayer EditAudioPlayer = AudioPlayer();
 // 歌詞編集用再生時間
 final StateProvider<Duration> EditPosiProvider = StateProvider<Duration>((ref) => const Duration());
 // 歌詞編集用歌詞データ
@@ -36,3 +37,7 @@ final StateProvider<List<String>> EditLrcProvider = StateProvider<List<String>>(
 TextEditingController tec = TextEditingController();
 // スプラッシュ画面に表示する[歌詞, 曲名, アーティスト名]のリスト
 List<String> SplashTextList = ['', '', ''];
+// チュートリアル用のキー
+List<GlobalKey> key = [GlobalKey(), GlobalKey(), GlobalKey(), GlobalKey(), GlobalKey(), GlobalKey()];
+// チュートリアル
+TutorialCoachMark? tcm;

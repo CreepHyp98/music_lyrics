@@ -6,6 +6,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:music_lyrics/class/BannerAdManager.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:music_lyrics/screens/Tutorial.dart';
 
 class BottomPlayerBar extends ConsumerStatefulWidget {
   const BottomPlayerBar({super.key});
@@ -77,6 +78,7 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
             children: [
               // 再生・停止ボタン
               IconButton(
+                key: key[3],
                 onPressed: () {
                   if (_isPlaying) {
                     setState(() {
@@ -142,6 +144,23 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
 
               // 再生時間のテキスト
               Text(MilliToMS(ref.watch(EditPosiProvider).inMilliseconds)),
+
+              // インフォメーションマーク
+              const Spacer(),
+              IconButton(
+                icon: const Icon(
+                  Icons.info_outline,
+                ),
+                onPressed: () {
+                  // 一時的にフラグオン
+                  prefs.setBool('tutorial_2', true);
+                  WidgetsBinding.instance.addPostFrameCallback(
+                    (Duration duration) {
+                      showTutorial(context, 2);
+                    },
+                  );
+                },
+              ),
             ],
           ),
 
