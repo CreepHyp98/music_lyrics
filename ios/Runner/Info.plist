@@ -12,7 +12,6 @@
 		<key>LSApplicationQueriesSchemes</key>
   		<array>
     		<string>https</string>
-<string>http</string>
   		</array>
 
 		<!--追加-->
