@@ -94,7 +94,7 @@ class LrcListView extends ConsumerWidget {
                   ? () {
                       // LyricWidgetと同じ関数で時間情報を取得
                       int value = getLyricStartTime(ref.watch(EditLrcProvider)[index]);
-                      ref.watch(EditAPProvider).seek(Duration(milliseconds: value));
+                      EditAudioPlayer.seek(Duration(milliseconds: value));
                     }
                   : null,
             ),

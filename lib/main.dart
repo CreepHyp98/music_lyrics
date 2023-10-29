@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -19,14 +20,26 @@ Future<void> main() async {
 
   getSplashText();
 
-  // メディア通知のセットアップ
-  // TODO: 歌詞編集用の再生でもMediaItemを指定しなくちゃいけなくなっちゃう
-  // TODO: 曲リストから再生するときのみメディア通知を出したい
-  //await JustAudioBackground.init(
-  //  androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
-  //  androidNotificationChannelName: 'Audio playback',
-  //  androidNotificationOngoing: true,
-  //);
+  // AudioPlayerのグローバル設定
+  const AudioContext audioContext = AudioContext(
+    iOS: AudioContextIOS(
+      category: AVAudioSessionCategory.playback,
+      options: [
+        AVAudioSessionOptions.defaultToSpeaker,
+        AVAudioSessionOptions.mixWithOthers,
+        //AVAudioSessionOptions.allowAirPlay,
+        //AVAudioSessionOptions.allowBluetooth,
+        //AVAudioSessionOptions.allowBluetoothA2DP,
+      ],
+    ),
+    android: AudioContextAndroid(
+      isSpeakerphoneOn: true,
+      contentType: AndroidContentType.music,
+      usageType: AndroidUsageType.media,
+      audioFocus: AndroidAudioFocus.gain,
+    ),
+  );
+  AudioPlayer.global.setAudioContext(audioContext);
 
   runApp(const ProviderScope(child: MyApp()));
 }

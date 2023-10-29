@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/widgets/LyricWidget.dart';
 import 'package:music_lyrics/widgets/VerticalRotatedWriting.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class NowPlaying extends ConsumerStatefulWidget {
   const NowPlaying({super.key});
@@ -14,60 +17,47 @@ class NowPlaying extends ConsumerStatefulWidget {
 }
 
 class _NowPlayingState extends ConsumerState<NowPlaying> {
-  // クラスのインスタンス化
-  Duration _duration = const Duration();
   // 再生中かどうかのフラグをtrueで初期化
   bool _isPlaying = true;
 
-  void listenToSongStream() {
-    // 音源ファイルの曲時間を取得
-    ref.watch(AudioProvider).audioPlayer!.durationStream.listen((duration) {
-      if (duration != null) {
-        _duration = duration;
-      }
-    });
+  void playSong() {
+    // SongProviderを更新
+    int currentIndex = ref.watch(IndexProvider);
+    ref.read(SongProvider.notifier).state = SongList[currentIndex];
+    // LyricProviderを更新
+    if (SongList[currentIndex].lyric != null) {
+      ref.read(LyricProvider.notifier).state = SongList[currentIndex].lyric!.split('\n');
+    } else {
+      ref.read(LyricProvider.notifier).state = [''];
+    }
+    // 再生
+    if (Platform.isAndroid == true) {
+      audioPlayer.play(DeviceFileSource(ref.watch(SongProvider).path!));
+    } else {
+      audioPlayer.play(UrlSource(ref.watch(SongProvider).path!));
+    }
+    _isPlaying = true;
+  }
 
+  void listenToSongStream() {
     // 現在の再生位置を取得
-    ref.watch(AudioProvider).audioPlayer!.positionStream.listen((position) {
+    audioPlayer.onPositionChanged.listen((position) {
       // このmountedがないとエラーになる
       if (mounted) {
         ref.read(PositionProvider.notifier).state = position;
       }
     });
 
-    ref.watch(AudioProvider).audioPlayer!.currentIndexStream.listen((event) {
+    // 再生終了後
+    audioPlayer.onPlayerComplete.listen((event) {
+      _isPlaying = false;
       // このmountedがないとエラーになる
       if (mounted) {
-        if (event != null) {
-          ref.watch(AudioProvider).songIndex = event;
-        }
-        ref.read(SongProvider.notifier).state = ref.watch(AudioProvider).songList![ref.watch(AudioProvider).songIndex!];
+        // 次のインデックスへ
+        ref.read(IndexProvider.notifier).state = ref.watch(IndexProvider) + 1;
 
-        // LyricProviderを更新
-        if (ref.watch(SongProvider).lyric != null) {
-          ref.read(LyricProvider.notifier).state = ref.watch(SongProvider).lyric!.split('\n');
-        } else {
-          ref.read(LyricProvider.notifier).state = [''];
-        }
-      }
-    });
-  }
-
-  // 再生中か停止中か取得
-  void listenToEvent() {
-    ref.watch(AudioProvider).audioPlayer!.playerStateStream.listen((state) {
-      if (state.playing) {
-        if (mounted) {
-          setState(() {
-            _isPlaying = true;
-          });
-        }
-      } else {
-        if (mounted) {
-          setState(() {
-            _isPlaying = false;
-          });
-        }
+        // 再生
+        playSong();
       }
     });
   }
@@ -80,19 +70,9 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
     // 歌詞描画エリアのために端末高さサイズも取得
     double lyricAreaHeight = deviceHeight * 0.65;
     double lyricAreaWidth = deviceWidth * 0.525;
-    // bluetooth接続履歴の取得
-    bool? isConnected = prefs.getBool('isConnected');
-    if (isConnected == null) {
-      prefs.setBool('isConnected', false);
-      isConnected = false;
-    }
 
-    if (ref.watch(AudioProvider).audioPlayer != null) {
-      // これがないとメディア通知での操作が画面に反映されない
-      listenToSongStream();
-      // 再生状況の取得
-      listenToEvent();
-    }
+    // 再生状況の取得
+    listenToSongStream();
 
     return Scaffold(
       body: SafeArea(
@@ -151,9 +131,13 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
               child: IconButton(
                 onPressed: () {
                   if (_isPlaying) {
-                    ref.watch(AudioProvider).audioPlayer!.pause();
+                    setState(() {
+                      audioPlayer.pause();
+                    });
                   } else {
-                    ref.watch(AudioProvider).audioPlayer!.play();
+                    setState(() {
+                      audioPlayer.resume();
+                    });
                   }
                   _isPlaying = !_isPlaying;
                 },
@@ -169,32 +153,18 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
               alignment: const Alignment(0.9, 0.98),
               child: IconButton(
                 onPressed: () {
-                  if (ref.watch(AudioProvider).audioPlayer!.hasNext) {
-                    ref.watch(AudioProvider).audioPlayer!.seekToNext();
-                  }
+                  setState(() {
+                    // 次のインデックスへ
+                    int nextIndex = ref.watch(IndexProvider) + 1;
+                    if (nextIndex < SongList.length) {
+                      ref.read(IndexProvider.notifier).state = nextIndex;
+                      // 再生
+                      playSong();
+                    }
+                  });
                 },
                 icon: Icon(
                   Icons.skip_next_outlined,
-                  size: fontSizeM,
-                ),
-              ),
-            ),
-
-            // ワイヤレス接続中ボタン
-            Align(
-              alignment: const Alignment(-0.95, 0.98),
-              child: IconButton(
-                onPressed: () {
-                  if (isConnected == false) {
-                    prefs.setBool('isConnected', true);
-                    isConnected = true;
-                  } else {
-                    prefs.setBool('isConnected', false);
-                    isConnected = false;
-                  }
-                },
-                icon: Icon(
-                  isConnected ? Icons.media_bluetooth_on : Icons.media_bluetooth_off,
                   size: fontSizeM,
                 ),
               ),

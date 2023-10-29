@@ -2,8 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:music_lyrics/class/MyAudioSourceClass.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:music_lyrics/class/SongClass.dart';
 import 'package:music_lyrics/widgets/SettingDialog.dart';
 
@@ -23,15 +22,11 @@ class AllSongs extends ConsumerStatefulWidget {
 class _AllSongsState extends ConsumerState<AllSongs> {
   // クラスのインスタンス化
   final OnAudioQuery _audioQuery = OnAudioQuery();
-  final AudioPlayer _audioPlayer = AudioPlayer();
 
   // アクセス許可のフラグ
   bool _hasPermission = false;
   // 曲リスト取得したかのフラグ
   bool _hasList = false;
-
-  // 曲リストの初期化
-  List<Song> allSongs = [];
 
   // 初回表示時の処理
   @override
@@ -75,9 +70,9 @@ class _AllSongsState extends ConsumerState<AllSongs> {
   // データベースから全曲リスト取得
   Future<void> setAllSongs() async {
     if (_hasList == false) {
-      allSongs = await songsDB.instance.getAllSongs();
+      SongList = await songsDB.instance.getAllSongs();
       _hasList = true;
-      sortFurigana(allSongs);
+      sortFurigana(SongList);
     }
   }
 
@@ -87,6 +82,24 @@ class _AllSongsState extends ConsumerState<AllSongs> {
       (a, b) => (a.title_furi!.toLowerCase()).compareTo(b.title_furi!.toLowerCase()),
     );
     setState(() {});
+  }
+
+  void playSong() {
+    // SongProviderを更新
+    int currentIndex = ref.watch(IndexProvider);
+    ref.read(SongProvider.notifier).state = SongList[currentIndex];
+    // LyricProviderを更新
+    if (SongList[currentIndex].lyric != null) {
+      ref.read(LyricProvider.notifier).state = SongList[currentIndex].lyric!.split('\n');
+    } else {
+      ref.read(LyricProvider.notifier).state = [''];
+    }
+    // 再生
+    if (Platform.isAndroid == true) {
+      audioPlayer.play(DeviceFileSource(ref.watch(SongProvider).path!));
+    } else {
+      audioPlayer.play(UrlSource(ref.watch(SongProvider).path!));
+    }
   }
 
   @override
@@ -108,7 +121,7 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                         Text("ロード中"),
                       ],
                     )
-                  : (allSongs.isEmpty == true)
+                  : (SongList.isEmpty == true)
                       ? const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -122,58 +135,41 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                           interactive: true,
                           child: ListView.builder(
                             // Listの要素数
-                            itemCount: allSongs.length,
+                            itemCount: SongList.length,
                             // Listの生成
                             itemBuilder: (context, index) {
                               return ListTile(
                                 onTap: () {
-                                  // SongProviderを更新
-                                  ref.read(SongProvider.notifier).state = allSongs[index];
-                                  // LyricProviderを更新
-                                  if (allSongs[index].lyric != null) {
-                                    ref.read(LyricProvider.notifier).state = allSongs[index].lyric!.split('\n');
-                                  } else {
-                                    ref.read(LyricProvider.notifier).state = [''];
-                                  }
+                                  // リストインデックス更新
+                                  ref.read(IndexProvider.notifier).state = index;
 
-                                  // リスト・インデックス・プレイヤーをセットし、再生
-                                  ref.read(AudioProvider.notifier).state = MyAudioSource(
-                                    songList: allSongs,
-                                    songIndex: index,
-                                    audioPlayer: _audioPlayer,
-                                  );
-
-                                  // オーディオファイルに変換し再生
-                                  parseSong(
-                                    ref.watch(AudioProvider).songList!,
-                                    ref.watch(AudioProvider).songIndex!,
-                                    ref.watch(AudioProvider).audioPlayer!,
-                                  );
+                                  // 再生
+                                  playSong();
 
                                   // NowPlayingに遷移
                                   ptc.jumpToTab(1);
                                 },
                                 title: Text(
-                                  allSongs[index].title!,
+                                  SongList[index].title!,
                                   maxLines: 1,
                                 ),
                                 subtitle: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      "${allSongs[index].artist}",
+                                      "${SongList[index].artist}",
                                       maxLines: 1,
                                     ),
-                                    Text(IntDurationToMS(allSongs[index].duration)),
+                                    Text(IntDurationToMS(SongList[index].duration)),
                                   ],
                                 ),
                                 trailing: IconButton(
                                   onPressed: () {
                                     // 歌詞編集用SongModelに今開いてる曲をセット
-                                    ref.read(EditSongProvider.notifier).state = allSongs[index];
+                                    ref.read(EditSongProvider.notifier).state = SongList[index];
                                     // EditLrcProviderを更新
-                                    if (allSongs[index].lyric != null) {
-                                      ref.read(EditLrcProvider.notifier).state = allSongs[index].lyric!.split('\n');
+                                    if (SongList[index].lyric != null) {
+                                      ref.read(EditLrcProvider.notifier).state = SongList[index].lyric!.split('\n');
                                     } else {
                                       ref.read(EditLrcProvider.notifier).state = [''];
                                     }
@@ -181,15 +177,13 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                                     // ダイアログ表示
                                     showDialog(
                                       context: context,
-                                      builder: (context) => SettingDialog(
-                                        defaultFurigana: allSongs[index].title_furi,
-                                      ),
+                                      builder: (context) => const SettingDialog(),
                                     );
                                   },
                                   icon: const Icon(Icons.more_horiz),
                                 ),
                                 leading: QueryArtworkWidget(
-                                  id: allSongs[index].id!,
+                                  id: SongList[index].id!,
                                   type: ArtworkType.AUDIO,
                                   artworkBorder: BorderRadius.circular(0),
                                   artworkFit: BoxFit.contain,

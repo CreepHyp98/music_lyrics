@@ -4,13 +4,12 @@ import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/class/SongDB.dart';
 
 class SettingDialog extends ConsumerWidget {
-  final String? defaultFurigana;
-  const SettingDialog({super.key, this.defaultFurigana});
+  const SettingDialog({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // TextFieldの入力text
-    final furiController = TextEditingController(text: defaultFurigana);
+    final furiController = TextEditingController(text: ref.watch(EditSongProvider).title_furi);
     // カーソルの位置を末尾に設定
     furiController.selection = TextSelection.fromPosition(TextPosition(offset: furiController.text.length));
 
@@ -40,17 +39,11 @@ class SettingDialog extends ConsumerWidget {
                 ),
               ),
               onTap: () {
-                // 編集する曲を取得
-                String filePath = ref.watch(EditSongProvider).path!;
-                // パスを使ってプレイヤーにセット
-                ref.watch(EditAPProvider).setFilePath(filePath);
                 // 歌詞編集のテキストフィールドに対象の歌詞をセット
                 tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
 
                 // 再生中なら止める
-                if (ref.watch(AudioProvider).audioPlayer != null) {
-                  ref.watch(AudioProvider).audioPlayer!.pause();
-                }
+                audioPlayer.pause();
 
                 // 編集画面に遷移
                 Navigator.pushNamed(context, '/edit');

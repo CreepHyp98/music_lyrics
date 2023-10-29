@@ -5,10 +5,14 @@
 		<!--追加-->
     	<key>NSAppleMusicUsageDescription</key>
 		<string>このアプリではデバイス内の音楽ファイルを再生するため上記のアクセスが必要です</string>
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>audio</string>
+		</array>
 		<key>LSApplicationQueriesSchemes</key>
   		<array>
     		<string>https</string>
-    		<string>http</string>
+<string>http</string>
   		</array>
 
 		<!--追加-->
@@ -20,7 +24,7 @@
     	    	  <key>SKAdNetworkIdentifier</key>
     	    	  <string>cstr6suwn9.skadnetwork</string>
     	    	</dict>
-    	  	</array>
+  		</array>
 
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>

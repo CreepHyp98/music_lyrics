@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:music_lyrics/class/BannerAdManager.dart';
 import 'package:music_lyrics/provider/provider.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class BottomPlayerBar extends ConsumerStatefulWidget {
   const BottomPlayerBar({super.key});
@@ -15,36 +18,25 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
   int? _duration;
   bool _isPlaying = false;
 
-  void listenToSongStream2() {
+  void listenToSongStream() {
     // 音源ファイルの曲時間を取得
     _duration = ref.watch(EditSongProvider).duration;
 
     // 現在の再生位置を取得
-    ref.watch(EditAPProvider).positionStream.listen((position) {
+    EditAudioPlayer.onPositionChanged.listen((position) {
       // このmountedがないとエラーになる
       if (mounted) {
-        if (_duration! >= position.inMilliseconds) {
-          ref.read(EditPosiProvider.notifier).state = position;
-        } else {
-          // 再生位置が曲時間を超えたら曲を止める
-          _isPlaying = false;
-          ref.watch(EditAPProvider).pause();
-        }
+        ref.read(EditPosiProvider.notifier).state = position;
       }
     });
-  }
 
-  // 再生中か停止中か取得
-  void listenToEvent() {
-    ref.watch(EditAPProvider).playerStateStream.listen((state) {
-      if (state.playing) {
-        if (mounted) {
-          _isPlaying = true;
-        }
-      } else {
-        if (mounted) {
+    // 再生終了後
+    audioPlayer.onPlayerComplete.listen((event) {
+      // このmountedがないとエラーになる
+      if (mounted) {
+        setState(() {
           _isPlaying = false;
-        }
+        });
       }
     });
   }
@@ -55,10 +47,8 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
     BannerAd myBanner = createBannerAd();
     myBanner.load();
 
-    // 再生位置などの取得
-    listenToSongStream2();
     // 再生状況の取得
-    listenToEvent();
+    listenToSongStream();
 
     return BottomAppBar(
       // 画面スクロールで色が変わるのを防ぐ
@@ -79,7 +69,7 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
               value: ref.watch(EditPosiProvider).inMilliseconds.toDouble(),
               max: _duration!.toDouble(),
               onChanged: (value) {
-                ref.watch(EditAPProvider).seek(Duration(milliseconds: value.toInt()));
+                EditAudioPlayer.seek(Duration(milliseconds: value.toInt()));
               },
             ),
           ),
@@ -90,11 +80,15 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
                 onPressed: () {
                   if (_isPlaying) {
                     setState(() {
-                      ref.watch(EditAPProvider).pause();
+                      EditAudioPlayer.pause();
                     });
                   } else {
                     setState(() {
-                      ref.watch(EditAPProvider).play();
+                      if (Platform.isAndroid == true) {
+                        EditAudioPlayer.play(DeviceFileSource(ref.watch(EditSongProvider).path!));
+                      } else {
+                        EditAudioPlayer.play(UrlSource(ref.watch(EditSongProvider).path!));
+                      }
                     });
                   }
                   _isPlaying = !_isPlaying;
@@ -110,9 +104,16 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
                   Duration tmp = ref.watch(EditPosiProvider) - const Duration(seconds: 10);
                   // 10秒戻して再生時間がマイナスにならないかチェック
                   if (tmp.inMilliseconds > 0) {
-                    ref.watch(EditAPProvider).seek(tmp);
+                    EditAudioPlayer.seek(tmp);
                   } else {
-                    ref.watch(EditAPProvider).seek(Duration.zero);
+                    EditAudioPlayer.seek(Duration.zero);
+                  }
+
+                  // 再生終了後でも動くように
+                  if (Platform.isAndroid == true) {
+                    EditAudioPlayer.play(DeviceFileSource(ref.watch(EditSongProvider).path!));
+                  } else {
+                    EditAudioPlayer.play(UrlSource(ref.watch(EditSongProvider).path!));
                   }
                 },
                 icon: const Icon(
@@ -126,11 +127,12 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
                   // 10秒進めて再生時間が曲時間を超えないかチェック
                   Duration tmp = ref.watch(EditPosiProvider) + const Duration(seconds: 10);
                   if (tmp.inMilliseconds < _duration!) {
-                    ref.watch(EditAPProvider).seek(tmp);
+                    EditAudioPlayer.seek(tmp);
                   } else {
-                    // 超えてたら曲を止める
+                    // 超えてたら再生時間を最大にして曲を止める
+                    EditAudioPlayer.seek(Duration(milliseconds: _duration!));
+                    EditAudioPlayer.pause();
                     _isPlaying = false;
-                    ref.watch(EditAPProvider).pause();
                   }
                 },
                 icon: const Icon(
