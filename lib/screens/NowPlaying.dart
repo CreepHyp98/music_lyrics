@@ -84,6 +84,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
               child: Text(
                 ref.watch(SongProvider).album.toString(),
                 style: const TextStyle(
+                  fontSize: 16,
                   fontFamily: 'shippori3',
                 ),
               ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/class/SongDB.dart';
+import 'package:music_lyrics/widgets/DeleteDialog.dart';
 
 class SettingDialog extends ConsumerWidget {
   const SettingDialog({super.key});
@@ -17,39 +18,14 @@ class SettingDialog extends ConsumerWidget {
       // タイトル（左寄せ）
       title: Text(
         ref.watch(EditSongProvider).title!,
-        style: const TextStyle(fontSize: 18),
+        style: const TextStyle(fontSize: 20),
         textAlign: TextAlign.left,
         maxLines: 1,
       ),
       content: SizedBox(
-        height: 150,
+        height: 160,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // 歌詞データの編集
-            GestureDetector(
-              child: const Text(
-                '歌詞データの編集',
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 16,
-                  letterSpacing: 2.0,
-                  decoration: TextDecoration.underline,
-                  decorationColor: Colors.blue,
-                ),
-              ),
-              onTap: () {
-                // 歌詞編集のテキストフィールドに対象の歌詞をセット
-                tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
-
-                // 再生中なら止める
-                audioPlayer.pause();
-
-                // 編集画面に遷移
-                Navigator.pushNamed(context, '/edit');
-              },
-            ),
-
             // 曲のフリガナTextField
             TextField(
               controller: furiController,
@@ -62,22 +38,60 @@ class SettingDialog extends ConsumerWidget {
               ),
             ),
 
-            // 閉じるボタン
-            ElevatedButton(
-              onPressed: () async {
-                // 入力されたフリガナの保存編集用プロバイダーにセット
-                ref.read(EditSongProvider.notifier).state.title_furi = furiController.text;
-                // データベースを更新
-                songsDB.instance.updateSong(ref.watch(EditSongProvider));
+            // 歌詞データの編集
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.edit_note),
+              title: const Text(
+                '歌詞データの編集',
+              ),
+              onTap: (() {
+                // 歌詞編集のテキストフィールドに対象の歌詞をセット
+                tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
 
-                // ダイアログを閉じる
+                // 再生中なら止める
+                audioPlayer.pause();
+
+                // 編集画面に遷移
+                Navigator.pushNamed(context, '/edit');
+              }),
+            ),
+
+            // ライブラリから削除
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.delete),
+              title: const Text(
+                'ライブラリから削除',
+              ),
+              onTap: (() {
                 Navigator.pop(context);
-              },
-              child: const Text('閉じる'),
+                showDialog(
+                  context: context,
+                  builder: (context) => const DeleteDialog(),
+                );
+              }),
             ),
           ],
         ),
       ),
+
+      actionsAlignment: MainAxisAlignment.center,
+      actions: [
+        // 閉じるボタン
+        ElevatedButton(
+          onPressed: () async {
+            // 入力されたフリガナの保存編集用プロバイダーにセット
+            ref.read(EditSongProvider.notifier).state.title_furi = furiController.text;
+            // データベースを更新
+            songsDB.instance.updateSong(ref.watch(EditSongProvider));
+
+            // ダイアログを閉じる
+            Navigator.pop(context);
+          },
+          child: const Text('閉じる'),
+        ),
+      ],
     );
   }
 }

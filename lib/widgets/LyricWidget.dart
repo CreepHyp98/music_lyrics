@@ -65,7 +65,6 @@ class _LyricWidgetState extends ConsumerState<LyricWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // 端末サイズからフォントサイズを指定
     double fontSizeM = 18;
 
     return VerticalRotatedWriting(text: syncLyric(), size: fontSizeM);

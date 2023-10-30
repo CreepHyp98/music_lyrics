@@ -79,44 +79,46 @@ class _UpdateDialogState extends State<UpdateDialog> {
     }
 
     return AlertDialog(
+      title: _done
+          ? const Text(
+              '更新終了',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20),
+            )
+          : const Text(
+              "更新中...",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20),
+            ),
       // ダイアログ外のタップを無効にする
-      content: SizedBox(
-        height: 90,
-        child: _done
-            // 更新完了
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('更新が終わりました'),
-                  ElevatedButton(
-                    child: const Text('OK'),
-                    onPressed: () {
-                      // ホーム画面の再構築
-                      Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => route.isCurrent);
-                      ptc.jumpToTab(0);
-                    },
-                  ),
-                ],
-              )
+      content: _done
+          // 更新完了
+          ? null
 
-            // 更新中
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("更新中..."),
-                  LinearProgressIndicator(
-                    value: widget.progress,
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      // ダイアログを閉じる
-                      Navigator.pop(context);
-                    },
-                    child: const Text('キャンセル'),
-                  ),
-                ],
+          // 更新中
+          : LinearProgressIndicator(
+              value: widget.progress,
+            ),
+
+      actionsAlignment: MainAxisAlignment.center,
+      actions: [
+        _done
+            ? ElevatedButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  // ホーム画面の再構築
+                  Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => route.isCurrent);
+                  ptc.jumpToTab(0);
+                },
+              )
+            : ElevatedButton(
+                onPressed: () async {
+                  // ダイアログを閉じる
+                  Navigator.pop(context);
+                },
+                child: const Text('キャンセル'),
               ),
-      ),
+      ],
     );
   }
 }
