@@ -30,16 +30,6 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
         ref.read(EditPosiProvider.notifier).state = position;
       }
     });
-
-    // 再生終了後
-    audioPlayer.onPlayerComplete.listen((event) {
-      // このmountedがないとエラーになる
-      if (mounted) {
-        setState(() {
-          _isPlaying = false;
-        });
-      }
-    });
   }
 
   @override
@@ -71,6 +61,9 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
               max: _duration!.toDouble(),
               onChanged: (value) {
                 EditAudioPlayer.seek(Duration(milliseconds: value.toInt()));
+                if (audioPlayer.state == PlayerState.paused) {
+                  ref.read(EditPosiProvider.notifier).state = Duration(milliseconds: value.toInt());
+                }
               },
             ),
           ),

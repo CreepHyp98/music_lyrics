@@ -94,6 +94,8 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                 if (index == 0) {
                   // TextFieldのコントローラーに歌詞プロバイダーをセット
                   tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
+                  // 編集用AudioPlayer一時停止
+                  EditAudioPlayer.pause();
                   _isSelected = [true, false];
                   setState(() {});
 
@@ -137,28 +139,30 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
 
           // 完了ボタン
           actions: [
-            IconButton(
-              key: key[5],
-              padding: EdgeInsets.all(deviceWidth / 40),
-              icon: Icon(
-                Icons.check_circle,
-                color: Theme.of(context).primaryColor,
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: IconButton(
+                key: key[5],
+                icon: Icon(
+                  Icons.check_circle,
+                  color: Theme.of(context).primaryColor,
+                ),
+                onPressed: () {
+                  // 再生ストップ
+                  EditAudioPlayer.stop();
+                  // 編集用再生位置も初期化
+                  ref.read(EditPosiProvider.notifier).state = Duration.zero;
+
+                  // 編集用プロバイダーのlyricにtextfieldの値をセット
+                  tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
+                  ref.read(EditSongProvider.notifier).state.lyric = tec.text;
+                  // データベースを更新
+                  songsDB.instance.updateSong(ref.watch(EditSongProvider));
+
+                  // ダイアログに戻る
+                  Navigator.pop(context);
+                },
               ),
-              onPressed: () {
-                // 再生ストップ
-                EditAudioPlayer.stop();
-                // 編集用再生位置も初期化
-                ref.read(EditPosiProvider.notifier).state = Duration.zero;
-
-                // 編集用プロバイダーのlyricにtextfieldの値をセット
-                tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
-                ref.read(EditSongProvider.notifier).state.lyric = tec.text;
-                // データベースを更新
-                songsDB.instance.updateSong(ref.watch(EditSongProvider));
-
-                // ダイアログに戻る
-                Navigator.pop(context);
-              },
             ),
           ],
         ),

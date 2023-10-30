@@ -62,6 +62,25 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
     });
   }
 
+  // 再生中か停止中か取得
+  void listenToEvent() {
+    audioPlayer.onPlayerStateChanged.listen((state) {
+      if (state == PlayerState.playing) {
+        if (mounted) {
+          setState(() {
+            _isPlaying = true;
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _isPlaying = false;
+          });
+        }
+      }
+    });
+  }
+
   // widgetの生成
   @override
   Widget build(BuildContext context) {
@@ -73,6 +92,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
 
     // 再生状況の取得
     listenToSongStream();
+    listenToEvent();
 
     return Scaffold(
       body: SafeArea(
@@ -132,13 +152,9 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
               child: IconButton(
                 onPressed: () {
                   if (_isPlaying) {
-                    setState(() {
-                      audioPlayer.pause();
-                    });
+                    audioPlayer.pause();
                   } else {
-                    setState(() {
-                      audioPlayer.resume();
-                    });
+                    audioPlayer.resume();
                   }
                   _isPlaying = !_isPlaying;
                 },
