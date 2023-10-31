@@ -80,7 +80,7 @@ class SettingDialog extends ConsumerWidget {
       actions: [
         // 閉じるボタン
         ElevatedButton(
-          onPressed: () async {
+          onPressed: () {
             // 入力されたフリガナの保存編集用プロバイダーにセット
             ref.read(EditSongProvider.notifier).state.title_furi = furiController.text;
             // データベースを更新

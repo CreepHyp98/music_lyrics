@@ -20,14 +20,18 @@ class LyricEdit extends ConsumerStatefulWidget {
 class _LyricEditState extends ConsumerState<LyricEdit> {
   // ToggleButton選択中かどうか
   List<bool> _isSelected = <bool>[true, false];
+  // チュートリアルを表示するか
+  late bool firstEdit_1;
+  late bool firstEdit_2;
 
   @override
   void initState() {
-    // 初めての編集ならチュートリアル画面に遷移
-    bool? firstEdit_1 = prefs.getBool('tutorial_1');
+    // チュートリアルの表示するか確認
+    firstEdit_1 = prefs.getBool('tutorial_1') ?? true;
+    firstEdit_2 = prefs.getBool('tutorial_2') ?? true;
 
-    if (firstEdit_1 == null || firstEdit_1 == true) {
-      prefs.setBool('tutorial_1', true);
+    // 初めての編集ならチュートリアル画面に遷移
+    if (firstEdit_1 == true) {
       WidgetsBinding.instance.addPostFrameCallback(
         (Duration duration) {
           showTutorial(context, 1);
@@ -54,9 +58,7 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
 
         // チュートリアル画面終了
         if (tcm != null) {
-          if (prefs.getBool('tutorial_1') == true || prefs.getBool('tutorial_2') == true) {
-            tcm!.finish();
-          }
+          tcm!.finish();
         }
 
         return true;
@@ -106,9 +108,7 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                   _isSelected = [false, true];
 
                   // 初めての編集ならチュートリアル画面に遷移
-                  bool? firstEdit_2 = prefs.getBool('tutorial_2');
-                  if (firstEdit_2 == null || firstEdit_2 == true) {
-                    prefs.setBool('tutorial_2', true);
+                  if (firstEdit_2 == true) {
                     WidgetsBinding.instance.addPostFrameCallback(
                       (Duration duration) {
                         showTutorial(context, 2);
@@ -236,8 +236,6 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                             Icons.info_outline,
                           ),
                           onPressed: () {
-                            // 一時的にフラグオン
-                            prefs.setBool('tutorial_1', true);
                             WidgetsBinding.instance.addPostFrameCallback(
                               (Duration duration) {
                                 showTutorial(context, 1);

@@ -18,7 +18,7 @@ class DeleteDialog extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             ElevatedButton(
-              onPressed: () async {
+              onPressed: () {
                 Navigator.pop(context);
               },
               child: const Text('いいえ'),
@@ -27,7 +27,7 @@ class DeleteDialog extends ConsumerWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).primaryColor,
               ),
-              onPressed: () async {
+              onPressed: () {
                 // データベースから削除
                 songsDB.instance.deleteSong(ref.watch(EditSongProvider).id!);
                 // 遷移元の画面を破棄してホーム画面へ

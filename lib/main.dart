@@ -44,13 +44,13 @@ Future<void> main() async {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   // 定数コンストラクタ
   const MyApp({super.key});
 
   // widgetの生成
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     // 端末のサイズを取得
     deviceHeight = MediaQuery.of(context).size.height;
     deviceWidth = MediaQuery.of(context).size.width;
@@ -61,6 +61,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         fontFamily: "Noto Sans JP",
+        colorSchemeSeed: Color(ref.watch(ColorValueProvider)),
       ),
       // 構成画面
       routes: <String, WidgetBuilder>{

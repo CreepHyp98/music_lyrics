@@ -139,6 +139,7 @@ class _AllSongsState extends ConsumerState<AllSongs> {
                             // Listの生成
                             itemBuilder: (context, index) {
                               return ListTile(
+                                tileColor: const Color(0xfffffbfe),
                                 onTap: () {
                                   // リストインデックス更新
                                   ref.read(IndexProvider.notifier).state = index;

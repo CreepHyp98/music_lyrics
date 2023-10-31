@@ -29,6 +29,7 @@ dependencies:
   flutter_launcher_icons: ^0.13.1 #追加
   google_mobile_ads: ^3.1.0 #追加
   tutorial_coach_mark: ^1.2.11  #追加
+  flutter_colorpicker: ^1.0.3 #追加
 
 #追加
 flutter_icons:       

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:music_lyrics/widgets/ColorDialog.dart';
 import 'package:music_lyrics/widgets/UpdateDialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:music_lyrics/class/BannerAdManager.dart';
@@ -45,6 +46,18 @@ class _SettingsState extends State<Settings> {
                 // Google フォームを開く
                 launchUrl(
                   Uri.parse('https://docs.google.com/forms/d/e/1FAIpQLSesGixlIAXYNodmKWg3jBOLPFVPvLylXKRzAskOtDDtYWGtOA/viewform?usp=sf_link'),
+                );
+              },
+            ),
+
+            // テーマカラー
+            ListTile(
+              leading: const Icon(Icons.palette),
+              title: const Text('テーマカラー'),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => const ColorDialog(),
                 );
               },
             ),

@@ -145,8 +145,6 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
                   Icons.info_outline,
                 ),
                 onPressed: () {
-                  // 一時的にフラグオン
-                  prefs.setBool('tutorial_2', true);
                   WidgetsBinding.instance.addPostFrameCallback(
                     (Duration duration) {
                       showTutorial(context, 2);

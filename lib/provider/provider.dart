@@ -41,3 +41,5 @@ List<String> SplashTextList = ['', '', ''];
 List<GlobalKey> key = [GlobalKey(), GlobalKey(), GlobalKey(), GlobalKey(), GlobalKey(), GlobalKey()];
 // チュートリアル
 TutorialCoachMark? tcm;
+// 保存されてるカラー値のprovider
+final StateProvider<int> ColorValueProvider = StateProvider<int>(((ref) => prefs.getInt('selectedColor') ?? Colors.blue.value));

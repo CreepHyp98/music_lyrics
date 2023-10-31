@@ -104,7 +104,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
       actions: [
         _done
             ? ElevatedButton(
-                child: const Text('OK'),
+                child: const Text('ＯＫ'),
                 onPressed: () {
                   // ホーム画面の再構築
                   Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => route.isCurrent);
@@ -112,7 +112,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
                 },
               )
             : ElevatedButton(
-                onPressed: () async {
+                onPressed: () {
                   // ダイアログを閉じる
                   Navigator.pop(context);
                 },
