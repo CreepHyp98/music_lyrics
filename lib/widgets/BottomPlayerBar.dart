@@ -157,8 +157,7 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
 
           // バナー広告
           const SizedBox(height: 5),
-          Container(
-            color: Colors.white,
+          SizedBox(
             height: myBanner.size.height.toDouble(),
             width: myBanner.size.width.toDouble(),
             child: AdWidget(ad: myBanner),

@@ -30,6 +30,8 @@ class _SettingsState extends State<Settings> {
                 onTap: () {
                   // ダイアログ表示
                   showDialog(
+                    // このダイアログは領域外タップ無効
+                    barrierDismissible: false,
                     context: context,
                     builder: (context) => UpdateDialog(
                       progress: 0.0,
@@ -50,10 +52,10 @@ class _SettingsState extends State<Settings> {
               },
             ),
 
-            // テーマカラー
+            // アクセントカラー
             ListTile(
               leading: const Icon(Icons.palette),
-              title: const Text('テーマカラー'),
+              title: const Text('アクセントカラー'),
               onTap: () {
                 showDialog(
                   context: context,
@@ -70,8 +72,7 @@ class _SettingsState extends State<Settings> {
             const Center(child: Text('developed by 太客')),
             const SizedBox(height: 2),
             // バナー広告
-            Container(
-              color: Colors.white,
+            SizedBox(
               height: myBanner.size.height.toDouble(),
               width: myBanner.size.width.toDouble(),
               child: AdWidget(ad: myBanner),

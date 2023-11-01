@@ -14,7 +14,10 @@ class ColorDialog extends ConsumerWidget {
       content: BlockPicker(
         pickerColor: Color(currentColor),
         onColorChanged: (Color color) {
+          // 選択されたカラーを保存
           currentColor = color.value;
+          prefs.setInt('selectedColor', currentColor);
+          ref.read(ColorValueProvider.notifier).state = currentColor;
         },
 
         // 想定した色にならなかったためデフォルトから黒色系統削除
@@ -30,7 +33,6 @@ class ColorDialog extends ConsumerWidget {
           Colors.teal,
           Colors.green,
           Colors.lightGreen,
-          Colors.lime,
           Colors.yellow,
           Colors.amber,
           Colors.orange,
@@ -53,16 +55,15 @@ class ColorDialog extends ConsumerWidget {
           );
         },
       ),
-      actionsAlignment: MainAxisAlignment.center,
       actions: [
-        ElevatedButton(
-          onPressed: () {
-            // 選択したカラーを保存
-            prefs.setInt('selectedColor', currentColor);
-            ref.read(ColorValueProvider.notifier).state = currentColor;
+        GestureDetector(
+          onTap: () {
             Navigator.pop(context);
           },
-          child: const Text('ＯＫ'),
+          child: const Text(
+            '閉じる',
+            style: TextStyle(fontSize: 15),
+          ),
         ),
       ],
     );

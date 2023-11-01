@@ -76,11 +76,10 @@ class SettingDialog extends ConsumerWidget {
         ),
       ),
 
-      actionsAlignment: MainAxisAlignment.center,
       actions: [
-        // 閉じるボタン
-        ElevatedButton(
-          onPressed: () {
+        // 閉じる
+        GestureDetector(
+          onTap: () {
             // 入力されたフリガナの保存編集用プロバイダーにセット
             ref.read(EditSongProvider.notifier).state.title_furi = furiController.text;
             // データベースを更新
@@ -89,7 +88,10 @@ class SettingDialog extends ConsumerWidget {
             // ダイアログを閉じる
             Navigator.pop(context);
           },
-          child: const Text('閉じる'),
+          child: const Text(
+            '閉じる',
+            style: TextStyle(fontSize: 15),
+          ),
         ),
       ],
     );

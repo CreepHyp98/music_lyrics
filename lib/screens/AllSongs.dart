@@ -110,95 +110,101 @@ class _AllSongsState extends ConsumerState<AllSongs> {
     }
 
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: (_hasPermission == false)
-              ? noAccessToLibraryWidget()
-              : (_hasList == false)
-                  ? const Column(
-                      children: [
-                        CircularProgressIndicator(),
-                        Text("ロード中"),
-                      ],
-                    )
-                  : (SongList.isEmpty == true)
-                      ? const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.settings),
-                            Text('の「楽曲ライブラリの更新」をタップしてください'),
-                          ],
-                        )
-                      : Scrollbar(
-                          thickness: 12.0,
-                          radius: const Radius.circular(12.0),
-                          interactive: true,
-                          child: ListView.builder(
-                            // Listの要素数
-                            itemCount: SongList.length,
-                            // Listの生成
-                            itemBuilder: (context, index) {
-                              return ListTile(
-                                tileColor: const Color(0xfffffbfe),
-                                onTap: () {
-                                  // リストインデックス更新
-                                  ref.read(IndexProvider.notifier).state = index;
-
-                                  // 再生
-                                  playSong();
-
-                                  // NowPlayingに遷移
-                                  ptc.jumpToTab(1);
-                                },
-                                title: Text(
-                                  SongList[index].title!,
-                                  maxLines: 1,
-                                ),
-                                subtitle: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "${SongList[index].artist}",
-                                      maxLines: 1,
-                                    ),
-                                    Text(IntDurationToMS(SongList[index].duration)),
-                                  ],
-                                ),
-                                trailing: IconButton(
-                                  onPressed: () {
-                                    // 歌詞編集用SongModelに今開いてる曲をセット
-                                    ref.read(EditSongProvider.notifier).state = SongList[index];
-                                    // EditLrcProviderを更新
-                                    if (SongList[index].lyric != null) {
-                                      ref.read(EditLrcProvider.notifier).state = SongList[index].lyric!.split('\n');
-                                    } else {
-                                      ref.read(EditLrcProvider.notifier).state = [''];
-                                    }
-
-                                    // ダイアログ表示
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => const SettingDialog(),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.more_horiz),
-                                ),
-                                leading: QueryArtworkWidget(
-                                  id: SongList[index].id!,
-                                  type: ArtworkType.AUDIO,
-                                  artworkBorder: BorderRadius.circular(0),
-                                  artworkFit: BoxFit.contain,
-                                  nullArtworkWidget: const Icon(Icons.music_note),
-                                ),
-                                // leadingとtitleの幅
-                                horizontalTitleGap: 5,
-                                // ListTile両端の余白
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 5),
-                              );
-                            },
-                          ),
-                        ),
+      // 通知バーの色を消すために高さ0のAppBar
+      appBar: PreferredSize(
+        preferredSize: Size.zero,
+        child: AppBar(
+          // 画面スクロールで色が変わるのを防ぐ
+          scrolledUnderElevation: 0,
         ),
+      ),
+      body: Center(
+        child: (_hasPermission == false)
+            ? noAccessToLibraryWidget()
+            : (_hasList == false)
+                ? const Column(
+                    children: [
+                      CircularProgressIndicator(),
+                      Text("ロード中"),
+                    ],
+                  )
+                : (SongList.isEmpty == true)
+                    ? const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.settings),
+                          Text('の「楽曲ライブラリの更新」をタップしてください'),
+                        ],
+                      )
+                    : Scrollbar(
+                        thickness: 12.0,
+                        radius: const Radius.circular(12.0),
+                        interactive: true,
+                        child: ListView.builder(
+                          // Listの要素数
+                          itemCount: SongList.length,
+                          // Listの生成
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              tileColor: const Color(0xfffffbfe),
+                              onTap: () {
+                                // リストインデックス更新
+                                ref.read(IndexProvider.notifier).state = index;
+
+                                // 再生
+                                playSong();
+
+                                // NowPlayingに遷移
+                                ptc.jumpToTab(1);
+                              },
+                              title: Text(
+                                SongList[index].title!,
+                                maxLines: 1,
+                              ),
+                              subtitle: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "${SongList[index].artist}",
+                                    maxLines: 1,
+                                  ),
+                                  Text(IntDurationToMS(SongList[index].duration)),
+                                ],
+                              ),
+                              trailing: IconButton(
+                                onPressed: () {
+                                  // 歌詞編集用SongModelに今開いてる曲をセット
+                                  ref.read(EditSongProvider.notifier).state = SongList[index];
+                                  // EditLrcProviderを更新
+                                  if (SongList[index].lyric != null) {
+                                    ref.read(EditLrcProvider.notifier).state = SongList[index].lyric!.split('\n');
+                                  } else {
+                                    ref.read(EditLrcProvider.notifier).state = [''];
+                                  }
+
+                                  // ダイアログ表示
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => const SettingDialog(),
+                                  );
+                                },
+                                icon: const Icon(Icons.more_horiz),
+                              ),
+                              leading: QueryArtworkWidget(
+                                id: SongList[index].id!,
+                                type: ArtworkType.AUDIO,
+                                artworkBorder: BorderRadius.circular(0),
+                                artworkFit: BoxFit.contain,
+                                nullArtworkWidget: const Icon(Icons.music_note),
+                              ),
+                              // leadingとtitleの幅
+                              horizontalTitleGap: 5,
+                              // ListTile両端の余白
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 5),
+                            );
+                          },
+                        ),
+                      ),
       ),
     );
   }

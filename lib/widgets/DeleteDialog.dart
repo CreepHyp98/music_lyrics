@@ -17,25 +17,28 @@ class DeleteDialog extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            ElevatedButton(
-              onPressed: () {
+            GestureDetector(
+              onTap: () {
                 Navigator.pop(context);
               },
-              child: const Text('いいえ'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
+              child: const Text(
+                'キャンセル',
+                style: TextStyle(fontSize: 15),
               ),
-              onPressed: () {
+            ),
+            GestureDetector(
+              onTap: () {
                 // データベースから削除
                 songsDB.instance.deleteSong(ref.watch(EditSongProvider).id!);
                 // 遷移元の画面を破棄してホーム画面へ
                 Navigator.of(context).pushReplacementNamed("/home");
               },
-              child: const Text(
-                ' はい ',
-                style: TextStyle(color: Colors.white),
+              child: Text(
+                '削除する',
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontSize: 15,
+                ),
               ),
             ),
           ],

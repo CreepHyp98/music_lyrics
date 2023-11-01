@@ -82,15 +82,12 @@ class _UpdateDialogState extends State<UpdateDialog> {
       title: _done
           ? const Text(
               '更新終了',
-              textAlign: TextAlign.center,
               style: TextStyle(fontSize: 20),
             )
           : const Text(
               "更新中...",
-              textAlign: TextAlign.center,
               style: TextStyle(fontSize: 20),
             ),
-      // ダイアログ外のタップを無効にする
       content: _done
           // 更新完了
           ? null
@@ -99,24 +96,28 @@ class _UpdateDialogState extends State<UpdateDialog> {
           : LinearProgressIndicator(
               value: widget.progress,
             ),
-
-      actionsAlignment: MainAxisAlignment.center,
       actions: [
         _done
-            ? ElevatedButton(
-                child: const Text('ＯＫ'),
-                onPressed: () {
+            ? GestureDetector(
+                child: const Text(
+                  '閉じる',
+                  style: TextStyle(fontSize: 15),
+                ),
+                onTap: () {
                   // ホーム画面の再構築
                   Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => route.isCurrent);
                   ptc.jumpToTab(0);
                 },
               )
-            : ElevatedButton(
-                onPressed: () {
+            : GestureDetector(
+                onTap: () {
                   // ダイアログを閉じる
                   Navigator.pop(context);
                 },
-                child: const Text('キャンセル'),
+                child: const Text(
+                  'キャンセル',
+                  style: TextStyle(fontSize: 15),
+                ),
               ),
       ],
     );
