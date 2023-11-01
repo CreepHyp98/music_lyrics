@@ -20,10 +20,10 @@ String getAdBannerUnitId() {
 
   if (Platform.isAndroid) {
     // Android のとき
-    adUnitId = "ca-app-pub-3940256099942544/6300978111";
+    adUnitId = "ca-app-pub-2338849205545790/3678213564";
   } else if (Platform.isIOS) {
     // iOSのとき
-    adUnitId = "ca-app-pub-3940256099942544/2934735716";
+    adUnitId = "ca-app-pub-2338849205545790/2959742855";
   }
   return adUnitId;
 }
