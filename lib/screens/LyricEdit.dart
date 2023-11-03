@@ -169,9 +169,8 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
 
         // 中央にはTextFieldもしくはListViewの歌詞
         body: Align(
-          key: _isSelected[0] ? key[0] : null,
           alignment: Alignment.center,
-          child: _isSelected[0] ? const LrcTextField() : const LrcListView(),
+          child: _isSelected[0] ? LrcTextField(key: key[0]) : const LrcListView(),
         ),
 
         // 下バーは"全体"なら検索などのボタン、"同期"なら再生バー
