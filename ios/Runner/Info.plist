@@ -5,10 +5,6 @@
 		<!--追加-->
     	<key>NSAppleMusicUsageDescription</key>
 		<string>このアプリではデバイス内の音楽ファイルを再生するため上記のアクセスが必要です</string>
-		<key>UIBackgroundModes</key>
-		<array>
-			<string>audio</string>
-		</array>
 		<key>LSApplicationQueriesSchemes</key>
   		<array>
     		<string>https</string>
@@ -71,6 +67,9 @@
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
 		<key>UIStatusBarHidden</key>
+		<false/>
+		<!--追加-->
+		<key>ITSAppUsesNonExemptEncryption</key>
 		<false/>
 	</dict>
 </plist>
