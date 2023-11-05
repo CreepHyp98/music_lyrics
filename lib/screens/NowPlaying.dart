@@ -18,9 +18,13 @@ class NowPlaying extends ConsumerStatefulWidget {
 
 class _NowPlayingState extends ConsumerState<NowPlaying> {
   // 再生中かどうかのフラグをtrueで初期化
-  bool _isPlaying = true;
+  bool _isPlaying = false;
+  // 終了後の処理を行ったかフラグ
+  bool _isFinished = false;
 
   void playSong() {
+    // 再生位置リセット
+    ref.read(PositionProvider.notifier).state = Duration.zero;
     // SongProviderを更新
     int currentIndex = ref.watch(IndexProvider);
     ref.read(SongProvider.notifier).state = SongList[currentIndex];
@@ -50,14 +54,16 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
 
     // 再生終了後
     audioPlayer.onPlayerComplete.listen((event) {
-      _isPlaying = false;
-      // このmountedがないとエラーになる
-      if (mounted) {
+      // なぜか二回通るのでフラグもチェック
+      if (mounted && _isFinished == false) {
         // 次のインデックスへ
-        ref.read(IndexProvider.notifier).state = ref.watch(IndexProvider) + 1;
-
-        // 再生
-        playSong();
+        int nextIndex = ref.watch(IndexProvider) + 1;
+        if (nextIndex < SongList.length) {
+          ref.read(IndexProvider.notifier).state = nextIndex;
+          // 再生
+          playSong();
+          _isFinished = true;
+        }
       }
     });
   }
@@ -69,6 +75,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
         if (mounted) {
           setState(() {
             _isPlaying = true;
+            _isFinished = false;
           });
         }
       } else {
