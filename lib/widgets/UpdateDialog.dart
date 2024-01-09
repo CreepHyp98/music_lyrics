@@ -47,8 +47,8 @@ class _UpdateDialogState extends State<UpdateDialog> {
       exist = false;
 
       // データベースに同じidの楽曲があるか探す
-      for (int j = 0; j < currentAllSong.length; j++) {
-        if (smList[i].id == currentAllSong[j].id) {
+      for (Song currentSong in currentAllSong) {
+        if (smList[i].id == currentSong.id) {
           exist = true;
           break;
         }
@@ -84,15 +84,15 @@ class _UpdateDialogState extends State<UpdateDialog> {
       exist = false;
 
       // データベースに同じidのアルバムがあるか探す
-      for (int j = 0; j < currentAllAlbum.length; j++) {
-        if (alList[i].id == currentAllAlbum[j].id) {
+      for (Album currentAlbum in currentAllAlbum) {
+        if (alList[i].id == currentAlbum.id) {
           exist = true;
 
           // 登録済みのアルバムと曲数が異なるかチェック
-          if (alList[i].numOfSongs != currentAllAlbum[j].numSongs) {
+          if (alList[i].numOfSongs != currentAlbum.numSongs) {
             // 曲数の更新
-            currentAllAlbum[j].numSongs = alList[i].numOfSongs;
-            AlbumDB.instance.updateAlbum(currentAllAlbum[j]);
+            currentAlbum.numSongs = alList[i].numOfSongs;
+            AlbumDB.instance.updateAlbum(currentAlbum);
           }
 
           break;
@@ -137,8 +137,8 @@ class _UpdateDialogState extends State<UpdateDialog> {
       exist = false;
 
       // データベースに同じ名前のアーティストがいるか探す
-      for (int j = 0; j < currentAllArtist.length; j++) {
-        if (arList[i].artist == currentAllArtist[j].artist) {
+      for (Artist currentArtist in currentAllArtist) {
+        if (arList[i].artist == currentArtist.artist) {
           exist = true;
           break;
         }
@@ -167,18 +167,18 @@ class _UpdateDialogState extends State<UpdateDialog> {
     // numTracksの追加
     currentAllSong = await SongDB.instance.getAllSongs();
     currentAllArtist = await ArtistDB.instance.getAllArtists();
-    for (Artist artist in currentAllArtist) {
+    for (Artist currentArtist in currentAllArtist) {
       // 曲数カウンタ初期化
       int count = 0;
-      for (Song song in currentAllSong) {
-        if (song.artist == artist.artist) {
+      for (Song currentSong in currentAllSong) {
+        if (currentSong.artist == currentArtist.artist) {
           count++;
         }
       }
 
       // 曲数の更新
-      artist.numTracks = count;
-      await ArtistDB.instance.updateArtist(artist);
+      currentArtist.numTracks = count;
+      await ArtistDB.instance.updateArtist(currentArtist);
     }
 
     setState(() {

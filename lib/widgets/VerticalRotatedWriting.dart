@@ -157,8 +157,8 @@ bool checkSmallScript(String char) {
     'ョ',
   ];
 
-  for (int i = 0; i < checkList.length; i++) {
-    if (char == checkList[i]) {
+  for (String smallScript in checkList) {
+    if (char == smallScript) {
       return true;
     }
   }

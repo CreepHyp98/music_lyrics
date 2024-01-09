@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_lyrics/class/SongClass.dart';
 import 'package:music_lyrics/screens/MusicList.dart';
 import 'package:music_lyrics/widgets/Album_ArtistInfoDialog.dart';
 
@@ -54,9 +55,9 @@ class _AllAlbumsState extends ConsumerState<AllAlbums> with AutomaticKeepAliveCl
                       // 一旦リストをクリア
                       albumSongs.clear();
                       // 収録曲リストにタップされたアルバムを追加
-                      for (int i = 0; i < SongList.length; i++) {
-                        if (SongList[i].album == AlbumList[index].album) {
-                          albumSongs.add(SongList[i]);
+                      for (Song song in SongList) {
+                        if (song.album == AlbumList[index].album) {
+                          albumSongs.add(song);
                         }
                       }
                       // 曲順にソート
@@ -87,9 +88,9 @@ class _AllAlbumsState extends ConsumerState<AllAlbums> with AutomaticKeepAliveCl
                       // 一旦リストをクリア
                       albumSongs.clear();
                       // 収録曲リストにタップされたアルバムを追加
-                      for (int i = 0; i < SongList.length; i++) {
-                        if (SongList[i].album == AlbumList[index].album) {
-                          albumSongs.add(SongList[i]);
+                      for (Song song in SongList) {
+                        if (song.album == AlbumList[index].album) {
+                          albumSongs.add(song);
                         }
                       }
 
