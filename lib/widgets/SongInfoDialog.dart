@@ -4,8 +4,8 @@ import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/class/SongDB.dart';
 import 'package:music_lyrics/widgets/DeleteDialog.dart';
 
-class SettingDialog extends ConsumerWidget {
-  const SettingDialog({super.key});
+class SongInfoDialog extends ConsumerWidget {
+  const SongInfoDialog({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -83,7 +83,7 @@ class SettingDialog extends ConsumerWidget {
             // 入力されたフリガナの保存編集用プロバイダーにセット
             ref.read(EditSongProvider.notifier).state.title_furi = furiController.text;
             // データベースを更新
-            songsDB.instance.updateSong(ref.watch(EditSongProvider));
+            SongDB.instance.updateSong(ref.watch(EditSongProvider));
 
             // ダイアログを閉じる
             Navigator.pop(context);

@@ -54,7 +54,7 @@ android {
         applicationId "com.CreepHyp.music_lyrics"
         minSdkVersion 21 // flutter.minSdkVersion → 21
         targetSdkVersion flutter.targetSdkVersion
-        versionCode 10   // エラーが治らないので直接指定
+        versionCode 73   // エラーが治らないので直接指定
         versionName flutterVersionName
     }
 

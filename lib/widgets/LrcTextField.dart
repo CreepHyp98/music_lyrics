@@ -17,6 +17,7 @@ class _LrcTextFieldState extends ConsumerState<LrcTextField> {
       child: TextField(
         controller: tec,
         scrollController: ScrollController(),
+        style: const TextStyle(fontSize: 15),
         maxLines: 22,
         decoration: const InputDecoration(
           labelText: '歌詞データ',

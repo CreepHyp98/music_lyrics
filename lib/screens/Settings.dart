@@ -40,18 +40,6 @@ class _SettingsState extends State<Settings> {
                   );
                 }),
 
-            // お問い合わせフォーム
-            ListTile(
-              leading: const Icon(Icons.send),
-              title: const Text('お問い合わせフォーム'),
-              onTap: () {
-                // Google フォームを開く
-                launchUrl(
-                  Uri.parse('https://docs.google.com/forms/d/e/1FAIpQLSesGixlIAXYNodmKWg3jBOLPFVPvLylXKRzAskOtDDtYWGtOA/viewform?usp=sf_link'),
-                );
-              },
-            ),
-
             // アクセントカラー
             ListTile(
               leading: const Icon(Icons.palette),
@@ -60,6 +48,18 @@ class _SettingsState extends State<Settings> {
                 showDialog(
                   context: context,
                   builder: (context) => const ColorDialog(),
+                );
+              },
+            ),
+
+            // お問い合わせフォーム
+            ListTile(
+              leading: const Icon(Icons.send),
+              title: const Text('お問い合わせフォーム'),
+              onTap: () {
+                // Google フォームを開く
+                launchUrl(
+                  Uri.parse('https://docs.google.com/forms/d/e/1FAIpQLSesGixlIAXYNodmKWg3jBOLPFVPvLylXKRzAskOtDDtYWGtOA/viewform?usp=sf_link'),
                 );
               },
             ),

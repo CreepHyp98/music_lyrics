@@ -26,11 +26,8 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
 
   @override
   void initState() {
-    // チュートリアルの表示するか確認
-    firstEdit_1 = prefs.getBool('tutorial_1') ?? true;
-    firstEdit_2 = prefs.getBool('tutorial_2') ?? true;
-
     // 初めての編集ならチュートリアル画面に遷移
+    firstEdit_1 = prefs.getBool('tutorial_1') ?? true;
     if (firstEdit_1 == true) {
       WidgetsBinding.instance.addPostFrameCallback(
         (Duration duration) {
@@ -108,6 +105,7 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                   _isSelected = [false, true];
 
                   // 初めての編集ならチュートリアル画面に遷移
+                  firstEdit_2 = prefs.getBool('tutorial_2') ?? true;
                   if (firstEdit_2 == true) {
                     WidgetsBinding.instance.addPostFrameCallback(
                       (Duration duration) {
@@ -157,7 +155,7 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                   tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
                   ref.read(EditSongProvider.notifier).state.lyric = tec.text;
                   // データベースを更新
-                  songsDB.instance.updateSong(ref.watch(EditSongProvider));
+                  SongDB.instance.updateSong(ref.watch(EditSongProvider));
 
                   // ダイアログに戻る
                   Navigator.pop(context);

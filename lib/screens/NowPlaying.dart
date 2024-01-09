@@ -27,10 +27,10 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
     ref.read(PositionProvider.notifier).state = Duration.zero;
     // SongProviderを更新
     int currentIndex = ref.watch(IndexProvider);
-    ref.read(SongProvider.notifier).state = SongList[currentIndex];
+    ref.read(SongProvider.notifier).state = SongQueue[currentIndex];
     // LyricProviderを更新
-    if (SongList[currentIndex].lyric != null) {
-      ref.read(LyricProvider.notifier).state = SongList[currentIndex].lyric!.split('\n');
+    if (SongQueue[currentIndex].lyric != null) {
+      ref.read(LyricProvider.notifier).state = SongQueue[currentIndex].lyric!.split('\n');
     } else {
       ref.read(LyricProvider.notifier).state = [''];
     }
@@ -58,7 +58,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
       if (mounted && _isFinished == false) {
         // 次のインデックスへ
         int nextIndex = ref.watch(IndexProvider) + 1;
-        if (nextIndex < SongList.length) {
+        if (nextIndex < SongQueue.length) {
           ref.read(IndexProvider.notifier).state = nextIndex;
           // 再生
           playSong();
@@ -112,7 +112,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
               child: Text(
                 ref.watch(SongProvider).album.toString(),
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontFamily: 'shippori3',
                 ),
               ),
@@ -181,7 +181,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
                   setState(() {
                     // 次のインデックスへ
                     int nextIndex = ref.watch(IndexProvider) + 1;
-                    if (nextIndex < SongList.length) {
+                    if (nextIndex < SongQueue.length) {
                       ref.read(IndexProvider.notifier).state = nextIndex;
                       // 再生
                       playSong();

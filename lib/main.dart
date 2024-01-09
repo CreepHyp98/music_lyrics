@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:music_lyrics/screens/LyricEdit.dart';
-import 'package:music_lyrics/widgets/NavigatonBar.dart';
+import 'package:music_lyrics/widgets/BottomNavBar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'provider/provider.dart';
 import 'screens/Splash.dart';
@@ -27,9 +27,6 @@ Future<void> main() async {
       options: [
         AVAudioSessionOptions.defaultToSpeaker,
         AVAudioSessionOptions.mixWithOthers,
-        //AVAudioSessionOptions.allowAirPlay,
-        //AVAudioSessionOptions.allowBluetooth,
-        //AVAudioSessionOptions.allowBluetoothA2DP,
       ],
     ),
     android: AudioContextAndroid(
@@ -66,7 +63,7 @@ class MyApp extends ConsumerWidget {
       // 構成画面
       routes: <String, WidgetBuilder>{
         '/': (_) => const Splash(),
-        '/home': (_) => const NavBarWidget(),
+        '/home': (_) => const BottomNavBar(),
         '/edit': (_) => const LyricEdit(),
       },
       debugShowCheckedModeBanner: false,
