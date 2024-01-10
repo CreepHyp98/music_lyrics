@@ -2,11 +2,11 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:music_lyrics/screens/LyricEdit.dart';
-import 'package:music_lyrics/widgets/BottomNavBar.dart';
+import 'package:music_lyrics/screens/lyric_edit.dart';
+import 'package:music_lyrics/widgets/bottom_nav_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'provider/provider.dart';
-import 'screens/Splash.dart';
+import 'screens/splash.dart';
 import 'package:flutter/services.dart';
 
 Future<void> main() async {
@@ -58,7 +58,7 @@ class MyApp extends ConsumerWidget {
       theme: ThemeData(
         useMaterial3: true,
         fontFamily: "Noto Sans JP",
-        colorSchemeSeed: Color(ref.watch(ColorValueProvider)),
+        colorSchemeSeed: Color(ref.watch(colorValueProvider)),
       ),
       // 構成画面
       routes: <String, WidgetBuilder>{
@@ -72,5 +72,5 @@ class MyApp extends ConsumerWidget {
 }
 
 Future<void> getSplashText() async {
-  SplashTextList = prefs.getStringList('splash') ?? ['', '', ''];
+  splashTextList = prefs.getStringList('splash') ?? ['', '', ''];
 }

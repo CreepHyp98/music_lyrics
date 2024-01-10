@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
-import 'package:music_lyrics/class/SongDB.dart';
-import 'package:music_lyrics/widgets/DeleteDialog.dart';
+import 'package:music_lyrics/class/song_database.dart';
+import 'package:music_lyrics/widgets/delete_dialog.dart';
 
 class SongInfoDialog extends ConsumerWidget {
   const SongInfoDialog({super.key});
@@ -10,14 +10,14 @@ class SongInfoDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // TextFieldの入力text
-    final furiController = TextEditingController(text: ref.watch(EditSongProvider).title_furi);
+    final furiController = TextEditingController(text: ref.watch(editSongProvider).titleFuri);
     // カーソルの位置を末尾に設定
     furiController.selection = TextSelection.fromPosition(TextPosition(offset: furiController.text.length));
 
     return AlertDialog(
       // タイトル（左寄せ）
       title: Text(
-        ref.watch(EditSongProvider).title!,
+        ref.watch(editSongProvider).title!,
         style: const TextStyle(fontSize: 20),
         textAlign: TextAlign.left,
         maxLines: 1,
@@ -47,7 +47,7 @@ class SongInfoDialog extends ConsumerWidget {
               ),
               onTap: (() {
                 // 歌詞編集のテキストフィールドに対象の歌詞をセット
-                tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
+                tec = TextEditingController(text: ref.watch(editLrcProvider).join('\n'));
 
                 // 再生中なら止める
                 audioPlayer.pause();
@@ -81,9 +81,9 @@ class SongInfoDialog extends ConsumerWidget {
         GestureDetector(
           onTap: () {
             // 入力されたフリガナの保存編集用プロバイダーにセット
-            ref.read(EditSongProvider.notifier).state.title_furi = furiController.text;
+            ref.read(editSongProvider.notifier).state.titleFuri = furiController.text;
             // データベースを更新
-            SongDB.instance.updateSong(ref.watch(EditSongProvider));
+            SongDB.instance.updateSong(ref.watch(editSongProvider));
 
             // ダイアログを閉じる
             Navigator.pop(context);

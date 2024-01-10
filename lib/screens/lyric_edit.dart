@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:music_lyrics/class/BannerAdManager.dart';
-import 'package:music_lyrics/class/SongDB.dart';
+import 'package:music_lyrics/class/banner_ad_manager.dart';
+import 'package:music_lyrics/class/song_database.dart';
 import 'package:music_lyrics/provider/provider.dart';
-import 'package:music_lyrics/screens/Tutorial.dart';
-import 'package:music_lyrics/widgets/BottomPlayerBar.dart';
-import 'package:music_lyrics/widgets/LrcListView.dart';
-import 'package:music_lyrics/widgets/LrcTextField.dart';
+import 'package:music_lyrics/screens/tutorial.dart';
+import 'package:music_lyrics/widgets/bottom_player_bar.dart';
+import 'package:music_lyrics/widgets/lrc_listview.dart';
+import 'package:music_lyrics/widgets/lrc_textfield.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LyricEdit extends ConsumerStatefulWidget {
@@ -49,9 +49,9 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
       // デバイスのバックイベント時の処理
       onWillPop: () async {
         // 再生ストップ
-        EditAudioPlayer.stop();
+        editAudioPlayer.stop();
         // 編集用再生位置も初期化
-        ref.read(EditPosiProvider.notifier).state = Duration.zero;
+        ref.read(editPosiProvider.notifier).state = Duration.zero;
 
         // チュートリアル画面終了
         if (tcm != null) {
@@ -73,9 +73,9 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
             icon: const Icon(Icons.cancel),
             onPressed: () {
               // 再生ストップ
-              EditAudioPlayer.stop();
+              editAudioPlayer.stop();
               // 編集用再生位置も初期化
-              ref.read(EditPosiProvider.notifier).state = Duration.zero;
+              ref.read(editPosiProvider.notifier).state = Duration.zero;
 
               // ダイアログに戻る
               Navigator.pop(context);
@@ -92,16 +92,16 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                 // 「全体」がタップされたら
                 if (index == 0) {
                   // TextFieldのコントローラーに歌詞プロバイダーをセット
-                  tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
+                  tec = TextEditingController(text: ref.watch(editLrcProvider).join('\n'));
                   // 編集用AudioPlayer一時停止
-                  EditAudioPlayer.pause();
+                  editAudioPlayer.pause();
                   _isSelected = [true, false];
                   setState(() {});
 
                   // 「同期」がタップされたら
                 } else {
                   // 歌詞プロバイダーにTextFieldの入力をセット
-                  ref.read(EditLrcProvider.notifier).state = tec.text.split('\n');
+                  ref.read(editLrcProvider.notifier).state = tec.text.split('\n');
                   _isSelected = [false, true];
 
                   // 初めての編集ならチュートリアル画面に遷移
@@ -147,15 +147,15 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                 ),
                 onPressed: () {
                   // 再生ストップ
-                  EditAudioPlayer.stop();
+                  editAudioPlayer.stop();
                   // 編集用再生位置も初期化
-                  ref.read(EditPosiProvider.notifier).state = Duration.zero;
+                  ref.read(editPosiProvider.notifier).state = Duration.zero;
 
                   // 編集用プロバイダーのlyricにtextfieldの値をセット
-                  tec = TextEditingController(text: ref.watch(EditLrcProvider).join('\n'));
-                  ref.read(EditSongProvider.notifier).state.lyric = tec.text;
+                  tec = TextEditingController(text: ref.watch(editLrcProvider).join('\n'));
+                  ref.read(editSongProvider.notifier).state.lyric = tec.text;
                   // データベースを更新
-                  SongDB.instance.updateSong(ref.watch(EditSongProvider));
+                  SongDB.instance.updateSong(ref.watch(editSongProvider));
 
                   // ダイアログに戻る
                   Navigator.pop(context);
@@ -201,7 +201,7 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                           ),
                           onPressed: () {
                             // 検索キーワード
-                            String keyword = "${ref.watch(EditSongProvider).title} ${ref.watch(EditSongProvider).artist!} lyricjp";
+                            String keyword = "${ref.watch(editSongProvider).title} ${ref.watch(editSongProvider).artist!} lyricjp";
                             // 検索エンジンを開く
                             launchUrl(Uri.parse('https://www.google.com/search?q=$keyword'));
                           },

@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
-import 'package:music_lyrics/widgets/LyricWidget.dart';
-import 'package:music_lyrics/widgets/VerticalRotatedWriting.dart';
+import 'package:music_lyrics/widgets/lyric_text.dart';
+import 'package:music_lyrics/widgets/vertical_rotated_writing.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:audioplayers/audioplayers.dart';
 
@@ -24,21 +24,21 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
 
   void playSong() {
     // 再生位置リセット
-    ref.read(PositionProvider.notifier).state = Duration.zero;
-    // SongProviderを更新
-    int currentIndex = ref.watch(IndexProvider);
-    ref.read(SongProvider.notifier).state = SongQueue[currentIndex];
-    // LyricProviderを更新
-    if (SongQueue[currentIndex].lyric != null) {
-      ref.read(LyricProvider.notifier).state = SongQueue[currentIndex].lyric!.split('\n');
+    ref.read(positionProvider.notifier).state = Duration.zero;
+    // songProviderを更新
+    int currentIndex = ref.watch(indexProvider);
+    ref.read(songProvider.notifier).state = songQueue[currentIndex];
+    // lyricProviderを更新
+    if (songQueue[currentIndex].lyric != null) {
+      ref.read(lyricProvider.notifier).state = songQueue[currentIndex].lyric!.split('\n');
     } else {
-      ref.read(LyricProvider.notifier).state = [''];
+      ref.read(lyricProvider.notifier).state = [''];
     }
     // 再生
     if (Platform.isAndroid == true) {
-      audioPlayer.play(DeviceFileSource(ref.watch(SongProvider).path!));
+      audioPlayer.play(DeviceFileSource(ref.watch(songProvider).path!));
     } else {
-      audioPlayer.play(UrlSource(ref.watch(SongProvider).path!));
+      audioPlayer.play(UrlSource(ref.watch(songProvider).path!));
     }
     _isPlaying = true;
   }
@@ -48,7 +48,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
     audioPlayer.onPositionChanged.listen((position) {
       // このmountedがないとエラーになる
       if (mounted) {
-        ref.read(PositionProvider.notifier).state = position;
+        ref.read(positionProvider.notifier).state = position;
       }
     });
 
@@ -57,9 +57,9 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
       // なぜか二回通るのでフラグもチェック
       if (mounted && _isFinished == false) {
         // 次のインデックスへ
-        int nextIndex = ref.watch(IndexProvider) + 1;
-        if (nextIndex < SongQueue.length) {
-          ref.read(IndexProvider.notifier).state = nextIndex;
+        int nextIndex = ref.watch(indexProvider) + 1;
+        if (nextIndex < songQueue.length) {
+          ref.read(indexProvider.notifier).state = nextIndex;
           // 再生
           playSong();
           _isFinished = true;
@@ -110,7 +110,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
             Align(
               alignment: const Alignment(-0.9, -0.95),
               child: Text(
-                ref.watch(SongProvider).album.toString(),
+                ref.watch(songProvider).album.toString(),
                 style: const TextStyle(
                   fontSize: 15,
                   fontFamily: 'shippori3',
@@ -123,7 +123,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
               alignment: const Alignment(0.85, -0.2),
               child: VerticalRotatedWriting(
                 size: fontSizeL,
-                text: ref.watch(SongProvider).title!,
+                text: ref.watch(songProvider).title!,
               ),
             ),
 
@@ -132,11 +132,11 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
               alignment: const Alignment(0.6, 0.4),
               child: VerticalRotatedWriting(
                 size: fontSizeM,
-                text: ref.watch(SongProvider).artist.toString(),
+                text: ref.watch(songProvider).artist.toString(),
               ),
             ),
 
-            ref.watch(SongProvider).lyric != null
+            ref.watch(songProvider).lyric != null
                 // 歌詞が登録されてれば歌詞
                 ? Positioned(
                     top: deviceHeight * 0.15,
@@ -180,9 +180,9 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
                 onPressed: () {
                   setState(() {
                     // 次のインデックスへ
-                    int nextIndex = ref.watch(IndexProvider) + 1;
-                    if (nextIndex < SongQueue.length) {
-                      ref.read(IndexProvider.notifier).state = nextIndex;
+                    int nextIndex = ref.watch(indexProvider) + 1;
+                    if (nextIndex < songQueue.length) {
+                      ref.read(indexProvider.notifier).state = nextIndex;
                       // 再生
                       playSong();
                     }
@@ -207,7 +207,7 @@ class ArtworkWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return QueryArtworkWidget(
-      id: ref.watch(SongProvider).id!,
+      id: ref.watch(songProvider).id!,
       format: ArtworkFormat.PNG,
       artworkQuality: FilterQuality.high,
       type: ArtworkType.AUDIO,

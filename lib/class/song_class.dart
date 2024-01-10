@@ -1,7 +1,7 @@
 class Song {
   int? id; // レコードの識別値
   String? title; //タイトル
-  String? title_furi; //タイトルのフリガナ
+  String? titleFuri; //タイトルのフリガナ
   String? artist; // アーティスト
   String? album; // アルバム
   int? duration; // 曲時間
@@ -11,7 +11,7 @@ class Song {
   Song({
     this.id,
     this.title,
-    this.title_furi,
+    this.titleFuri,
     this.artist,
     this.album,
     this.duration,
@@ -23,7 +23,7 @@ class Song {
     return {
       'id': id,
       'title': title,
-      'title_furi': title_furi,
+      'titleFuri': titleFuri,
       'artist': artist,
       'album': album,
       'duration': duration,

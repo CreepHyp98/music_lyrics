@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:music_lyrics/class/BannerAdManager.dart';
+import 'package:music_lyrics/class/banner_ad_manager.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:music_lyrics/screens/Tutorial.dart';
+import 'package:music_lyrics/screens/tutorial.dart';
 
 class BottomPlayerBar extends ConsumerStatefulWidget {
   const BottomPlayerBar({super.key});
@@ -21,13 +21,13 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
 
   void listenToSongStream() {
     // 音源ファイルの曲時間を取得
-    _duration = ref.watch(EditSongProvider).duration;
+    _duration = ref.watch(editSongProvider).duration;
 
     // 現在の再生位置を取得
-    EditAudioPlayer.onPositionChanged.listen((position) {
+    editAudioPlayer.onPositionChanged.listen((position) {
       // このmountedがないとエラーになる
       if (mounted) {
-        ref.read(EditPosiProvider.notifier).state = position;
+        ref.read(editPosiProvider.notifier).state = position;
       }
     });
   }
@@ -57,12 +57,12 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
             data: SliderThemeData(overlayShape: SliderComponentShape.noOverlay),
 
             child: Slider(
-              value: ref.watch(EditPosiProvider).inMilliseconds.toDouble(),
+              value: ref.watch(editPosiProvider).inMilliseconds.toDouble(),
               max: _duration!.toDouble(),
               onChanged: (value) {
-                EditAudioPlayer.seek(Duration(milliseconds: value.toInt()));
+                editAudioPlayer.seek(Duration(milliseconds: value.toInt()));
                 if (audioPlayer.state == PlayerState.paused) {
-                  ref.read(EditPosiProvider.notifier).state = Duration(milliseconds: value.toInt());
+                  ref.read(editPosiProvider.notifier).state = Duration(milliseconds: value.toInt());
                 }
               },
             ),
@@ -75,14 +75,14 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
                 onPressed: () {
                   if (_isPlaying) {
                     setState(() {
-                      EditAudioPlayer.pause();
+                      editAudioPlayer.pause();
                     });
                   } else {
                     setState(() {
                       if (Platform.isAndroid == true) {
-                        EditAudioPlayer.play(DeviceFileSource(ref.watch(EditSongProvider).path!));
+                        editAudioPlayer.play(DeviceFileSource(ref.watch(editSongProvider).path!));
                       } else {
-                        EditAudioPlayer.play(UrlSource(ref.watch(EditSongProvider).path!));
+                        editAudioPlayer.play(UrlSource(ref.watch(editSongProvider).path!));
                       }
                     });
                   }
@@ -96,19 +96,19 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
               // 10秒戻るボタン
               IconButton(
                 onPressed: () {
-                  Duration tmp = ref.watch(EditPosiProvider) - const Duration(seconds: 10);
+                  Duration tmp = ref.watch(editPosiProvider) - const Duration(seconds: 10);
                   // 10秒戻して再生時間がマイナスにならないかチェック
                   if (tmp.inMilliseconds > 0) {
-                    EditAudioPlayer.seek(tmp);
+                    editAudioPlayer.seek(tmp);
                   } else {
-                    EditAudioPlayer.seek(Duration.zero);
+                    editAudioPlayer.seek(Duration.zero);
                   }
 
                   // 再生終了後でも動くように
                   if (Platform.isAndroid == true) {
-                    EditAudioPlayer.play(DeviceFileSource(ref.watch(EditSongProvider).path!));
+                    editAudioPlayer.play(DeviceFileSource(ref.watch(editSongProvider).path!));
                   } else {
-                    EditAudioPlayer.play(UrlSource(ref.watch(EditSongProvider).path!));
+                    editAudioPlayer.play(UrlSource(ref.watch(editSongProvider).path!));
                   }
                 },
                 icon: const Icon(
@@ -120,13 +120,13 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
               IconButton(
                 onPressed: () {
                   // 10秒進めて再生時間が曲時間を超えないかチェック
-                  Duration tmp = ref.watch(EditPosiProvider) + const Duration(seconds: 10);
+                  Duration tmp = ref.watch(editPosiProvider) + const Duration(seconds: 10);
                   if (tmp.inMilliseconds < _duration!) {
-                    EditAudioPlayer.seek(tmp);
+                    editAudioPlayer.seek(tmp);
                   } else {
                     // 超えてたら再生時間を最大にして曲を止める
-                    EditAudioPlayer.seek(Duration(milliseconds: _duration!));
-                    EditAudioPlayer.pause();
+                    editAudioPlayer.seek(Duration(milliseconds: _duration!));
+                    editAudioPlayer.pause();
                     _isPlaying = false;
                   }
                 },
@@ -136,7 +136,7 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
               ),
 
               // 再生時間のテキスト
-              Text(MilliToMS(ref.watch(EditPosiProvider).inMilliseconds)),
+              Text(milliToMinSec(ref.watch(editPosiProvider).inMilliseconds)),
 
               // インフォメーションマーク
               const Spacer(),
@@ -168,7 +168,7 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
   }
 }
 
-String MilliToMS(int milliSeconds) {
+String milliToMinSec(int milliSeconds) {
   String result;
   String minutesDisp;
   String secondsDisp;

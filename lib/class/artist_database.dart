@@ -1,4 +1,4 @@
-import 'package:music_lyrics/class/ArtistClass.dart';
+import 'package:music_lyrics/class/artist_class.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -27,7 +27,7 @@ class ArtistDB {
   }
 
   Future<void> _onCreate(Database db, int version) async {
-    await db.execute('CREATE TABLE artists(id INTEGER PRIMARY KEY, artist TEXT, artist_furi TEXT, numTracks INTEGER)');
+    await db.execute('CREATE TABLE artists(id INTEGER PRIMARY KEY, artist TEXT, artistFuri TEXT, numTracks INTEGER)');
   }
 
   // データの挿入
@@ -51,7 +51,7 @@ class ArtistDB {
       return Artist(
         id: maps[i]['id'],
         artist: maps[i]['artist'],
-        artist_furi: maps[i]['artist_furi'],
+        artistFuri: maps[i]['artistFuri'],
         numTracks: maps[i]['numTracks'],
       );
     });

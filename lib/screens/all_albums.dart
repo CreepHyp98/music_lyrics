@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_lyrics/class/SongClass.dart';
-import 'package:music_lyrics/screens/MusicList.dart';
-import 'package:music_lyrics/widgets/Album_ArtistInfoDialog.dart';
+import 'package:music_lyrics/class/song_class.dart';
+import 'package:music_lyrics/screens/music_list.dart';
+import 'package:music_lyrics/widgets/album_artist_info_dialog.dart';
 
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:music_lyrics/provider/provider.dart';
@@ -21,13 +21,13 @@ class _AllAlbumsState extends ConsumerState<AllAlbums> with AutomaticKeepAliveCl
   bool get wantKeepAlive => true;
 
   // アルバムタブのスクロールコントローラー
-  final ScrollController _SC = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   // 一つ下の階層のスクロールコントローラー
   final ScrollController _belowSC = ScrollController();
 
   @override
   void dispose() {
-    _SC.dispose();
+    _scrollController.dispose();
     _belowSC.dispose();
     super.dispose();
   }
@@ -36,16 +36,16 @@ class _AllAlbumsState extends ConsumerState<AllAlbums> with AutomaticKeepAliveCl
   Widget build(BuildContext context) {
     super.build(context);
     return Scrollbar(
-      controller: ref.watch(belowAlbum) ? _belowSC : _SC,
+      controller: ref.watch(belowAlbum) ? _belowSC : _scrollController,
       thickness: 12.0,
       radius: const Radius.circular(12.0),
       interactive: true,
       child: ref.watch(belowAlbum)
-          ? MusicList(PlayList: albumSongs, dispArtist: true, sc: _belowSC)
+          ? MusicList(playlist: albumSongs, dispArtist: true, sc: _belowSC)
           : ListView.builder(
-              controller: _SC,
+              controller: _scrollController,
               // Listの要素数
-              itemCount: AlbumList.length,
+              itemCount: albumList.length,
               // Listの生成
               itemBuilder: (context, index) {
                 return ListTile(
@@ -55,8 +55,8 @@ class _AllAlbumsState extends ConsumerState<AllAlbums> with AutomaticKeepAliveCl
                       // 一旦リストをクリア
                       albumSongs.clear();
                       // 収録曲リストにタップされたアルバムを追加
-                      for (Song song in SongList) {
-                        if (song.album == AlbumList[index].album) {
+                      for (Song song in songList) {
+                        if (song.album == albumList[index].album) {
                           albumSongs.add(song);
                         }
                       }
@@ -70,17 +70,17 @@ class _AllAlbumsState extends ConsumerState<AllAlbums> with AutomaticKeepAliveCl
                     });
                   },
                   title: Text(
-                    AlbumList[index].album,
+                    albumList[index].album,
                     maxLines: 1,
                   ),
                   subtitle: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "${AlbumList[index].artist}",
+                        "${albumList[index].artist}",
                         maxLines: 1,
                       ),
-                      Text(AlbumList[index].numSongs.toString()),
+                      Text(albumList[index].numSongs.toString()),
                     ],
                   ),
                   trailing: IconButton(
@@ -88,8 +88,8 @@ class _AllAlbumsState extends ConsumerState<AllAlbums> with AutomaticKeepAliveCl
                       // 一旦リストをクリア
                       albumSongs.clear();
                       // 収録曲リストにタップされたアルバムを追加
-                      for (Song song in SongList) {
-                        if (song.album == AlbumList[index].album) {
+                      for (Song song in songList) {
+                        if (song.album == albumList[index].album) {
                           albumSongs.add(song);
                         }
                       }
@@ -97,13 +97,13 @@ class _AllAlbumsState extends ConsumerState<AllAlbums> with AutomaticKeepAliveCl
                       // ダイアログ表示
                       showDialog(
                         context: context,
-                        builder: (context) => Album_ArtistInfoDialog(index: index),
+                        builder: (context) => AlbumArtistInfoDialog(index: index),
                       );
                     },
                     icon: const Icon(Icons.more_horiz),
                   ),
                   leading: QueryArtworkWidget(
-                    id: AlbumList[index].id,
+                    id: albumList[index].id,
                     type: ArtworkType.ALBUM,
                     artworkBorder: BorderRadius.circular(0),
                     artworkFit: BoxFit.contain,

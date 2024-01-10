@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_lyrics/class/SongClass.dart';
-import 'package:music_lyrics/screens/MusicList.dart';
+import 'package:music_lyrics/class/song_class.dart';
+import 'package:music_lyrics/screens/music_list.dart';
 
 import 'package:music_lyrics/provider/provider.dart';
-import 'package:music_lyrics/widgets/Album_ArtistInfoDialog.dart';
+import 'package:music_lyrics/widgets/album_artist_info_dialog.dart';
 
 class AllArtists extends ConsumerStatefulWidget {
   // 定数コンストラクタ
@@ -20,13 +20,13 @@ class _AllArtistsState extends ConsumerState<AllArtists> with AutomaticKeepAlive
   bool get wantKeepAlive => true;
 
   // アーティストタブのスクロールコントローラー
-  final ScrollController _SC = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   // 一つ下の階層のスクロールコントローラー
   final ScrollController _belowSC = ScrollController();
 
   @override
   void dispose() {
-    _SC.dispose();
+    _scrollController.dispose();
     _belowSC.dispose();
     super.dispose();
   }
@@ -36,16 +36,16 @@ class _AllArtistsState extends ConsumerState<AllArtists> with AutomaticKeepAlive
     super.build(context);
 
     return Scrollbar(
-      controller: ref.watch(belowArtist) ? _belowSC : _SC,
+      controller: ref.watch(belowArtist) ? _belowSC : _scrollController,
       thickness: 12.0,
       radius: const Radius.circular(12.0),
       interactive: true,
       child: ref.watch(belowArtist)
-          ? MusicList(PlayList: artistSongs, dispArtist: false, sc: _belowSC)
+          ? MusicList(playlist: artistSongs, dispArtist: false, sc: _belowSC)
           : ListView.builder(
-              controller: _SC,
+              controller: _scrollController,
               // Listの要素数
-              itemCount: ArtistList.length,
+              itemCount: artistList.length,
               // Listの生成
               itemBuilder: (context, index) {
                 return ListTile(
@@ -55,8 +55,8 @@ class _AllArtistsState extends ConsumerState<AllArtists> with AutomaticKeepAlive
                       // 一旦リストをクリア
                       artistSongs.clear();
                       // 収録曲リストにタップされたアルバムを追加
-                      for (Song song in SongList) {
-                        if (song.artist == ArtistList[index].artist) {
+                      for (Song song in songList) {
+                        if (song.artist == artistList[index].artist) {
                           artistSongs.add(song);
                         }
                       }
@@ -73,11 +73,11 @@ class _AllArtistsState extends ConsumerState<AllArtists> with AutomaticKeepAlive
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        ArtistList[index].artist,
+                        artistList[index].artist,
                         maxLines: 1,
                       ),
                       Text(
-                        ArtistList[index].numTracks.toString(),
+                        artistList[index].numTracks.toString(),
                         style: const TextStyle(fontSize: 14),
                       ),
                     ],
@@ -87,8 +87,8 @@ class _AllArtistsState extends ConsumerState<AllArtists> with AutomaticKeepAlive
                       // 一旦リストをクリア
                       artistSongs.clear();
                       // 収録曲リストにタップされたアルバムを追加
-                      for (Song song in SongList) {
-                        if (song.artist == ArtistList[index].artist) {
+                      for (Song song in songList) {
+                        if (song.artist == artistList[index].artist) {
                           artistSongs.add(song);
                         }
                       }
@@ -96,7 +96,7 @@ class _AllArtistsState extends ConsumerState<AllArtists> with AutomaticKeepAlive
                       // ダイアログ表示
                       showDialog(
                         context: context,
-                        builder: (context) => Album_ArtistInfoDialog(index: index),
+                        builder: (context) => AlbumArtistInfoDialog(index: index),
                       );
                     },
                     icon: const Icon(Icons.more_horiz),

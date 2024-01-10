@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:music_lyrics/widgets/ColorDialog.dart';
-import 'package:music_lyrics/widgets/UpdateDialog.dart';
+import 'package:music_lyrics/widgets/color_dialog.dart';
+import 'package:music_lyrics/widgets/update_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:music_lyrics/class/BannerAdManager.dart';
+import 'package:music_lyrics/class/banner_ad_manager.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});

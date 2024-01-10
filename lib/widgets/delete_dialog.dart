@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_lyrics/class/AlbumClass.dart';
-import 'package:music_lyrics/class/AlbumDB.dart';
-import 'package:music_lyrics/class/ArtistClass.dart';
-import 'package:music_lyrics/class/ArtistDB.dart';
+import 'package:music_lyrics/class/album_class.dart';
+import 'package:music_lyrics/class/album_database.dart';
+import 'package:music_lyrics/class/artist_class.dart';
+import 'package:music_lyrics/class/artist_database.dart';
 import 'package:music_lyrics/provider/provider.dart';
-import 'package:music_lyrics/class/SongDB.dart';
+import 'package:music_lyrics/class/song_database.dart';
 
 class DeleteDialog extends ConsumerWidget {
   const DeleteDialog({super.key});
@@ -33,10 +33,10 @@ class DeleteDialog extends ConsumerWidget {
             GestureDetector(
               onTap: () {
                 // 全曲データベースから削除
-                SongDB.instance.deleteSong(ref.watch(EditSongProvider).id!);
+                SongDB.instance.deleteSong(ref.watch(editSongProvider).id!);
 
-                String albumName = ref.watch(EditSongProvider).album!;
-                for (Album album in AlbumList) {
+                String albumName = ref.watch(editSongProvider).album!;
+                for (Album album in albumList) {
                   if (albumName == album.album) {
                     if (album.numSongs == 1) {
                       // アルバム最後の一曲だったらアルバムデータベースから削除
@@ -49,8 +49,8 @@ class DeleteDialog extends ConsumerWidget {
                   }
                 }
 
-                String artistName = ref.watch(EditSongProvider).artist!;
-                for (Artist artist in ArtistList) {
+                String artistName = ref.watch(editSongProvider).artist!;
+                for (Artist artist in artistList) {
                   if (artistName == artist.artist) {
                     if (artist.numTracks == 1) {
                       // アーティスト最後の一曲だったらアーティストデータベースからも削除

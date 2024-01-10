@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:music_lyrics/provider/provider.dart';
-import 'package:music_lyrics/widgets/VerticalRotatedWriting.dart';
+import 'package:music_lyrics/widgets/vertical_rotated_writing.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key});
@@ -29,7 +29,7 @@ class _SplashState extends State<Splash> {
     return Scaffold(
       backgroundColor: const Color(0xfffffbfe),
       body: Center(
-        child: SplashTextList[1] == ''
+        child: splashTextList[1] == ''
             // 空なら
             ? const Align(
                 alignment: Alignment(0.0, -0.4),
@@ -55,7 +55,7 @@ class _SplashState extends State<Splash> {
                     alignment: const Alignment(-0.5, 0.4),
                     child: VerticalRotatedWriting(
                       size: 18,
-                      text: "${SplashTextList[1]}／${SplashTextList[2]}",
+                      text: "${splashTextList[1]}／${splashTextList[2]}",
                     ),
                   ),
                 ],

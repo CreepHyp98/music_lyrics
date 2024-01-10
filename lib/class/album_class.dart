@@ -1,14 +1,14 @@
 class Album {
   int id; // アルバムの識別値
   String album; // アルバム名
-  String album_furi; // アルバムのフリガナ
+  String albumFuri; // アルバムのフリガナ
   String? artist; // アーティスト
   int numSongs; // 曲数
 
   Album({
     required this.id,
     required this.album,
-    required this.album_furi,
+    required this.albumFuri,
     this.artist,
     required this.numSongs,
   });
@@ -17,7 +17,7 @@ class Album {
     return {
       'id': id,
       'album': album,
-      'album_furi': album_furi,
+      'albumFuri': albumFuri,
       'artist': artist,
       'numSongs': numSongs,
     };

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:music_lyrics/class/SongClass.dart';
-import 'package:music_lyrics/class/AlbumClass.dart';
-import 'package:music_lyrics/class/ArtistClass.dart';
+import 'package:music_lyrics/class/song_class.dart';
+import 'package:music_lyrics/class/album_class.dart';
+import 'package:music_lyrics/class/artist_class.dart';
 
 import 'package:music_lyrics/provider/provider.dart';
-import 'package:music_lyrics/screens/MainPage.dart';
-import 'package:music_lyrics/screens/TextConvert.dart';
+import 'package:music_lyrics/screens/main_page.dart';
+import 'package:music_lyrics/screens/text_convert.dart';
 import 'package:on_audio_query/on_audio_query.dart';
-import 'package:music_lyrics/class/SongDB.dart';
-import 'package:music_lyrics/class/AlbumDB.dart';
-import 'package:music_lyrics/class/ArtistDB.dart';
+import 'package:music_lyrics/class/song_database.dart';
+import 'package:music_lyrics/class/album_database.dart';
+import 'package:music_lyrics/class/artist_database.dart';
 
+// プログレスバーの更新のためfinal修飾子はつけない
+// ignore: must_be_immutable
 class UpdateDialog extends StatefulWidget {
   double progress;
   bool doneOnce;
@@ -59,7 +61,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
         final song = Song(
           id: smList[i].id,
           title: smList[i].title,
-          title_furi: await getFurigana(smList[i].title),
+          titleFuri: await getFurigana(smList[i].title),
           artist: smList[i].artist,
           album: smList[i].album,
           duration: smList[i].duration,
@@ -104,7 +106,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
         final album = Album(
           id: alList[i].id,
           album: alList[i].album,
-          album_furi: await getFurigana(alList[i].album),
+          albumFuri: await getFurigana(alList[i].album),
           artist: alList[i].artist,
           numSongs: alList[i].numOfSongs,
         );
@@ -149,7 +151,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
         final artist = Artist(
           id: arList[i].id,
           artist: arList[i].artist,
-          artist_furi: await getFurigana(arList[i].artist),
+          artistFuri: await getFurigana(arList[i].artist),
           // numTracksの追加は別で行う
         );
 

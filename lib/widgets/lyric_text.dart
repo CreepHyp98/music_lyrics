@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
-import 'package:music_lyrics/widgets/VerticalRotatedWriting.dart';
+import 'package:music_lyrics/widgets/vertical_rotated_writing.dart';
 import 'package:wakelock/wakelock.dart';
 
 class LyricWidget extends ConsumerStatefulWidget {
@@ -24,23 +24,23 @@ class _LyricWidgetState extends ConsumerState<LyricWidget> {
     int startTime, nextTime = 0;
 
     // 保持している値が実際の再生時間を超える ⇒ 曲が変わった
-    if (currentMilliSeconds > ref.watch(PositionProvider).inMilliseconds) {
+    if (currentMilliSeconds > ref.watch(positionProvider).inMilliseconds) {
       // 歌詞Listのインデックスを初期化
       currentLyricIndex = 0;
     }
     // 再生時間を更新
-    currentMilliSeconds = ref.watch(PositionProvider).inMilliseconds;
+    currentMilliSeconds = ref.watch(positionProvider).inMilliseconds;
     // 歌詞データから歌いだし時間を取得
-    startTime = getLyricStartTime(ref.watch(LyricProvider)[currentLyricIndex]);
+    startTime = getLyricStartTime(ref.watch(lyricProvider)[currentLyricIndex]);
 
     if (startTime >= 0) {
       // 歌詞同期時は自動スリープを無効にする
       Wakelock.enable();
       try {
         // 最後のインデックスではないなら
-        if (currentLyricIndex != ref.watch(LyricProvider).length - 1) {
+        if (currentLyricIndex != ref.watch(lyricProvider).length - 1) {
           // 次の歌詞の歌いだし時間を取得
-          nextTime = getLyricStartTime(ref.watch(LyricProvider)[currentLyricIndex + 1]);
+          nextTime = getLyricStartTime(ref.watch(lyricProvider)[currentLyricIndex + 1]);
           // 現在の再生時間がそれを超えたなら
           if (currentMilliSeconds >= nextTime) {
             // 歌詞Listのインデックスを次に進める
@@ -49,10 +49,10 @@ class _LyricWidgetState extends ConsumerState<LyricWidget> {
         }
 
         if (currentMilliSeconds >= startTime) {
-          currentLyric = ref.watch(LyricProvider)[currentLyricIndex].substring(10);
+          currentLyric = ref.watch(lyricProvider)[currentLyricIndex].substring(10);
         }
       } catch (e) {
-        // まだLyricProviderに値が入ってない
+        // まだlyricProviderに値が入ってない
       }
     } else {
       // .lrcファイルがない、もしくは.lrcファイルはあるが時間情報がない

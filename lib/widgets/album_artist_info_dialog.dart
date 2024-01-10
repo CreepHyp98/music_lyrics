@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_lyrics/class/AlbumDB.dart';
-import 'package:music_lyrics/class/ArtistDB.dart';
+import 'package:music_lyrics/class/album_database.dart';
+import 'package:music_lyrics/class/artist_database.dart';
 import 'package:music_lyrics/provider/provider.dart';
 
-class Album_ArtistInfoDialog extends ConsumerWidget {
+class AlbumArtistInfoDialog extends ConsumerWidget {
   final int index;
-  const Album_ArtistInfoDialog({super.key, required this.index});
+  const AlbumArtistInfoDialog({super.key, required this.index});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // TextFieldの入力text
     final TextEditingController furiController;
     if (upperTC.index == 1) {
-      furiController = TextEditingController(text: AlbumList[index].album_furi);
+      furiController = TextEditingController(text: albumList[index].albumFuri);
     } else {
-      furiController = TextEditingController(text: ArtistList[index].artist_furi);
+      furiController = TextEditingController(text: artistList[index].artistFuri);
     }
     // カーソルの位置を末尾に設定
     furiController.selection = TextSelection.fromPosition(TextPosition(offset: furiController.text.length));
@@ -23,7 +23,7 @@ class Album_ArtistInfoDialog extends ConsumerWidget {
     return AlertDialog(
       // タイトル（左寄せ）
       title: Text(
-        (upperTC.index == 1) ? AlbumList[index].album : ArtistList[index].artist,
+        (upperTC.index == 1) ? albumList[index].album : artistList[index].artist,
         style: const TextStyle(fontSize: 20),
         textAlign: TextAlign.left,
         maxLines: 1,
@@ -45,11 +45,11 @@ class Album_ArtistInfoDialog extends ConsumerWidget {
           onTap: () {
             // 入力されたフリガナでデータベースを更新
             if (upperTC.index == 1) {
-              AlbumList[index].album_furi = furiController.text;
-              AlbumDB.instance.updateAlbum(AlbumList[index]);
+              albumList[index].albumFuri = furiController.text;
+              AlbumDB.instance.updateAlbum(albumList[index]);
             } else {
-              ArtistList[index].artist_furi = furiController.text;
-              ArtistDB.instance.updateArtist(ArtistList[index]);
+              artistList[index].artistFuri = furiController.text;
+              ArtistDB.instance.updateArtist(artistList[index]);
             }
 
             // ダイアログを閉じる

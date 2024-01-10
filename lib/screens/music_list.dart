@@ -3,19 +3,19 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:music_lyrics/class/SongClass.dart';
-import 'package:music_lyrics/widgets/SongInfoDialog.dart';
+import 'package:music_lyrics/class/song_class.dart';
+import 'package:music_lyrics/widgets/song_info_dialog.dart';
 
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:music_lyrics/provider/provider.dart';
 
 class MusicList extends ConsumerStatefulWidget {
-  final List<Song> PlayList;
+  final List<Song> playlist;
   final bool dispArtist;
   final ScrollController? sc;
 
   // 定数コンストラクタ
-  const MusicList({super.key, required this.PlayList, required this.dispArtist, this.sc});
+  const MusicList({super.key, required this.playlist, required this.dispArtist, this.sc});
 
   // stateの作成
   @override
@@ -27,20 +27,20 @@ class _MusicListState extends ConsumerState<MusicList> with AutomaticKeepAliveCl
   bool get wantKeepAlive => true;
 
   void playSong() {
-    // SongProviderを更新
-    int currentIndex = ref.watch(IndexProvider);
-    ref.read(SongProvider.notifier).state = widget.PlayList[currentIndex];
-    // LyricProviderを更新
-    if (widget.PlayList[currentIndex].lyric != null) {
-      ref.read(LyricProvider.notifier).state = widget.PlayList[currentIndex].lyric!.split('\n');
+    // songProviderを更新
+    int currentIndex = ref.watch(indexProvider);
+    ref.read(songProvider.notifier).state = widget.playlist[currentIndex];
+    // lyricProviderを更新
+    if (widget.playlist[currentIndex].lyric != null) {
+      ref.read(lyricProvider.notifier).state = widget.playlist[currentIndex].lyric!.split('\n');
     } else {
-      ref.read(LyricProvider.notifier).state = [''];
+      ref.read(lyricProvider.notifier).state = [''];
     }
     // 再生
     if (Platform.isAndroid == true) {
-      audioPlayer.play(DeviceFileSource(ref.watch(SongProvider).path!));
+      audioPlayer.play(DeviceFileSource(ref.watch(songProvider).path!));
     } else {
-      audioPlayer.play(UrlSource(ref.watch(SongProvider).path!));
+      audioPlayer.play(UrlSource(ref.watch(songProvider).path!));
     }
   }
 
@@ -56,16 +56,16 @@ class _MusicListState extends ConsumerState<MusicList> with AutomaticKeepAliveCl
       child: ListView.builder(
         controller: widget.sc,
         // Listの要素数
-        itemCount: widget.PlayList.length,
+        itemCount: widget.playlist.length,
         // Listの生成
         itemBuilder: (context, index) {
           return ListTile(
             tileColor: const Color(0xfffffbfe),
             onTap: () {
               // 再生キュー
-              SongQueue = widget.PlayList;
+              songQueue = widget.playlist;
               // リストインデックス更新
-              ref.read(IndexProvider.notifier).state = index;
+              ref.read(indexProvider.notifier).state = index;
 
               // 再生
               playSong();
@@ -74,7 +74,7 @@ class _MusicListState extends ConsumerState<MusicList> with AutomaticKeepAliveCl
               lowerTC.jumpToTab(1);
             },
             title: Text(
-              widget.PlayList[index].title!,
+              widget.playlist[index].title!,
               maxLines: 1,
             ),
             subtitle: Row(
@@ -84,22 +84,22 @@ class _MusicListState extends ConsumerState<MusicList> with AutomaticKeepAliveCl
                   width: deviceWidth - 150,
                   child: Text(
                     // アーティスト名かアルバム名か表示を分ける
-                    widget.dispArtist ? "${widget.PlayList[index].artist}" : "${widget.PlayList[index].album}",
+                    widget.dispArtist ? "${widget.playlist[index].artist}" : "${widget.playlist[index].album}",
                     maxLines: 1,
                   ),
                 ),
-                Text(IntDurationToMS(widget.PlayList[index].duration)),
+                Text(intDurationToMinSec(widget.playlist[index].duration)),
               ],
             ),
             trailing: IconButton(
               onPressed: () {
                 // 歌詞編集用SongModelに今開いてる曲をセット
-                ref.read(EditSongProvider.notifier).state = widget.PlayList[index];
-                // EditLrcProviderを更新
-                if (widget.PlayList[index].lyric != null) {
-                  ref.read(EditLrcProvider.notifier).state = widget.PlayList[index].lyric!.split('\n');
+                ref.read(editSongProvider.notifier).state = widget.playlist[index];
+                // editLrcProviderを更新
+                if (widget.playlist[index].lyric != null) {
+                  ref.read(editLrcProvider.notifier).state = widget.playlist[index].lyric!.split('\n');
                 } else {
-                  ref.read(EditLrcProvider.notifier).state = [''];
+                  ref.read(editLrcProvider.notifier).state = [''];
                 }
 
                 // ダイアログ表示
@@ -111,7 +111,7 @@ class _MusicListState extends ConsumerState<MusicList> with AutomaticKeepAliveCl
               icon: const Icon(Icons.more_horiz),
             ),
             leading: QueryArtworkWidget(
-              id: widget.PlayList[index].id!,
+              id: widget.playlist[index].id!,
               type: ArtworkType.AUDIO,
               artworkBorder: BorderRadius.circular(0),
               artworkFit: BoxFit.contain,
@@ -128,7 +128,7 @@ class _MusicListState extends ConsumerState<MusicList> with AutomaticKeepAliveCl
   }
 }
 
-String IntDurationToMS(int? time) {
+String intDurationToMinSec(int? time) {
   String result;
 
   int minutes = (time! / (1000 * 60)).floor();

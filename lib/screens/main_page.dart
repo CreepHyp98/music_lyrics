@@ -2,15 +2,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music_lyrics/screens/AllAlbums.dart';
-import 'package:music_lyrics/screens/AllArtists.dart';
-import 'package:music_lyrics/screens/MusicList.dart';
+import 'package:music_lyrics/screens/all_albums.dart';
+import 'package:music_lyrics/screens/all_artists.dart';
+import 'package:music_lyrics/screens/music_list.dart';
 
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:music_lyrics/provider/provider.dart';
-import 'package:music_lyrics/class/SongDB.dart';
-import 'package:music_lyrics/class/AlbumDB.dart';
-import 'package:music_lyrics/class/ArtistDB.dart';
+import 'package:music_lyrics/class/song_database.dart';
+import 'package:music_lyrics/class/album_database.dart';
+import 'package:music_lyrics/class/artist_database.dart';
 
 class MainPage extends ConsumerStatefulWidget {
   // 定数コンストラクタ
@@ -24,7 +24,7 @@ class MainPage extends ConsumerStatefulWidget {
 class _AllSongsState extends ConsumerState<MainPage> with SingleTickerProviderStateMixin {
   // クラスのインスタンス化
   final OnAudioQuery _audioQuery = OnAudioQuery();
-  final ScrollController _SC = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   // アクセス許可のフラグ
   bool _hasPermission = false;
@@ -43,7 +43,7 @@ class _AllSongsState extends ConsumerState<MainPage> with SingleTickerProviderSt
 
   @override
   void dispose() {
-    _SC.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -81,20 +81,20 @@ class _AllSongsState extends ConsumerState<MainPage> with SingleTickerProviderSt
   // データベースからそれぞれのリストを取得
   Future<void> setAllLists() async {
     if (_hasList == false) {
-      SongList = await SongDB.instance.getAllSongs();
-      AlbumList = await AlbumDB.instance.getAllAlbums();
-      ArtistList = await ArtistDB.instance.getAllArtists();
+      songList = await SongDB.instance.getAllSongs();
+      albumList = await AlbumDB.instance.getAllAlbums();
+      artistList = await ArtistDB.instance.getAllArtists();
 
       setState(() {
         // フリガナで五十音順にソート
-        SongList.sort(
-          (a, b) => (a.title_furi!.toLowerCase()).compareTo(b.title_furi!.toLowerCase()),
+        songList.sort(
+          (a, b) => (a.titleFuri!.toLowerCase()).compareTo(b.titleFuri!.toLowerCase()),
         );
-        AlbumList.sort(
-          (a, b) => (a.album_furi.toLowerCase()).compareTo(b.album_furi.toLowerCase()),
+        albumList.sort(
+          (a, b) => (a.albumFuri.toLowerCase()).compareTo(b.albumFuri.toLowerCase()),
         );
-        ArtistList.sort(
-          (a, b) => (a.artist_furi.toLowerCase()).compareTo(b.artist_furi.toLowerCase()),
+        artistList.sort(
+          (a, b) => (a.artistFuri.toLowerCase()).compareTo(b.artistFuri.toLowerCase()),
         );
       });
 
@@ -179,7 +179,7 @@ class _AllSongsState extends ConsumerState<MainPage> with SingleTickerProviderSt
                     ],
                   ),
                 )
-              : (SongList.isEmpty == true)
+              : (songList.isEmpty == true)
                   ? const Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -194,9 +194,9 @@ class _AllSongsState extends ConsumerState<MainPage> with SingleTickerProviderSt
                       children: [
                         // 全曲リスト
                         MusicList(
-                          PlayList: SongList,
+                          playlist: songList,
                           dispArtist: true,
-                          sc: _SC,
+                          sc: _scrollController,
                         ),
                         // アルバムリスト
                         const AllAlbums(),

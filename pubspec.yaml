@@ -12,8 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   sqflite:  #追加
-
-  cupertino_icons: ^1.0.5
+  path: ^1.9.0  #追加
 
   on_audio_query: ^2.9.0  #追加
   permission_handler: ^10.3.0 #追加

@@ -8,7 +8,7 @@ class ColorDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    int currentColor = ref.watch(ColorValueProvider);
+    int currentColor = ref.watch(colorValueProvider);
 
     return AlertDialog(
       content: BlockPicker(
@@ -17,7 +17,7 @@ class ColorDialog extends ConsumerWidget {
           // 選択されたカラーを保存
           currentColor = color.value;
           prefs.setInt('selectedColor', currentColor);
-          ref.read(ColorValueProvider.notifier).state = currentColor;
+          ref.read(colorValueProvider.notifier).state = currentColor;
         },
 
         // 想定した色にならなかったためデフォルトから黒色系統削除

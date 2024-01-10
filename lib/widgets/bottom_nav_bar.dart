@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
-import 'package:music_lyrics/screens/MainPage.dart';
-import 'package:music_lyrics/screens/NowPlaying.dart';
-import 'package:music_lyrics/screens/Settings.dart';
+import 'package:music_lyrics/screens/main_page.dart';
+import 'package:music_lyrics/screens/now_playing.dart';
+import 'package:music_lyrics/screens/settings.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 class BottomNavBar extends ConsumerWidget {
@@ -58,7 +58,7 @@ class BottomNavBar extends ConsumerWidget {
               activeColorPrimary: Colors.black,
               inactiveColorPrimary: Colors.grey,
               onPressed: (p0) {
-                if (ref.watch(SongProvider).title == null) {
+                if (ref.watch(songProvider).title == null) {
                   return null;
                 } else {
                   lowerTC.jumpToTab(1);

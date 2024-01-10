@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
-import 'package:music_lyrics/widgets/LyricWidget.dart';
+import 'package:music_lyrics/widgets/lyric_text.dart';
 
-import 'BottomPlayerBar.dart';
+import 'bottom_player_bar.dart';
 
 class LrcListView extends ConsumerWidget {
   const LrcListView({super.key});
@@ -13,7 +13,7 @@ class LrcListView extends ConsumerWidget {
     return SizedBox(
       width: deviceWidth * 0.9,
       child: ListView.separated(
-        itemCount: ref.watch(EditLrcProvider).length,
+        itemCount: ref.watch(editLrcProvider).length,
         itemBuilder: (context, index) {
           return ListTile(
             // ListTileの設定
@@ -38,19 +38,19 @@ class LrcListView extends ConsumerWidget {
                   ),
                   Text(
                     // 時間情報があればその歌いだし時間を表示、なければ空欄
-                    checkStartTime(ref.watch(EditLrcProvider)[index]) ? ref.watch(EditLrcProvider)[index].substring(1, 9) : '',
+                    checkStartTime(ref.watch(editLrcProvider)[index]) ? ref.watch(editLrcProvider)[index].substring(1, 9) : '',
                     style: const TextStyle(fontSize: 12),
                   ),
                 ],
               ),
               onPressed: () {
                 // 歌いだし時間をタップした時間に更新
-                String newTime = MilliToMS(ref.watch(EditPosiProvider).inMilliseconds);
+                String newTime = milliToMinSec(ref.watch(editPosiProvider).inMilliseconds);
                 // すでに時間情報があれば書き換え、なければ
-                if (checkStartTime(ref.watch(EditLrcProvider)[index]) == true) {
-                  ref.read(EditLrcProvider.notifier).state[index] = ref.watch(EditLrcProvider)[index].replaceRange(1, 9, newTime);
+                if (checkStartTime(ref.watch(editLrcProvider)[index]) == true) {
+                  ref.read(editLrcProvider.notifier).state[index] = ref.watch(editLrcProvider)[index].replaceRange(1, 9, newTime);
                 } else {
-                  ref.read(EditLrcProvider.notifier).state[index] = "[$newTime]${ref.watch(EditLrcProvider)[index]}";
+                  ref.read(editLrcProvider.notifier).state[index] = "[$newTime]${ref.watch(editLrcProvider)[index]}";
                 }
               },
             ),
@@ -63,7 +63,7 @@ class LrcListView extends ConsumerWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     // 時間情報があれば10文字目から切り出す、なければそのまま
-                    checkStartTime(ref.watch(EditLrcProvider)[index]) ? ref.watch(EditLrcProvider)[index].substring(10) : ref.watch(EditLrcProvider)[index],
+                    checkStartTime(ref.watch(editLrcProvider)[index]) ? ref.watch(editLrcProvider)[index].substring(10) : ref.watch(editLrcProvider)[index],
                     maxLines: 2,
                     style: const TextStyle(fontSize: 15),
                   ),
@@ -84,19 +84,19 @@ class LrcListView extends ConsumerWidget {
             // 右タップでそこから再生
             trailing: IconButton(
               // 時間情報がなければグレーアウト
-              icon: checkStartTime(ref.watch(EditLrcProvider)[index])
+              icon: checkStartTime(ref.watch(editLrcProvider)[index])
                   ? const Icon(Icons.play_arrow)
                   : const Icon(
                       Icons.play_arrow,
                       color: Colors.grey,
                     ),
               // 時間情報がなければタップ無効
-              onPressed: checkStartTime(ref.watch(EditLrcProvider)[index])
+              onPressed: checkStartTime(ref.watch(editLrcProvider)[index])
                   ? () {
                       // LyricWidgetと同じ関数で時間情報を取得
-                      int value = getLyricStartTime(ref.watch(EditLrcProvider)[index]);
-                      EditAudioPlayer.seek(Duration(milliseconds: value));
-                      ref.read(EditPosiProvider.notifier).state = Duration(milliseconds: value);
+                      int value = getLyricStartTime(ref.watch(editLrcProvider)[index]);
+                      editAudioPlayer.seek(Duration(milliseconds: value));
+                      ref.read(editPosiProvider.notifier).state = Duration(milliseconds: value);
                     }
                   : null,
             ),
