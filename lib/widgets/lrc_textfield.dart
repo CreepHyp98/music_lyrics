@@ -16,7 +16,6 @@ class _LrcTextFieldState extends ConsumerState<LrcTextField> {
       width: deviceWidth * 0.9,
       child: TextField(
         controller: tec,
-        scrollController: ScrollController(),
         style: const TextStyle(fontSize: 15),
         maxLines: 22,
         decoration: const InputDecoration(

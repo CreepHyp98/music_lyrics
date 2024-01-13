@@ -23,7 +23,7 @@ class AlbumArtistInfoDialog extends ConsumerWidget {
     return AlertDialog(
       // タイトル（左寄せ）
       title: Text(
-        (upperTC.index == 1) ? albumList[index].album : artistList[index].artist,
+        (upperTC.index == 1) ? albumList[index].album! : artistList[index].artist!,
         style: const TextStyle(fontSize: 20),
         textAlign: TextAlign.left,
         maxLines: 1,

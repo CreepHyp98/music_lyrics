@@ -44,6 +44,7 @@ class _AllSongsState extends ConsumerState<MainPage> with SingleTickerProviderSt
   @override
   void dispose() {
     _scrollController.dispose();
+    upperTC.dispose();
     super.dispose();
   }
 
@@ -91,10 +92,10 @@ class _AllSongsState extends ConsumerState<MainPage> with SingleTickerProviderSt
           (a, b) => (a.titleFuri!.toLowerCase()).compareTo(b.titleFuri!.toLowerCase()),
         );
         albumList.sort(
-          (a, b) => (a.albumFuri.toLowerCase()).compareTo(b.albumFuri.toLowerCase()),
+          (a, b) => (a.albumFuri!.toLowerCase()).compareTo(b.albumFuri!.toLowerCase()),
         );
         artistList.sort(
-          (a, b) => (a.artistFuri.toLowerCase()).compareTo(b.artistFuri.toLowerCase()),
+          (a, b) => (a.artistFuri!.toLowerCase()).compareTo(b.artistFuri!.toLowerCase()),
         );
       });
 
@@ -115,28 +116,6 @@ class _AllSongsState extends ConsumerState<MainPage> with SingleTickerProviderSt
         child: AppBar(
           // 画面スクロールで色が変わるのを防ぐ
           scrolledUnderElevation: 0,
-          leading: IconButton(
-            onPressed: (() {
-              // アルバムのタブ、かつ一つ下の階層？
-              if ((upperTC.index == 1) && (ref.watch(belowAlbum) == true)) {
-                // 上の階層に戻る
-                ref.read(belowAlbum.notifier).state = false;
-
-                // アーティストのタブ、かつ一つ下の階層？
-              } else if ((upperTC.index == 2) && (ref.watch(belowArtist) == true)) {
-                // 上の階層に戻る
-                ref.read(belowArtist.notifier).state = false;
-              }
-            }),
-            icon: const Icon(Icons.arrow_back),
-            color: upperTC.index == 0
-                ? Colors.white
-                : ((upperTC.index == 1) && (ref.watch(belowAlbum))) || ((upperTC.index == 2) && (ref.watch(belowArtist)))
-                    ? Colors.black
-                    : Colors.white,
-            // タップ時の色を無くす
-            highlightColor: Colors.white,
-          ),
 
           // 上タブバー
           bottom: TabBar(
@@ -196,7 +175,6 @@ class _AllSongsState extends ConsumerState<MainPage> with SingleTickerProviderSt
                         MusicList(
                           playlist: songList,
                           dispArtist: true,
-                          sc: _scrollController,
                         ),
                         // アルバムリスト
                         const AllAlbums(),

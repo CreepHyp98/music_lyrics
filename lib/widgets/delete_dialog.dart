@@ -43,7 +43,7 @@ class DeleteDialog extends ConsumerWidget {
                       AlbumDB.instance.deleteAlbum(albumName);
                     } else {
                       // 最後の一曲じゃなければ曲数-1でデータベース更新
-                      album.numSongs = album.numSongs - 1;
+                      album.numSongs = album.numSongs! - 1;
                       AlbumDB.instance.updateAlbum(album);
                     }
                   }
@@ -62,10 +62,6 @@ class DeleteDialog extends ConsumerWidget {
                     }
                   }
                 }
-
-                // 階層をすべて上に戻す
-                ref.read(belowAlbum.notifier).state = false;
-                ref.read(belowArtist.notifier).state = false;
 
                 // 遷移元の画面を破棄してホーム画面へ
                 Navigator.of(context).pushReplacementNamed("/home");

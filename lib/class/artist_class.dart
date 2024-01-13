@@ -1,13 +1,13 @@
 class Artist {
-  int id; // アーティストの識別値
-  String artist; // アーティスト名
-  String artistFuri; //アーティストのフリガナ
+  int? id; // アーティストの識別値
+  String? artist; // アーティスト名
+  String? artistFuri; //アーティストのフリガナ
   int? numTracks; // 曲数
 
   Artist({
-    required this.id,
-    required this.artist,
-    required this.artistFuri,
+    this.id,
+    this.artist,
+    this.artistFuri,
     this.numTracks,
   });
 

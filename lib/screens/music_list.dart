@@ -12,10 +12,9 @@ import 'package:music_lyrics/provider/provider.dart';
 class MusicList extends ConsumerStatefulWidget {
   final List<Song> playlist;
   final bool dispArtist;
-  final ScrollController? sc;
 
   // 定数コンストラクタ
-  const MusicList({super.key, required this.playlist, required this.dispArtist, this.sc});
+  const MusicList({super.key, required this.playlist, required this.dispArtist});
 
   // stateの作成
   @override
@@ -49,12 +48,10 @@ class _MusicListState extends ConsumerState<MusicList> with AutomaticKeepAliveCl
     super.build(context);
 
     return Scrollbar(
-      controller: widget.sc,
       thickness: 12.0,
       radius: const Radius.circular(12.0),
       interactive: true,
       child: ListView.builder(
-        controller: widget.sc,
         // Listの要素数
         itemCount: widget.playlist.length,
         // Listの生成

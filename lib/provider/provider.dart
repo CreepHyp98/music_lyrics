@@ -40,10 +40,6 @@ final StateProvider<List<String>> lyricProvider = StateProvider<List<String>>(((
 final PersistentTabController lowerTC = PersistentTabController();
 // 曲リスト上タブのコントローラー
 late TabController upperTC;
-// 一つ下の階層（アルバム > 収録曲）に行くかフラグ
-final StateProvider<bool> belowAlbum = StateProvider<bool>((ref) => false);
-// 一つ下の階層（アーティスト > 該当曲）に行くかフラグ
-final StateProvider<bool> belowArtist = StateProvider<bool>((ref) => false);
 // 歌詞編集用SongModel
 final StateProvider<Song> editSongProvider = StateProvider<Song>((ref) => Song());
 // 歌詞編集用AudioPlayer
