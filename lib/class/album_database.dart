@@ -58,6 +58,21 @@ class AlbumDB {
     });
   }
 
+  // アルバムフリガナの取得
+  Future<String?> getAlbumFuri(int id) async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> result = await db.query(
+      'albums',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (result.isNotEmpty) {
+      return result.first['albumFuri'];
+    } else {
+      return null;
+    }
+  }
+
   // データの更新
   Future<void> updateAlbum(Album album) async {
     final Database db = await database;

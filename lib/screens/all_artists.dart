@@ -55,9 +55,17 @@ class _AllArtistsState extends ConsumerState<AllArtists> with AutomaticKeepAlive
                 }
               }
               // 曲順にソート
-              artistSongs.sort(
-                (a, b) => (a.path!).compareTo(b.path!),
-              );
+              artistSongs.sort((a, b) {
+                // アルバムフリガナで比較
+                int albumComparison = a.albumFuri!.toLowerCase().compareTo(b.albumFuri!.toLowerCase());
+
+                if (albumComparison == 0) {
+                  // アルバムフリガナが同じ場合は曲順で比較
+                  return (a.path!).compareTo(b.path!);
+                } else {
+                  return albumComparison;
+                }
+              });
 
               // 下の階層に画面遷移
               Navigator.push(

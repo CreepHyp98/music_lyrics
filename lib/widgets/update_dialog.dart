@@ -43,45 +43,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
     List<AlbumModel> alList = await audioQuery.queryAlbums();
     List<ArtistModel> arList = await audioQuery.queryArtists();
 
-    // 全曲データベースの構築
-    for (int i = 0; i < smList.length; i++) {
-      // 曲登録済みかフラグを初期化
-      exist = false;
-
-      // データベースに同じidの楽曲があるか探す
-      for (Song currentSong in currentAllSong) {
-        if (smList[i].id == currentSong.id) {
-          exist = true;
-          break;
-        }
-      }
-
-      // 登録済みフラグがfalseのままだったらその曲を追加
-      if ((exist == false) && (smList[i].duration! > 5000)) {
-        final song = Song(
-          id: smList[i].id,
-          title: smList[i].title,
-          titleFuri: await getFurigana(smList[i].title),
-          artist: smList[i].artist,
-          album: smList[i].album,
-          albumId: smList[i].albumId,
-          duration: smList[i].duration,
-          path: smList[i].data,
-          lyric: await copyLyric(smList[i].data),
-        );
-
-        await SongDB.instance.insertSong(song);
-      }
-
-      // 進捗状況を更新
-      if (mounted) {
-        setState(() {
-          widget.progress = i / (smList.length + alList.length + arList.length);
-        });
-      }
-    }
-
-    // アルバムデータベースの構築
+    // Songクラスでアルバムフリガナを使うため、初めにアルバムデータベースを構築する
     for (int i = 0; i < alList.length; i++) {
       // アルバム登録済みかフラグを初期化
       exist = false;
@@ -119,6 +81,45 @@ class _UpdateDialogState extends State<UpdateDialog> {
       if (mounted) {
         setState(() {
           widget.progress = (smList.length + i) / (smList.length + alList.length + arList.length);
+        });
+      }
+    }
+
+    // 全曲データベースの構築
+    for (int i = 0; i < smList.length; i++) {
+      // 曲登録済みかフラグを初期化
+      exist = false;
+
+      // データベースに同じidの楽曲があるか探す
+      for (Song currentSong in currentAllSong) {
+        if (smList[i].id == currentSong.id) {
+          exist = true;
+          break;
+        }
+      }
+
+      // 登録済みフラグがfalseのままだったらその曲を追加
+      if ((exist == false) && (smList[i].duration! > 5000)) {
+        final song = Song(
+          id: smList[i].id,
+          title: smList[i].title,
+          titleFuri: await getFurigana(smList[i].title),
+          artist: smList[i].artist,
+          album: smList[i].album,
+          albumFuri: await AlbumDB.instance.getAlbumFuri(smList[i].albumId!),
+          albumId: smList[i].albumId,
+          duration: smList[i].duration,
+          path: smList[i].data,
+          lyric: await copyLyric(smList[i].data),
+        );
+
+        await SongDB.instance.insertSong(song);
+      }
+
+      // 進捗状況を更新
+      if (mounted) {
+        setState(() {
+          widget.progress = i / (smList.length + alList.length + arList.length);
         });
       }
     }

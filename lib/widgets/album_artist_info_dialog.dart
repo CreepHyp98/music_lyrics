@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/class/album_database.dart';
 import 'package:music_lyrics/class/artist_database.dart';
+import 'package:music_lyrics/class/song_class.dart';
+import 'package:music_lyrics/class/song_database.dart';
 import 'package:music_lyrics/provider/provider.dart';
 
 class AlbumArtistInfoDialog extends ConsumerWidget {
@@ -47,6 +49,13 @@ class AlbumArtistInfoDialog extends ConsumerWidget {
             if (upperTC.index == 1) {
               albumList[index].albumFuri = furiController.text;
               AlbumDB.instance.updateAlbum(albumList[index]);
+              // Songクラスのほうも更新
+              for (Song song in songList) {
+                if (song.albumId == albumList[index].id) {
+                  song.albumFuri = furiController.text;
+                  SongDB.instance.updateSong(song);
+                }
+              }
             } else {
               artistList[index].artistFuri = furiController.text;
               ArtistDB.instance.updateArtist(artistList[index]);
