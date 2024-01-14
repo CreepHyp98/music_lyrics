@@ -64,6 +64,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
           titleFuri: await getFurigana(smList[i].title),
           artist: smList[i].artist,
           album: smList[i].album,
+          albumId: smList[i].albumId,
           duration: smList[i].duration,
           path: smList[i].data,
           lyric: await copyLyric(smList[i].data),
@@ -149,7 +150,6 @@ class _UpdateDialogState extends State<UpdateDialog> {
       // 登録済みフラグがfalseのままだったらそのアーティストを追加
       if (exist == false) {
         final artist = Artist(
-          id: arList[i].id,
           artist: arList[i].artist,
           artistFuri: await getFurigana(arList[i].artist),
           // numTracksの追加は別で行う

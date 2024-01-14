@@ -50,7 +50,8 @@ class _AllAlbumsState extends ConsumerState<AllAlbums> with AutomaticKeepAliveCl
               albumSongs.clear();
               // 収録曲リストにタップされたアルバムを追加
               for (Song song in songList) {
-                if (song.album == albumList[index].album) {
+                // アルバムidが一致したらリストに追加
+                if (song.albumId == albumList[index].id) {
                   albumSongs.add(song);
                 }
               }

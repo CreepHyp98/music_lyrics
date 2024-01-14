@@ -87,7 +87,7 @@ class _AllArtistsState extends ConsumerState<AllArtists> with AutomaticKeepAlive
               onPressed: () {
                 // 一旦リストをクリア
                 artistSongs.clear();
-                // 収録曲リストにタップされたアルバムを追加
+                // 収録曲リストにタップされたアーティストを追加
                 for (Song song in songList) {
                   if (song.artist == artistList[index].artist) {
                     artistSongs.add(song);

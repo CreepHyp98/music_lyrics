@@ -73,13 +73,13 @@ class AlbumDB {
   }
 
   // データの削除
-  Future<void> deleteAlbum(String name) async {
+  Future<void> deleteAlbum(int id) async {
     final Database db = await database;
     await db.delete(
       'albums',
-      // nameと一致するアルバムを削除
-      where: "album = ?",
-      whereArgs: [name],
+      // idで指定されたデータを削除
+      where: "id = ?",
+      whereArgs: [id],
     );
   }
 }

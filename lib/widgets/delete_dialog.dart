@@ -35,12 +35,12 @@ class DeleteDialog extends ConsumerWidget {
                 // 全曲データベースから削除
                 SongDB.instance.deleteSong(ref.watch(editSongProvider).id!);
 
-                String albumName = ref.watch(editSongProvider).album!;
+                int albumId = ref.watch(editSongProvider).albumId!;
                 for (Album album in albumList) {
-                  if (albumName == album.album) {
+                  if (albumId == album.id) {
                     if (album.numSongs == 1) {
                       // アルバム最後の一曲だったらアルバムデータベースから削除
-                      AlbumDB.instance.deleteAlbum(albumName);
+                      AlbumDB.instance.deleteAlbum(albumId);
                     } else {
                       // 最後の一曲じゃなければ曲数-1でデータベース更新
                       album.numSongs = album.numSongs! - 1;

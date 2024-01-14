@@ -69,15 +69,14 @@ class _SettingsState extends State<Settings> {
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Center(child: Text('developed by 太客')),
-            const SizedBox(height: 2),
+            const Center(child: Text('Developed by 太客')),
+            const SizedBox(height: 5),
             // バナー広告
             SizedBox(
               height: myBanner.size.height.toDouble(),
               width: myBanner.size.width.toDouble(),
               child: AdWidget(ad: myBanner),
             ),
-            const SizedBox(height: 2),
           ],
         ),
       ],

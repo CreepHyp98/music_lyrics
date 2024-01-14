@@ -27,7 +27,7 @@ class ArtistDB {
   }
 
   Future<void> _onCreate(Database db, int version) async {
-    await db.execute('CREATE TABLE artists(id INTEGER PRIMARY KEY, artist TEXT, artistFuri TEXT, numTracks INTEGER)');
+    await db.execute('CREATE TABLE artists(artist TEXT PRIMARY KEY, artistFuri TEXT, numTracks INTEGER)');
   }
 
   // データの挿入
@@ -49,7 +49,6 @@ class ArtistDB {
 
     return List.generate(maps.length, (i) {
       return Artist(
-        id: maps[i]['id'],
         artist: maps[i]['artist'],
         artistFuri: maps[i]['artistFuri'],
         numTracks: maps[i]['numTracks'],
@@ -63,9 +62,9 @@ class ArtistDB {
     await db.update(
       'artists',
       artist.toMap(),
-      // idで指定されたデータを更新
-      where: "id = ?",
-      whereArgs: [artist.id],
+      // アーティスト名で指定されたデータを更新
+      where: "artist = ?",
+      whereArgs: [artist.artist],
       // conflictが発生したときは中止して継続
       conflictAlgorithm: ConflictAlgorithm.ignore,
     );
@@ -76,7 +75,7 @@ class ArtistDB {
     final Database db = await database;
     await db.delete(
       'artists',
-      // idで指定されたデータを削除
+      // アーティスト名で指定されたデータを削除
       where: "artist = ?",
       whereArgs: [name],
     );

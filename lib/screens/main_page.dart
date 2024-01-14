@@ -44,7 +44,6 @@ class _AllSongsState extends ConsumerState<MainPage> with SingleTickerProviderSt
   @override
   void dispose() {
     _scrollController.dispose();
-    upperTC.dispose();
     super.dispose();
   }
 
