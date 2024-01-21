@@ -34,7 +34,7 @@ class _SplashState extends State<Splash> {
             ? const Align(
                 alignment: Alignment(0.0, -0.4),
                 child: VerticalRotatedWriting(
-                  size: 24,
+                  fontSize: 24,
                   text: 'あなたの歌詞が',
                 ),
               )
@@ -45,7 +45,7 @@ class _SplashState extends State<Splash> {
                   const Align(
                     alignment: Alignment(0.0, -0.4),
                     child: VerticalRotatedWriting(
-                      size: 20,
+                      fontSize: 20,
                       text: 'ダミー歌詞',
                     ),
                   ),
@@ -54,7 +54,7 @@ class _SplashState extends State<Splash> {
                   Align(
                     alignment: const Alignment(-0.5, 0.4),
                     child: VerticalRotatedWriting(
-                      size: 18,
+                      fontSize: 18,
                       text: "${splashTextList[1]}／${splashTextList[2]}",
                     ),
                   ),

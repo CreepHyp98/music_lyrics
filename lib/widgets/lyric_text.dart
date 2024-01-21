@@ -4,52 +4,108 @@ import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/widgets/vertical_rotated_writing.dart';
 import 'package:wakelock/wakelock.dart';
 
-class LyricWidget extends ConsumerStatefulWidget {
-  const LyricWidget({super.key});
+class LyricText extends ConsumerStatefulWidget {
+  const LyricText({super.key});
 
   @override
-  ConsumerState<LyricWidget> createState() => _LyricWidgetState();
+  ConsumerState<LyricText> createState() => _LyricTextState();
 }
 
-class _LyricWidgetState extends ConsumerState<LyricWidget> {
-  // 一行ごとの歌詞list
-  List<String> lineLyric = [];
+class _LyricTextState extends ConsumerState<LyricText> {
+  final ScrollController _scrollController = ScrollController();
   // 一行ごとに分割された歌詞Listのインデックス
-  int currentLyricIndex = 0;
+  late int currentLyricIndex;
   // 再生時間（ミリ秒）を保持
-  int currentMilliSeconds = 0;
+  late int currentMilliSeconds;
+  // 歌詞テキストのリスト
+  late List<String> lyricList;
+  // 歌いだし時間のリスト
+  late List<int> startTime;
+  // 自動スクロール移動ピクセル数
+  late double offset;
+  // リストへの代入したか
+  bool _done = false;
 
-  String syncLyric() {
-    String currentLyric = '';
-    int startTime, nextTime = 0;
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void assignLyricStartTime() {
+    // 各変数やリストを初期化
+    currentLyricIndex = 0;
+    currentMilliSeconds = 0;
+    offset = 0;
+    // 一行目が画面の中央に来るように改行を入れとく
+    lyricList = ['\n', '\n'];
+    // 改行の追加に合わせて時間情報を入れとく
+    startTime = [0, 1];
+
+    // 作業用変数に歌詞プロバイダーをセット
+    List<String> temp = ref.watch(lyricProvider);
+    // 歌詞プロバイダーから歌い出し時間と歌詞をリストに追加
+    for (int i = 0; i < temp.length; i++) {
+      startTime.add(getLyricStartTime(temp[i]));
+      // すでにstartTimeには[0, 1]が入っているので+2する
+      if (startTime[i + 2] != -1) {
+        // 時間情報のみ　⇒　改行
+        if (temp[i].length == 10) {
+          lyricList.add('\n');
+        } else {
+          lyricList.add(temp[i].substring(10));
+        }
+      } else {
+        lyricList.add(temp[i]);
+      }
+    }
+    // 最終行が画面の中央に来るように改行を入れとく
+    lyricList.addAll(List.generate(5, (index) => '\n'));
+    // 歌い出し時間には最後の歌いだし時間+3分の値を入れとく
+    startTime.addAll(List.generate(5, (index) => getLyricStartTime(temp.last) + 180000));
+
+    // 代入が完了したのでスクロール位置を先頭に戻して、画面を再描画
+    setState(() {
+      _done = true;
+    });
+  }
+
+  void syncLyric() {
+    int nextTime = 0;
 
     // 保持している値が実際の再生時間を超える ⇒ 曲が変わった
     if (currentMilliSeconds > ref.watch(positionProvider).inMilliseconds) {
-      // 歌詞Listのインデックスを初期化
-      currentLyricIndex = 0;
+      // 歌詞リストを更新
+      _done = false;
+      assignLyricStartTime();
+      // スクロール位置を先頭に戻す
+      _scrollController.animateTo(0, duration: const Duration(milliseconds: 500), curve: Curves.easeOutQuart);
     }
     // 再生時間を更新
     currentMilliSeconds = ref.watch(positionProvider).inMilliseconds;
-    // 歌詞データから歌いだし時間を取得
-    startTime = getLyricStartTime(ref.watch(lyricProvider)[currentLyricIndex]);
 
-    if (startTime >= 0) {
-      // 歌詞同期時は自動スリープを無効にする
+    if (startTime[currentLyricIndex] >= 0) {
+      // 歌詞同期時、かつ再生中は自動スリープを無効にする
       Wakelock.enable();
       try {
         // 最後のインデックスではないなら
-        if (currentLyricIndex != ref.watch(lyricProvider).length - 1) {
+        if (currentLyricIndex != lyricList.length - 1) {
           // 次の歌詞の歌いだし時間を取得
-          nextTime = getLyricStartTime(ref.watch(lyricProvider)[currentLyricIndex + 1]);
+          nextTime = startTime[currentLyricIndex + 1];
           // 現在の再生時間がそれを超えたなら
           if (currentMilliSeconds >= nextTime) {
+            if (currentLyricIndex == 1) {
+              // 一行目だけは固定幅で動かす
+              offset = 10;
+            } else if (currentLyricIndex > 1) {
+              // 現在の行数分ずらす
+              offset = offset + ((1 + (lyricList[currentLyricIndex].length ~/ 30)) * 34.8);
+            }
+            _scrollController.animateTo(offset, duration: const Duration(milliseconds: 250), curve: Curves.easeOutQuart);
+
             // 歌詞Listのインデックスを次に進める
             currentLyricIndex++;
           }
-        }
-
-        if (currentMilliSeconds >= startTime) {
-          currentLyric = ref.watch(lyricProvider)[currentLyricIndex].substring(10);
         }
       } catch (e) {
         // まだlyricProviderに値が入ってない
@@ -59,15 +115,52 @@ class _LyricWidgetState extends ConsumerState<LyricWidget> {
       // 歌詞同期はないので自動スリープを有効にする
       Wakelock.disable();
     }
-
-    return currentLyric;
   }
 
   @override
   Widget build(BuildContext context) {
-    double fontSizeM = 18;
+    if (_done == false) {
+      assignLyricStartTime();
+    }
 
-    return VerticalRotatedWriting(text: syncLyric(), size: fontSizeM);
+    syncLyric();
+
+    return ListView.builder(
+      controller: _scrollController,
+      itemCount: lyricList.length,
+      itemBuilder: (context, index) {
+        return GestureDetector(
+          child: VerticalRotatedWriting(
+            text: lyricList[index],
+            fontSize: 18,
+            // 現在の歌詞インデックスは黒色、それ以外は灰色
+            color: (index == currentLyricIndex) ? Colors.black : Colors.grey,
+          ),
+          onTap: () {
+            // 歌い出し時間が設定されている場合のみ飛べるようにする
+            if (startTime[index] != -1) {
+              // スクロール位置を更新（先頭二行の分、for文は2からスタート）
+              offset = 10;
+              for (int i = 2; i < index; i++) {
+                offset = offset + ((1 + (lyricList[i].length ~/ 30)) * 34.8);
+              }
+              _scrollController.animateTo(offset, duration: const Duration(milliseconds: 250), curve: Curves.easeOutQuart);
+
+              // タップしたインデックスに更新
+              currentLyricIndex = index;
+              // その歌い出し時間に移動
+              audioPlayer.seek(Duration(milliseconds: startTime[currentLyricIndex]));
+              // positionProviderの更新がかみ合わず、スクロール位置が先頭に戻ってしまうことがあるので0をセット
+              currentMilliSeconds = 0;
+            }
+          },
+        );
+      },
+      // 右から左にスクロール
+      reverse: true,
+      // 水平方向にスクロール
+      scrollDirection: Axis.horizontal,
+    );
   }
 }
 

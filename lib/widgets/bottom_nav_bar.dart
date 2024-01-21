@@ -57,7 +57,8 @@ class BottomNavBar extends ConsumerWidget {
         // 画面遷移のアニメーション
         screenTransitionAnimation: const ScreenTransitionAnimation(
           animateTabTransition: true,
-          curve: Curves.linear,
+          duration: Duration(milliseconds: 500),
+          curve: Curves.easeOutQuart,
         ),
       ),
     );

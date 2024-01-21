@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 class VerticalRotatedWriting extends StatelessWidget {
   final String text;
-  final double size;
+  final double fontSize;
+  final Color? color;
 
   const VerticalRotatedWriting({
     super.key,
     required this.text,
-    required this.size,
+    required this.fontSize,
+    this.color,
   });
 
   @override
@@ -21,7 +23,7 @@ class VerticalRotatedWriting extends StatelessWidget {
         for (var rune in splitText)
           Row(
             children: [
-              const SizedBox(width: 14),
+              const SizedBox(width: 15),
               _character(rune),
             ],
           )
@@ -32,7 +34,7 @@ class VerticalRotatedWriting extends StatelessWidget {
   // アルファベットを垂直方向に揃えるためSizedBoxでwrap
   Widget _character(String char) {
     // フォントサイズからテキストボックスサイズを指定（縦横同じ）
-    double boxSize = size * 1.1;
+    double boxSize = fontSize * 1.1;
 
     if (VerticalRotatedSymbols.map[char] != null) {
       // 記号なら
@@ -43,9 +45,11 @@ class VerticalRotatedWriting extends StatelessWidget {
           child: Text(
             VerticalRotatedSymbols.map[char]!,
             style: TextStyle(
-              fontSize: size,
+              fontSize: fontSize,
               fontFamily: 'shippori3',
               height: 1.0,
+              // 指定があれば色を変える
+              color: color,
             ),
           ),
         ),
@@ -61,10 +65,12 @@ class VerticalRotatedWriting extends StatelessWidget {
         child: Text(
           char,
           style: TextStyle(
-            fontSize: size,
+            fontSize: fontSize,
             fontFamily: 'shippori3',
             // 上寄せするため1よりも小さい値を設定
             height: 0.7,
+            // 指定があれば色を変える
+            color: color,
           ),
         ),
       );
@@ -76,9 +82,10 @@ class VerticalRotatedWriting extends StatelessWidget {
           child: Text(
             char,
             style: TextStyle(
-              fontSize: size,
+              fontSize: fontSize,
               fontFamily: 'shippori3',
               height: 1.0,
+              color: color,
             ),
           ),
         ),

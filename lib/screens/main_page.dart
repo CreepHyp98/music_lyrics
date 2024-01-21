@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -182,28 +181,5 @@ class _AllSongsState extends ConsumerState<MainPage> with SingleTickerProviderSt
                       ],
                     ),
     );
-  }
-}
-
-Future<String?> copyLyric(String path) async {
-  // 絶対パスの拡張子のインデックスを取得
-  int extensionIndex = path.lastIndexOf('.');
-
-  try {
-    // コピー元となる.lrcファイルのパスをセット
-    String lyricPath = '${path.substring(0, extensionIndex)}.lrc';
-    // パス → ファイル
-    File lyricFile = File(lyricPath);
-    // ファイル → String
-    String lyricData = await lyricFile.readAsString();
-    // 空行を削除する
-    List<String> lines = lyricData.split('\n');
-    lines.removeWhere((line) => line.isEmpty);
-    lyricData = lines.join('\n');
-
-    return lyricData;
-  } catch (e) {
-    // .lrcファイルがない場合はnullを返す
-    return null;
   }
 }

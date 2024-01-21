@@ -7,6 +7,7 @@ import 'package:music_lyrics/widgets/lyric_text.dart';
 import 'package:music_lyrics/widgets/vertical_rotated_writing.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:wakelock/wakelock.dart';
 
 class NowPlaying extends ConsumerStatefulWidget {
   const NowPlaying({super.key});
@@ -82,6 +83,8 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
         if (mounted) {
           setState(() {
             _isPlaying = false;
+            // 画面スリープ無効を解除
+            Wakelock.disable();
           });
         }
       }
@@ -91,11 +94,9 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
   // widgetの生成
   @override
   Widget build(BuildContext context) {
-    double fontSizeM = 18;
-    double fontSizeL = 20;
     // 歌詞描画エリアのために端末高さサイズも取得
-    double lyricAreaHeight = deviceHeight * 0.65;
-    double lyricAreaWidth = deviceWidth * 0.525;
+    double lyricAreaHeight = deviceHeight * 0.68;
+    double lyricAreaWidth = deviceWidth * 0.68;
 
     // 再生状況の取得
     listenToSongStream();
@@ -122,7 +123,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
             Align(
               alignment: const Alignment(0.85, -0.2),
               child: VerticalRotatedWriting(
-                size: fontSizeL,
+                fontSize: 20,
                 text: ref.watch(songProvider).title!,
               ),
             ),
@@ -131,7 +132,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
             Align(
               alignment: const Alignment(0.6, 0.4),
               child: VerticalRotatedWriting(
-                size: fontSizeM,
+                fontSize: 18,
                 text: ref.watch(songProvider).artist.toString(),
               ),
             ),
@@ -139,13 +140,13 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
             ref.watch(songProvider).lyric != null
                 // 歌詞が登録されてれば歌詞
                 ? Positioned(
-                    top: deviceHeight * 0.15,
+                    top: deviceHeight * 0.12,
                     left: 0,
                     child: Container(
                       alignment: Alignment.topRight,
                       height: lyricAreaHeight,
                       width: lyricAreaWidth,
-                      child: const LyricWidget(),
+                      child: const LyricText(),
                     ),
                   )
                 // なければジャケ写
@@ -168,7 +169,7 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
                 },
                 icon: Icon(
                   _isPlaying ? Icons.pause_outlined : Icons.play_arrow_outlined,
-                  size: fontSizeM,
+                  size: 18,
                 ),
               ),
             ),
@@ -188,9 +189,9 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
                     }
                   });
                 },
-                icon: Icon(
+                icon: const Icon(
                   Icons.skip_next_outlined,
-                  size: fontSizeM,
+                  size: 18,
                 ),
               ),
             ),

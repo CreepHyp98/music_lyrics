@@ -89,17 +89,18 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
             child: ToggleButtons(
               isSelected: _isSelected,
               onPressed: (index) {
-                // 「全体」がタップされたら
-                if (index == 0) {
+                // 「同期」のときに「全体」がタップされたら
+                if ((_isSelected[1] == true) && (index == 0)) {
                   // TextFieldのコントローラーに歌詞プロバイダーをセット
-                  tec = TextEditingController(text: ref.watch(editLrcProvider).join('\n'));
+                  tec.text = ref.watch(editLrcProvider).join('\n');
                   // 編集用AudioPlayer一時停止
                   editAudioPlayer.pause();
                   _isSelected = [true, false];
                   setState(() {});
+                }
 
-                  // 「同期」がタップされたら
-                } else {
+                // 「全体」のときに「同期」がタップされたら
+                if ((_isSelected[0] == true) && (index == 1)) {
                   // 歌詞プロバイダーにTextFieldの入力をセット
                   ref.read(editLrcProvider.notifier).state = tec.text.split('\n');
                   _isSelected = [false, true];
@@ -152,11 +153,14 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                   ref.read(editPosiProvider.notifier).state = Duration.zero;
 
                   // 編集用プロバイダーのlyricにtextfieldの値をセット
-                  tec = TextEditingController(text: ref.watch(editLrcProvider).join('\n'));
                   ref.read(editSongProvider.notifier).state.lyric = tec.text;
+                  // 全体に入力して完了だと更新できていなかったので下記追加
+                  if (_isSelected[0] == true) {
+                    ref.read(editLrcProvider.notifier).state = tec.text.split('\n');
+                  }
+
                   // データベースを更新
                   SongDB.instance.updateSong(ref.watch(editSongProvider));
-
                   // ダイアログに戻る
                   Navigator.pop(context);
                 },

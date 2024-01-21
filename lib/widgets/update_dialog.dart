@@ -1,10 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:music_lyrics/class/song_class.dart';
 import 'package:music_lyrics/class/album_class.dart';
 import 'package:music_lyrics/class/artist_class.dart';
 
 import 'package:music_lyrics/provider/provider.dart';
-import 'package:music_lyrics/screens/main_page.dart';
 import 'package:music_lyrics/screens/text_convert.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:music_lyrics/class/song_database.dart';
@@ -80,7 +81,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
       // 進捗状況を更新
       if (mounted) {
         setState(() {
-          widget.progress = (smList.length + i) / (smList.length + alList.length + arList.length);
+          widget.progress = i / (alList.length + smList.length + arList.length);
         });
       }
     }
@@ -119,7 +120,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
       // 進捗状況を更新
       if (mounted) {
         setState(() {
-          widget.progress = i / (smList.length + alList.length + arList.length);
+          widget.progress = (i + alList.length) / (alList.length + smList.length + arList.length);
         });
       }
     }
@@ -215,7 +216,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
               height: 50,
               child: Column(
                 children: [
-                  const Text('フリガナを取得しているため\n少し時間がかかります'),
+                  Text('フリガナを取得しているため\n少し時間がかかります (${(widget.progress * 100).floor()}%)'),
                   const Spacer(),
                   LinearProgressIndicator(
                     value: widget.progress,
@@ -248,5 +249,29 @@ class _UpdateDialogState extends State<UpdateDialog> {
               ),
       ],
     );
+  }
+}
+
+Future<String?> copyLyric(String path) async {
+  // 絶対パスの拡張子のインデックスを取得
+  int extensionIndex = path.lastIndexOf('.');
+
+  try {
+    // コピー元となる.lrcファイルのパスをセット
+    String lyricPath = '${path.substring(0, extensionIndex)}.lrc';
+    // パス → ファイル
+    File lyricFile = File(lyricPath);
+    // ファイル → String
+    String lyricData = await lyricFile.readAsString();
+    List<String> lines = lyricData.split('\n');
+    // 空行の削除&ラスト一文字何か入ってるのでそれは含まない
+    lines = lines.where((line) => line.isNotEmpty).map((line) => line.substring(0, line.length - 1)).toList();
+    // 改行コードでつないでおわり
+    lyricData = lines.join('\n');
+
+    return lyricData;
+  } catch (e) {
+    // .lrcファイルがない場合はnullを返す
+    return null;
   }
 }
