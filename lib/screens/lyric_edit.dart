@@ -26,6 +26,8 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
 
   @override
   void initState() {
+    super.initState();
+
     // 初めての編集ならチュートリアル画面に遷移
     firstEdit_1 = prefs.getBool('tutorial_1') ?? true;
     if (firstEdit_1 == true) {
@@ -35,8 +37,6 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
         },
       );
     }
-
-    super.initState();
   }
 
   @override
@@ -61,8 +61,6 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
         return true;
       },
       child: Scaffold(
-        // TextField入力時、上にずれてしまうのを防ぐ
-        //resizeToAvoidBottomInset: false,
         // 上バー
         appBar: AppBar(
           // 画面スクロールで色が変わるのを防ぐ
@@ -170,9 +168,13 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
         ),
 
         // 中央にはTextFieldもしくはListViewの歌詞
-        body: Align(
-          alignment: Alignment.center,
-          child: _isSelected[0] ? LrcTextField(key: key[0]) : const LrcListView(),
+        body: Center(
+          child: _isSelected[0]
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 5.0),
+                  child: LrcTextField(key: key[0]),
+                )
+              : const LrcListView(),
         ),
 
         // 下バーは"全体"なら検索などのボタン、"同期"なら再生バー
@@ -182,7 +184,7 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                 elevation: 0,
                 // 下側の余白のみ削除
                 padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
-                height: deviceHeight * 0.14,
+                height: deviceHeight * 0.13,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
