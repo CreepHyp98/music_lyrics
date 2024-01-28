@@ -5,7 +5,7 @@ class Song {
   String? artist; // アーティスト
   String? album; // アルバム
   String? albumFuri; // アルバムのフリガナ
-  int? albumId; // アルバムID
+  int? track; // トラックNo.
   int? duration; // 曲時間
   String? path; // ファイルパス
   String? lyric; // 歌詞
@@ -17,7 +17,7 @@ class Song {
     this.artist,
     this.album,
     this.albumFuri,
-    this.albumId,
+    this.track,
     this.duration,
     this.path,
     this.lyric,
@@ -31,7 +31,7 @@ class Song {
       'artist': artist,
       'album': album,
       'albumFuri': albumFuri,
-      'albumId': albumId,
+      'track': track,
       'duration': duration,
       'path': path,
       'lyric': lyric,

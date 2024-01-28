@@ -51,7 +51,7 @@ class AlbumArtistInfoDialog extends ConsumerWidget {
               AlbumDB.instance.updateAlbum(albumList[index]);
               // Songクラスのほうも更新
               for (Song song in songList) {
-                if (song.albumId == albumList[index].id) {
+                if ((song.album == albumList[index].album) && (song.artist == albumList[index].artist)) {
                   song.albumFuri = furiController.text;
                   SongDB.instance.updateSong(song);
                 }

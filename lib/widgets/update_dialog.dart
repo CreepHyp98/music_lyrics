@@ -49,18 +49,10 @@ class _UpdateDialogState extends State<UpdateDialog> {
       // アルバム登録済みかフラグを初期化
       exist = false;
 
-      // データベースに同じidのアルバムがあるか探す
+      // データベースに同じアルバム名とアーティスト名のアルバムがあるか探す
       for (Album currentAlbum in currentAllAlbum) {
-        if (alList[i].id == currentAlbum.id) {
+        if ((alList[i].album == currentAlbum.album) && (alList[i].artist == currentAlbum.artist)) {
           exist = true;
-
-          // 登録済みのアルバムと曲数が異なるかチェック
-          if (alList[i].numOfSongs != currentAlbum.numSongs) {
-            // 曲数の更新
-            currentAlbum.numSongs = alList[i].numOfSongs;
-            AlbumDB.instance.updateAlbum(currentAlbum);
-          }
-
           break;
         }
       }
@@ -68,11 +60,10 @@ class _UpdateDialogState extends State<UpdateDialog> {
       // 登録済みフラグがfalseのままだったらそのアルバムを追加
       if (exist == false) {
         final album = Album(
-          id: alList[i].id,
           album: alList[i].album,
           albumFuri: await getFurigana(alList[i].album),
           artist: alList[i].artist,
-          numSongs: alList[i].numOfSongs,
+          // numSongsの追加は別でおこなう
         );
 
         await AlbumDB.instance.insertAlbum(album);
@@ -107,8 +98,8 @@ class _UpdateDialogState extends State<UpdateDialog> {
           titleFuri: await getFurigana(smList[i].title),
           artist: smList[i].artist,
           album: smList[i].album,
-          albumFuri: await AlbumDB.instance.getAlbumFuri(smList[i].albumId!),
-          albumId: smList[i].albumId,
+          albumFuri: await AlbumDB.instance.getAlbumFuri(smList[i].album!, smList[i].artist!),
+          track: smList[i].track,
           duration: smList[i].duration,
           path: smList[i].data,
           lyric: await copyLyric(smList[i].data),
@@ -168,8 +159,24 @@ class _UpdateDialogState extends State<UpdateDialog> {
       }
     }
 
-    // numTracksの追加
+    // アルバムnumSongsの追加
     currentAllSong = await SongDB.instance.getAllSongs();
+    currentAllAlbum = await AlbumDB.instance.getAllAlbums();
+    for (Album currentAlbum in currentAllAlbum) {
+      // 曲数カウンタ初期化
+      int count = 0;
+      for (Song currentSong in currentAllSong) {
+        if ((currentSong.album == currentAlbum.album) && (currentSong.artist == currentAlbum.artist)) {
+          count++;
+        }
+      }
+
+      // 曲数の更新
+      currentAlbum.numSongs = count;
+      await AlbumDB.instance.updateAlbum(currentAlbum);
+    }
+
+    // アーティストnumTracksの追加
     currentAllArtist = await ArtistDB.instance.getAllArtists();
     for (Artist currentArtist in currentAllArtist) {
       // 曲数カウンタ初期化

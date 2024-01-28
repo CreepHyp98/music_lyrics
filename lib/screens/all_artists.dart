@@ -61,7 +61,7 @@ class _AllArtistsState extends ConsumerState<AllArtists> with AutomaticKeepAlive
 
                 if (albumComparison == 0) {
                   // アルバムフリガナが同じ場合は曲順で比較
-                  return (a.path!).compareTo(b.path!);
+                  return (a.track!).compareTo(b.track!);
                 } else {
                   return albumComparison;
                 }

@@ -27,7 +27,7 @@ class AlbumDB {
   }
 
   Future<void> _onCreate(Database db, int version) async {
-    await db.execute('CREATE TABLE albums(id INTEGER PRIMARY KEY, album TEXT, albumFuri TEXT, artist TEXT, numSongs INTEGER)');
+    await db.execute('CREATE TABLE albums(album TEXT, albumFuri TEXT, artist TEXT, numSongs INTEGER, PRIMARY KEY(album, albumFuri))');
   }
 
   // データの挿入
@@ -49,7 +49,6 @@ class AlbumDB {
 
     return List.generate(maps.length, (i) {
       return Album(
-        id: maps[i]['id'],
         album: maps[i]['album'],
         albumFuri: maps[i]['albumFuri'],
         artist: maps[i]['artist'],
@@ -59,12 +58,12 @@ class AlbumDB {
   }
 
   // アルバムフリガナの取得
-  Future<String?> getAlbumFuri(int id) async {
+  Future<String?> getAlbumFuri(String albumName, String artistName) async {
     final Database db = await database;
     final List<Map<String, dynamic>> result = await db.query(
       'albums',
-      where: 'id = ?',
-      whereArgs: [id],
+      where: 'album = ? AND artist = ?',
+      whereArgs: [albumName, artistName],
     );
     if (result.isNotEmpty) {
       return result.first['albumFuri'];
@@ -79,22 +78,22 @@ class AlbumDB {
     await db.update(
       'albums',
       album.toMap(),
-      // idで指定されたデータを更新
-      where: "id = ?",
-      whereArgs: [album.id],
+      // アルバム名とアーティスト名で指定されたデータを更新
+      where: 'album = ? AND artist = ?',
+      whereArgs: [album.album, album.artist],
       // conflictが発生したときは中止して継続
       conflictAlgorithm: ConflictAlgorithm.ignore,
     );
   }
 
   // データの削除
-  Future<void> deleteAlbum(int id) async {
+  Future<void> deleteAlbum(Album album) async {
     final Database db = await database;
     await db.delete(
       'albums',
-      // idで指定されたデータを削除
-      where: "id = ?",
-      whereArgs: [id],
+      // アルバム名とアーティスト名で指定されたデータを更新
+      where: 'album = ? AND artist = ?',
+      whereArgs: [album.album, album.artist],
     );
   }
 }

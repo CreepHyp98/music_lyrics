@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music_lyrics/class/album_class.dart';
 import 'package:music_lyrics/class/song_class.dart';
 import 'package:music_lyrics/screens/below_album_artist.dart';
 import 'package:music_lyrics/widgets/album_artist_info_dialog.dart';
@@ -22,6 +23,22 @@ class _AllAlbumsState extends ConsumerState<AllAlbums> with AutomaticKeepAliveCl
 
   // アルバムタブのスクロールコントローラー
   final ScrollController _scrollController = ScrollController();
+  // ジャケ写用のidリスト
+  final List<int> idList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // idリストの作成
+    for (Album album in albumList) {
+      for (Song song in songList) {
+        if ((album.album == song.album) && (album.artist == song.artist)) {
+          idList.add(song.id!);
+          break;
+        }
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -50,14 +67,14 @@ class _AllAlbumsState extends ConsumerState<AllAlbums> with AutomaticKeepAliveCl
               albumSongs.clear();
               // 収録曲リストにタップされたアルバムを追加
               for (Song song in songList) {
-                // アルバムidが一致したらリストに追加
-                if (song.albumId == albumList[index].id) {
+                // アルバム名とアーティスト名が一致したらリストに追加
+                if ((song.album == albumList[index].album) && (song.artist == albumList[index].artist)) {
                   albumSongs.add(song);
                 }
               }
               // 曲順にソート
               albumSongs.sort(
-                (a, b) => (a.path!).compareTo(b.path!),
+                (a, b) => (a.track!).compareTo(b.track!),
               );
 
               // 下の階層に画面遷移
@@ -105,8 +122,8 @@ class _AllAlbumsState extends ConsumerState<AllAlbums> with AutomaticKeepAliveCl
               icon: const Icon(Icons.more_horiz),
             ),
             leading: QueryArtworkWidget(
-              id: albumList[index].id!,
-              type: ArtworkType.ALBUM,
+              id: idList[index],
+              type: ArtworkType.AUDIO,
               artworkBorder: BorderRadius.circular(0),
               artworkFit: BoxFit.contain,
               nullArtworkWidget: const Icon(Icons.music_note),
