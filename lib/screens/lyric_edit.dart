@@ -31,11 +31,10 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
     // 初めての編集ならチュートリアル画面に遷移
     firstEdit_1 = prefs.getBool('tutorial_1') ?? true;
     if (firstEdit_1 == true) {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (Duration duration) {
-          showTutorial(context, 1);
-        },
-      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(const Duration(milliseconds: 100));
+        showTutorial(context, 1);
+      });
     }
   }
 
@@ -87,32 +86,31 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
             child: ToggleButtons(
               isSelected: _isSelected,
               onPressed: (index) {
-                // 「同期」のときに「全体」がタップされたら
-                if ((_isSelected[1] == true) && (index == 0)) {
-                  // TextFieldのコントローラーに歌詞プロバイダーをセット
-                  tec.text = ref.watch(editLrcProvider).join('\n');
-                  // 編集用AudioPlayer一時停止
-                  editAudioPlayer.pause();
-                  _isSelected = [true, false];
-                  setState(() {});
-                }
-
                 // 「全体」のときに「同期」がタップされたら
                 if ((_isSelected[0] == true) && (index == 1)) {
                   // 歌詞プロバイダーにTextFieldの入力をセット
-                  ref.read(editLrcProvider.notifier).state = tec.text.split('\n');
+                  editLrc = tec.text.split('\n');
                   _isSelected = [false, true];
 
                   // 初めての編集ならチュートリアル画面に遷移
                   firstEdit_2 = prefs.getBool('tutorial_2') ?? true;
                   if (firstEdit_2 == true) {
-                    WidgetsBinding.instance.addPostFrameCallback(
-                      (Duration duration) {
-                        showTutorial(context, 2);
-                      },
-                    );
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      Future.delayed(const Duration(milliseconds: 100));
+                      showTutorial(context, 2);
+                    });
                   }
 
+                  setState(() {});
+                }
+
+                // 「同期」のときに「全体」がタップされたら
+                if ((_isSelected[1] == true) && (index == 0)) {
+                  // TextFieldのコントローラーに歌詞プロバイダーをセット
+                  tec.text = editLrc.join('\n');
+                  // 編集用AudioPlayer一時停止
+                  editAudioPlayer.pause();
+                  _isSelected = [true, false];
                   setState(() {});
                 }
               },
@@ -150,12 +148,12 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                   // 編集用再生位置も初期化
                   ref.read(editPosiProvider.notifier).state = Duration.zero;
 
-                  // 編集用プロバイダーのlyricにtextfieldの値をセット
-                  ref.read(editSongProvider.notifier).state.lyric = tec.text;
                   // 全体に入力して完了だと更新できていなかったので下記追加
                   if (_isSelected[0] == true) {
-                    ref.read(editLrcProvider.notifier).state = tec.text.split('\n');
+                    editLrc = tec.text.split('\n');
                   }
+                  // 編集用プロバイダーのlyricにtextfieldの値をセット
+                  ref.read(editSongProvider.notifier).state.lyric = editLrc.join('\n');
 
                   // データベースを更新
                   SongDB.instance.updateSong(ref.watch(editSongProvider));
@@ -183,11 +181,10 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                 // 画面スクロールで色が変わるのを防ぐ
                 elevation: 0,
                 // 下側の余白のみ削除
-                padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
-                height: deviceHeight * 0.13,
+                padding: const EdgeInsets.only(left: 19.0, right: 8.0),
+                height: deviceHeight * 0.12,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Row(
                       children: [
@@ -214,6 +211,7 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                         ),
 
                         // 空行削除ボタン
+                        const SizedBox(width: 5),
                         OutlinedButton(
                           style: OutlinedButton.styleFrom(
                             shape: const RoundedRectangleBorder(
@@ -240,18 +238,16 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                             Icons.info_outline,
                           ),
                           onPressed: () {
-                            WidgetsBinding.instance.addPostFrameCallback(
-                              (Duration duration) {
-                                showTutorial(context, 1);
-                              },
-                            );
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              Future.delayed(const Duration(milliseconds: 100));
+                              showTutorial(context, 1);
+                            });
                           },
                         ),
                       ],
                     ),
 
                     // バナー広告
-                    const SizedBox(height: 5),
                     SizedBox(
                       height: myBanner.size.height.toDouble(),
                       width: myBanner.size.width.toDouble(),

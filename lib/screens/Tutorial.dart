@@ -15,7 +15,7 @@ List<TargetFocus> initTargets_1() {
           padding: const EdgeInsets.only(left: 50, bottom: 50),
           child: const Text(
             "ここに歌詞を入力します",
-            style: TextStyle(color: Colors.white, fontSize: 18.0),
+            style: TextStyle(color: Colors.white, fontSize: 18),
           ),
         )
       ],
@@ -33,7 +33,7 @@ List<TargetFocus> initTargets_1() {
           align: ContentAlign.top,
           child: const Text(
             "歌詞の検索ができます",
-            style: TextStyle(color: Colors.white, fontSize: 18.0),
+            style: TextStyle(color: Colors.white, fontSize: 18),
           ),
         )
       ],
@@ -51,7 +51,7 @@ List<TargetFocus> initTargets_1() {
           child: const Text(
             "入力が終わったら「同期」ボタンを\nタップします",
             textAlign: TextAlign.right,
-            style: TextStyle(color: Colors.white, fontSize: 18.0),
+            style: TextStyle(color: Colors.white, fontSize: 18),
           ),
         ),
       ],
@@ -75,7 +75,7 @@ List<TargetFocus> initTargets_2() {
           align: ContentAlign.top,
           child: const Text(
             "歌詞を同期させるには\nまず曲を再生します",
-            style: TextStyle(color: Colors.white, fontSize: 18.0),
+            style: TextStyle(color: Colors.white, fontSize: 18),
           ),
         )
       ],
@@ -92,7 +92,7 @@ List<TargetFocus> initTargets_2() {
         TargetContent(
           child: const Text(
             "歌い出しに合わせてタップします\nタップした時間がアイコンの下に\n表示されます",
-            style: TextStyle(color: Colors.white, fontSize: 18.0),
+            style: TextStyle(color: Colors.white, fontSize: 18),
           ),
         )
       ],
@@ -110,7 +110,7 @@ List<TargetFocus> initTargets_2() {
           child: const Text(
             "同期した歌詞を保存します\n途中でも保存可能です",
             textAlign: TextAlign.right,
-            style: TextStyle(color: Colors.white, fontSize: 18.0),
+            style: TextStyle(color: Colors.white, fontSize: 18),
           ),
         ),
       ],

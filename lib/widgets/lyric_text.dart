@@ -101,7 +101,11 @@ class _LyricTextState extends ConsumerState<LyricText> {
               // 現在の行数分ずらす
               offset = offset + ((1 + (lyricList[currentLyricIndex].length ~/ 30)) * 34.8);
             }
-            _scrollController.animateTo(offset, duration: const Duration(milliseconds: 250), curve: Curves.easeOutQuart);
+            _scrollController.animateTo(
+              offset,
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutQuart,
+            );
 
             // 歌詞Listのインデックスを次に進める
             currentLyricIndex++;
@@ -144,7 +148,11 @@ class _LyricTextState extends ConsumerState<LyricText> {
               for (int i = 2; i < index; i++) {
                 offset = offset + ((1 + (lyricList[i].length ~/ 30)) * 34.8);
               }
-              _scrollController.animateTo(offset, duration: const Duration(milliseconds: 250), curve: Curves.easeOutQuart);
+              _scrollController.animateTo(
+                offset,
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutQuart,
+              );
 
               // タップしたインデックスに更新
               currentLyricIndex = index;

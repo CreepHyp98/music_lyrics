@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/screens/all_albums.dart';
@@ -59,7 +58,7 @@ class _AllSongsState extends ConsumerState<MainPage> with SingleTickerProviderSt
   Widget noAccessToLibraryWidget() {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         color: Colors.redAccent.withOpacity(0.5),
       ),
       padding: const EdgeInsets.all(20),

@@ -94,9 +94,9 @@ class _MusicListState extends ConsumerState<MusicList> with AutomaticKeepAliveCl
                 ref.read(editSongProvider.notifier).state = widget.playlist[index];
                 // editLrcProviderを更新
                 if (widget.playlist[index].lyric != null) {
-                  ref.read(editLrcProvider.notifier).state = widget.playlist[index].lyric!.split('\n');
+                  editLrc = widget.playlist[index].lyric!.split('\n');
                 } else {
-                  ref.read(editLrcProvider.notifier).state = [''];
+                  editLrc = [''];
                 }
 
                 // ダイアログ表示

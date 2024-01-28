@@ -46,10 +46,9 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
       elevation: 0,
       // 下側の余白のみ削除
       padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
-      height: deviceHeight * 0.16,
+      height: deviceHeight * 0.15,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // SliderThemeでスライダーをラップ
           SliderTheme(
@@ -145,18 +144,16 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
                   Icons.info_outline,
                 ),
                 onPressed: () {
-                  WidgetsBinding.instance.addPostFrameCallback(
-                    (Duration duration) {
-                      showTutorial(context, 2);
-                    },
-                  );
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    Future.delayed(const Duration(milliseconds: 100));
+                    showTutorial(context, 2);
+                  });
                 },
               ),
             ],
           ),
 
           // バナー広告
-          const SizedBox(height: 5),
           SizedBox(
             height: myBanner.size.height.toDouble(),
             width: myBanner.size.width.toDouble(),

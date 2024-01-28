@@ -47,7 +47,7 @@ class SongInfoDialog extends ConsumerWidget {
               ),
               onTap: (() {
                 // 歌詞編集のテキストフィールドに対象の歌詞をセット
-                tec = TextEditingController(text: ref.watch(editLrcProvider).join('\n'));
+                tec = TextEditingController(text: ref.watch(editSongProvider).lyric);
 
                 // 再生中なら止める
                 audioPlayer.pause();

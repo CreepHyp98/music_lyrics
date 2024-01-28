@@ -47,7 +47,7 @@ final AudioPlayer editAudioPlayer = AudioPlayer();
 // 歌詞編集用再生時間
 final StateProvider<Duration> editPosiProvider = StateProvider<Duration>((ref) => const Duration());
 // 歌詞編集用歌詞データ
-final StateProvider<List<String>> editLrcProvider = StateProvider<List<String>>(((ref) => [""]));
+List<String> editLrc = [''];
 // 歌詞編集用テキストコントローラー
 TextEditingController tec = TextEditingController();
 // スプラッシュ画面に表示する[歌詞, 曲名, アーティスト名]のリスト
