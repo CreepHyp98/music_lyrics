@@ -81,9 +81,12 @@ class _AllArtistsState extends ConsumerState<AllArtists> with AutomaticKeepAlive
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  artistList[index].artist!,
-                  maxLines: 1,
+                SizedBox(
+                  width: deviceWidth - 110,
+                  child: Text(
+                    artistList[index].artist!,
+                    maxLines: 1,
+                  ),
                 ),
                 Text(
                   artistList[index].numTracks.toString(),

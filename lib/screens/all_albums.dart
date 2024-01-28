@@ -95,9 +95,12 @@ class _AllAlbumsState extends ConsumerState<AllAlbums> with AutomaticKeepAliveCl
             subtitle: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  "${albumList[index].artist}",
-                  maxLines: 1,
+                SizedBox(
+                  width: deviceWidth - 140,
+                  child: Text(
+                    "${albumList[index].artist}",
+                    maxLines: 1,
+                  ),
                 ),
                 Text(albumList[index].numSongs.toString()),
               ],
