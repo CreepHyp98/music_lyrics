@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
-import 'package:music_lyrics/widgets/lyric_text.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import 'bottom_player_bar.dart';
@@ -31,17 +30,6 @@ class _LrcListViewState extends ConsumerState<LrcListView> {
     });
   }
 
-  Future<void> updateStartTime(int index) async {
-    // 歌いだし時間をタップした時間に更新
-    String newTime = milliToMinSec(ref.watch(editPosiProvider).inMilliseconds);
-    // すでに時間情報があれば書き換え、なければlrcの形式にして追加
-    if (getLyricStartTime(editLrc[index]) != -1) {
-      editLrc[index] = editLrc[index].replaceRange(1, 9, newTime);
-    } else {
-      editLrc[index] = "[$newTime]${editLrc[index]}";
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -63,28 +51,48 @@ class _LrcListViewState extends ConsumerState<LrcListView> {
             contentPadding: const EdgeInsets.symmetric(horizontal: 5),
 
             // 左側タップで歌いだし時間の取得
-            leading: FloatingActionButton(
+            leading: GestureDetector(
               key: index == 0 ? key[4] : null,
-              heroTag: 'btn$index',
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  const Icon(Icons.timer_outlined),
-                  Text(
-                    // 時間情報があればその歌いだし時間を表示、なければ空欄
-                    (getLyricStartTime(editLrc[index]) != -1) ? editLrc[index].substring(1, 9) : '',
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                ],
+              child: Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).primaryColor),
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Icon(
+                      Icons.timer_outlined,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    Text(
+                      // 歌い出し時間があれば表示
+                      (editStartTime[index] != -1) ? milliToMinSec(editStartTime[index]) : '',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
               ),
-              onPressed: () async {
-                // 歌い出し時間をタップした時間に更新
-                updateStartTime(index);
+              onTap: () {
+                // 歌いだし時間をタップした時間に更新(タップの誤差があるので100ミリ秒引いとく)
+                editStartTime[index] = ref.watch(editPosiProvider).inMilliseconds - 100;
+
+                if (index > 0) {
+                  // 一個前の歌い出し時間が空で空行なら
+                  if ((editStartTime[index - 1] == -1) && (editLrc[index - 1] == '')) {
+                    // 今の歌い出し時間の-0.5秒をセット
+                    editStartTime[index - 1] = editStartTime[index] - 500;
+                  }
+                }
+
                 // タップされたインデックスが画面の一番下なら自動スクロールする
-                if (index == endIndex) {
+                if ((index == endIndex) && (index != editLrc.length - 1)) {
                   _itemScrollController.scrollTo(
-                    index: index - 6,
-                    duration: const Duration(milliseconds: 250),
+                    // 次のインデックスが空行なら二行スクロール
+                    index: editLrc[index + 1] != '' ? index - 6 : index - 5,
+                    duration: const Duration(milliseconds: 500),
                     curve: Curves.easeOutQuart,
                   );
                 }
@@ -100,8 +108,7 @@ class _LrcListViewState extends ConsumerState<LrcListView> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      // 時間情報があれば10文字目から切り出す、なければそのまま
-                      (getLyricStartTime(editLrc[index]) != -1) ? editLrc[index].substring(10) : editLrc[index],
+                      editLrc[index],
                       maxLines: 2,
                       style: const TextStyle(fontSize: 15),
                     ),
@@ -123,19 +130,18 @@ class _LrcListViewState extends ConsumerState<LrcListView> {
             // 右タップでそこから再生
             trailing: IconButton(
                 // 時間情報がなければグレーアウト
-                icon: (getLyricStartTime(editLrc[index]) != -1)
+                icon: (editStartTime[index] != -1)
                     ? const Icon(Icons.play_arrow)
                     : const Icon(
                         Icons.play_arrow,
                         color: Colors.grey,
                       ),
                 // 時間情報がなければタップ無効
-                onPressed: (getLyricStartTime(editLrc[index]) != -1)
+                onPressed: (editStartTime[index] != -1)
                     ? () {
                         // LyricWidgetと同じ関数で時間情報を取得
-                        int value = getLyricStartTime(editLrc[index]);
-                        editAudioPlayer.seek(Duration(milliseconds: value));
-                        ref.read(editPosiProvider.notifier).state = Duration(milliseconds: value);
+                        editAudioPlayer.seek(Duration(milliseconds: editStartTime[index]));
+                        ref.read(editPosiProvider.notifier).state = Duration(milliseconds: editStartTime[index]);
                       }
                     : null),
           );

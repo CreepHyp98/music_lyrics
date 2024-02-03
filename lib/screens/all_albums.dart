@@ -61,7 +61,6 @@ class _AllAlbumsState extends ConsumerState<AllAlbums> with AutomaticKeepAliveCl
         // Listの生成
         itemBuilder: (context, index) {
           return ListTile(
-            tileColor: const Color(0xfffffbfe),
             onTap: () {
               // 一旦リストをクリア
               albumSongs.clear();

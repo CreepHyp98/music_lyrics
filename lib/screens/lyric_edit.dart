@@ -8,6 +8,7 @@ import 'package:music_lyrics/screens/tutorial.dart';
 import 'package:music_lyrics/widgets/bottom_player_bar.dart';
 import 'package:music_lyrics/widgets/lrc_listview.dart';
 import 'package:music_lyrics/widgets/lrc_textfield.dart';
+import 'package:music_lyrics/widgets/lyric_text.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LyricEdit extends ConsumerStatefulWidget {
@@ -36,6 +37,25 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
         showTutorial(context, 1);
       });
     }
+
+    // 歌い出し時間のリストを-1で初期化
+    editStartTime = List.generate(editLrc.length, (index) => -1);
+  }
+
+  // 歌いだし時間と歌詞データを結合
+  List<String> combineStartTimeAndLrc() {
+    List<String> tempLrc = List.generate(editLrc.length, (index) => '');
+
+    for (int i = 0; i < editLrc.length; i++) {
+      // 歌い出し時間があればそのまま結合、なければ歌詞データのみ
+      if (editStartTime[i] != -1) {
+        tempLrc[i] = "[${milliToMinSec(editStartTime[i])}]${editLrc[i]}";
+      } else {
+        tempLrc[i] = editLrc[i];
+      }
+    }
+
+    return tempLrc;
   }
 
   @override
@@ -90,7 +110,16 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                 if ((_isSelected[0] == true) && (index == 1)) {
                   // 歌詞プロバイダーにTextFieldの入力をセット
                   editLrc = tec.text.split('\n');
-                  _isSelected = [false, true];
+
+                  for (int i = 0; i < editLrc.length; i++) {
+                    // 歌い出し時間のセット
+                    editStartTime[i] = getLyricStartTime(editLrc[i]);
+
+                    // 歌詞データのセット
+                    if (getLyricStartTime(editLrc[i]) != -1) {
+                      editLrc[i] = editLrc[i].substring(10);
+                    }
+                  }
 
                   // 初めての編集ならチュートリアル画面に遷移
                   firstEdit_2 = prefs.getBool('tutorial_2') ?? true;
@@ -101,15 +130,18 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                     });
                   }
 
+                  _isSelected = [false, true];
                   setState(() {});
                 }
 
                 // 「同期」のときに「全体」がタップされたら
                 if ((_isSelected[1] == true) && (index == 0)) {
-                  // TextFieldのコントローラーに歌詞プロバイダーをセット
-                  tec.text = editLrc.join('\n');
+                  // 歌い出し時間と歌詞データをくっつけて、TextFieldのコントローラーに歌詞プロバイダーをセット
+                  tec.text = combineStartTimeAndLrc().join('\n');
+
                   // 編集用AudioPlayer一時停止
                   editAudioPlayer.pause();
+
                   _isSelected = [true, false];
                   setState(() {});
                 }
@@ -148,12 +180,12 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                   // 編集用再生位置も初期化
                   ref.read(editPosiProvider.notifier).state = Duration.zero;
 
-                  // 全体に入力して完了だと更新できていなかったので下記追加
+                  // 編集用プロバイダーのlyricに歌詞データをセット
                   if (_isSelected[0] == true) {
-                    editLrc = tec.text.split('\n');
+                    ref.read(editSongProvider.notifier).state.lyric = tec.text;
+                  } else {
+                    ref.read(editSongProvider.notifier).state.lyric = combineStartTimeAndLrc().join('\n');
                   }
-                  // 編集用プロバイダーのlyricにtextfieldの値をセット
-                  ref.read(editSongProvider.notifier).state.lyric = editLrc.join('\n');
 
                   // データベースを更新
                   SongDB.instance.updateSong(ref.watch(editSongProvider));

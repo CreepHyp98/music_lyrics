@@ -91,7 +91,7 @@ List<TargetFocus> initTargets_2() {
       contents: [
         TargetContent(
           child: const Text(
-            "歌い出しに合わせてタップします\nタップした時間がアイコンの下に\n表示されます",
+            "歌い出しに合わせてタップします\n空行の場合はタップしなくても\n次の歌い出し時間から自動で算出できます",
             style: TextStyle(color: Colors.white, fontSize: 18),
           ),
         )

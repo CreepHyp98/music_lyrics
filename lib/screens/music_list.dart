@@ -57,7 +57,6 @@ class _MusicListState extends ConsumerState<MusicList> with AutomaticKeepAliveCl
         // Listの生成
         itemBuilder: (context, index) {
           return ListTile(
-            tileColor: const Color(0xfffffbfe),
             onTap: () {
               // 再生キュー
               songQueue = widget.playlist;

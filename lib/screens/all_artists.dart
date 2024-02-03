@@ -44,7 +44,6 @@ class _AllArtistsState extends ConsumerState<AllArtists> with AutomaticKeepAlive
         // Listの生成
         itemBuilder: (context, index) {
           return ListTile(
-            tileColor: const Color(0xfffffbfe),
             onTap: () {
               // 一旦リストをクリア
               artistSongs.clear();
