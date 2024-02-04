@@ -30,7 +30,7 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 android {
     compileSdkVersion flutter.compileSdkVersion
     compileSdkVersion 33 // 追加
-    ndkVersion flutter.ndkVersion
+    ndkVersion flutter.ndkVersion //flutter.ndkVersion → 26.1.10909125
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -66,6 +66,11 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release    // .debug→.release
+
+            // 追加
+            ndk {
+               debugSymbolLevel 'SYMBOL_TABLE'
+            }
         }
     }
 }
