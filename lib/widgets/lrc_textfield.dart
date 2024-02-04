@@ -28,8 +28,6 @@ class _LrcTextFieldState extends ConsumerState<LrcTextField> {
           floatingLabelBehavior: FloatingLabelBehavior.always,
           border: OutlineInputBorder(),
         ),
-        // TextFieldに最初はフォーカスをあてない
-        autofocus: false,
       ),
     );
   }
