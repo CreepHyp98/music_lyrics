@@ -103,7 +103,6 @@ class _NowPlayingState extends ConsumerState<NowPlaying> {
     listenToEvent();
 
     return Scaffold(
-      backgroundColor: const Color(0xfffffbfe),
       body: SafeArea(
         child: Stack(
           children: [

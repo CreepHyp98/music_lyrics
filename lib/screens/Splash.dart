@@ -27,7 +27,6 @@ class _SplashState extends State<Splash> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xfffffbfe),
       body: Center(
         child: splashTextList[1] == ''
             // 空なら

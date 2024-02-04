@@ -53,7 +53,7 @@ class BottomNavBar extends ConsumerWidget {
           ),
         ],
         navBarStyle: NavBarStyle.style5,
-        backgroundColor: const Color(0xfffffbfe),
+
         // 画面遷移のアニメーション
         screenTransitionAnimation: const ScreenTransitionAnimation(
           animateTabTransition: true,
