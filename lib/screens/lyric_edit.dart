@@ -7,7 +7,6 @@ import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/screens/tutorial.dart';
 import 'package:music_lyrics/widgets/bottom_player_bar.dart';
 import 'package:music_lyrics/widgets/lrc_listview.dart';
-import 'package:music_lyrics/widgets/lrc_textfield.dart';
 import 'package:music_lyrics/widgets/lyric_text.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -19,18 +18,17 @@ class LyricEdit extends ConsumerStatefulWidget {
 }
 
 class _LyricEditState extends ConsumerState<LyricEdit> {
-  // ToggleButton選択中かどうか
-  List<bool> _isSelected = <bool>[true, false];
-  // チュートリアルを表示するか
-  late bool firstEdit_1;
-  late bool firstEdit_2;
+  // テキストフィールドのコントローラー
+  final tec = TextEditingController();
+  // テキストフィールドを初期化するかどうか
+  bool _doneOnce = true;
 
   @override
   void initState() {
     super.initState();
 
     // 初めての編集ならチュートリアル画面に遷移
-    firstEdit_1 = prefs.getBool('tutorial_1') ?? true;
+    bool firstEdit_1 = prefs.getBool('tutorial_1') ?? true;
     if (firstEdit_1 == true) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Future.delayed(const Duration(milliseconds: 100));
@@ -40,6 +38,12 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
 
     // 歌い出し時間のリストを-1で初期化
     editStartTime = List.generate(editLrc.length, (index) => -1);
+  }
+
+  @override
+  void dispose() {
+    tec.dispose();
+    super.dispose();
   }
 
   // 歌いだし時間と歌詞データを結合
@@ -63,6 +67,14 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
     // バナー広告の読み込み
     BannerAd myBanner = createBannerAd();
     myBanner.load();
+    // 初回表示時のみ編集用歌詞データをセット
+    if (_doneOnce == true) {
+      String? inputText = ref.watch(editSongProvider).lyric;
+      if (inputText != null) {
+        tec.text = inputText;
+      }
+      _doneOnce = false;
+    }
 
     return WillPopScope(
       // デバイスのバックイベント時の処理
@@ -104,10 +116,10 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
           title: SizedBox(
             height: 40,
             child: ToggleButtons(
-              isSelected: _isSelected,
+              isSelected: ref.watch(isSelectedProvider),
               onPressed: (index) {
                 // 「全体」のときに「同期」がタップされたら
-                if ((_isSelected[0] == true) && (index == 1)) {
+                if ((ref.watch(isSelectedProvider)[0] == true) && (index == 1)) {
                   // 歌詞プロバイダーにTextFieldの入力をセット
                   editLrc = tec.text.split('\n');
 
@@ -122,7 +134,7 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                   }
 
                   // 初めての編集ならチュートリアル画面に遷移
-                  firstEdit_2 = prefs.getBool('tutorial_2') ?? true;
+                  bool firstEdit_2 = prefs.getBool('tutorial_2') ?? true;
                   if (firstEdit_2 == true) {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       Future.delayed(const Duration(milliseconds: 100));
@@ -130,20 +142,18 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                     });
                   }
 
-                  _isSelected = [false, true];
-                  setState(() {});
+                  ref.read(isSelectedProvider.notifier).state = [false, true];
                 }
 
                 // 「同期」のときに「全体」がタップされたら
-                if ((_isSelected[1] == true) && (index == 0)) {
+                if ((ref.watch(isSelectedProvider)[1] == true) && (index == 0)) {
                   // 歌い出し時間と歌詞データをくっつけて、TextFieldのコントローラーに歌詞プロバイダーをセット
                   tec.text = combineStartTimeAndLrc().join('\n');
 
                   // 編集用AudioPlayer一時停止
                   editAudioPlayer.pause();
 
-                  _isSelected = [true, false];
-                  setState(() {});
+                  ref.read(isSelectedProvider.notifier).state = [true, false];
                 }
               },
               selectedBorderColor: Theme.of(context).primaryColor,
@@ -181,7 +191,7 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                   ref.read(editPosiProvider.notifier).state = Duration.zero;
 
                   // 編集用プロバイダーのlyricに歌詞データをセット
-                  if (_isSelected[0] == true) {
+                  if (ref.watch(isSelectedProvider)[0] == true) {
                     ref.read(editSongProvider.notifier).state.lyric = tec.text;
                   } else {
                     ref.read(editSongProvider.notifier).state.lyric = combineStartTimeAndLrc().join('\n');
@@ -199,16 +209,33 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
 
         // 中央にはTextFieldもしくはListViewの歌詞
         body: Center(
-          child: _isSelected[0]
+          child: ref.watch(isSelectedProvider)[0]
+              // TextField
               ? Padding(
                   padding: const EdgeInsets.only(top: 5.0),
-                  child: LrcTextField(key: key[0]),
+                  child: SizedBox(
+                    width: deviceWidth * 0.9,
+                    // キーボードが出たときの画面下端からキーボード上端までの高さを考慮する
+                    height: deviceHeight - (MediaQuery.of(context).viewInsets.bottom),
+                    child: TextField(
+                      controller: tec,
+                      style: const TextStyle(fontSize: 15),
+                      maxLines: 50,
+                      decoration: const InputDecoration(
+                        labelText: '歌詞データ',
+                        // ラベルテキストを常に浮かす
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
                 )
+              // ListView
               : const LrcListView(),
         ),
 
         // 下バーは"全体"なら検索などのボタン、"同期"なら再生バー
-        bottomNavigationBar: _isSelected[0]
+        bottomNavigationBar: ref.watch(isSelectedProvider)[0]
             ? BottomAppBar(
                 // 画面スクロールで色が変わるのを防ぐ
                 elevation: 0,

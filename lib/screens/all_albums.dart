@@ -118,7 +118,10 @@ class _AllAlbumsState extends ConsumerState<AllAlbums> with AutomaticKeepAliveCl
                 // ダイアログ表示
                 showDialog(
                   context: context,
-                  builder: (context) => AlbumArtistInfoDialog(index: index),
+                  builder: (context) => AlbumArtistInfoDialog(
+                    index: index,
+                    tabIndex: 1,
+                  ),
                 );
               },
               icon: const Icon(Icons.more_horiz),

@@ -56,6 +56,7 @@ class _BottomPlayerBarState extends ConsumerState<BottomPlayerBar> {
             data: SliderThemeData(overlayShape: SliderComponentShape.noOverlay),
 
             child: Slider(
+              inactiveColor: Colors.grey.shade200,
               value: ref.watch(editPosiProvider).inMilliseconds.toDouble(),
               max: _duration!.toDouble(),
               onChanged: (value) {

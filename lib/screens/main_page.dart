@@ -16,13 +16,14 @@ class MainPage extends ConsumerStatefulWidget {
 
   // stateの作成
   @override
-  ConsumerState<MainPage> createState() => _AllSongsState();
+  ConsumerState<MainPage> createState() => _MainPageState();
 }
 
-class _AllSongsState extends ConsumerState<MainPage> with SingleTickerProviderStateMixin {
+class _MainPageState extends ConsumerState<MainPage> with SingleTickerProviderStateMixin {
   // クラスのインスタンス化
   final OnAudioQuery _audioQuery = OnAudioQuery();
   final ScrollController _scrollController = ScrollController();
+  late final TabController _tabController;
 
   // アクセス許可のフラグ
   bool _hasPermission = false;
@@ -36,12 +37,13 @@ class _AllSongsState extends ConsumerState<MainPage> with SingleTickerProviderSt
     // アクセス許可のリクエスト
     checkAndRequestPermissions();
     // タブバーのコントローラーをインスタンス化
-    upperTC = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -116,7 +118,7 @@ class _AllSongsState extends ConsumerState<MainPage> with SingleTickerProviderSt
 
           // 上タブバー
           bottom: TabBar(
-            controller: upperTC,
+            controller: _tabController,
             indicatorSize: TabBarIndicatorSize.tab,
             tabs: const [
               Tab(
@@ -166,7 +168,7 @@ class _AllSongsState extends ConsumerState<MainPage> with SingleTickerProviderSt
                       ),
                     )
                   : TabBarView(
-                      controller: upperTC,
+                      controller: _tabController,
                       children: [
                         // 全曲リスト
                         MusicList(

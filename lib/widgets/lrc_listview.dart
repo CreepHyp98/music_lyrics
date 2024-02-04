@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/widgets/lrc_dialog.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-
 import 'bottom_player_bar.dart';
 
 class LrcListView extends ConsumerStatefulWidget {

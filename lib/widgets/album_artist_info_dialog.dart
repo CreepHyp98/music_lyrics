@@ -8,13 +8,14 @@ import 'package:music_lyrics/provider/provider.dart';
 
 class AlbumArtistInfoDialog extends ConsumerWidget {
   final int index;
-  const AlbumArtistInfoDialog({super.key, required this.index});
+  final int tabIndex;
+  const AlbumArtistInfoDialog({super.key, required this.index, required this.tabIndex});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // TextFieldの入力text
     final TextEditingController furiController;
-    if (upperTC.index == 1) {
+    if (tabIndex == 1) {
       furiController = TextEditingController(text: albumList[index].albumFuri);
     } else {
       furiController = TextEditingController(text: artistList[index].artistFuri);
@@ -25,7 +26,7 @@ class AlbumArtistInfoDialog extends ConsumerWidget {
     return AlertDialog(
       // タイトル（左寄せ）
       title: Text(
-        (upperTC.index == 1) ? albumList[index].album! : artistList[index].artist!,
+        (tabIndex == 1) ? albumList[index].album! : artistList[index].artist!,
         style: const TextStyle(fontSize: 20),
         textAlign: TextAlign.left,
         maxLines: 1,
@@ -33,7 +34,7 @@ class AlbumArtistInfoDialog extends ConsumerWidget {
       content: TextField(
         controller: furiController,
         decoration: InputDecoration(
-          labelText: (upperTC.index == 1) ? 'アルバムのフリガナ' : 'アーティストのフリガナ',
+          labelText: (tabIndex == 1) ? 'アルバムのフリガナ' : 'アーティストのフリガナ',
           // ラベルテキストを常に浮かす
           floatingLabelBehavior: FloatingLabelBehavior.always,
           // 入力文字と下線の隙間を埋める
@@ -46,7 +47,7 @@ class AlbumArtistInfoDialog extends ConsumerWidget {
         GestureDetector(
           onTap: () {
             // 入力されたフリガナでデータベースを更新
-            if (upperTC.index == 1) {
+            if (tabIndex == 1) {
               albumList[index].albumFuri = furiController.text;
               AlbumDB.instance.updateAlbum(albumList[index]);
               // Songクラスのほうも更新

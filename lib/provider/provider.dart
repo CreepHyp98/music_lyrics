@@ -16,8 +16,8 @@ double deviceHeight = 0;
 // 保存されたデータを参照
 late final SharedPreferences prefs;
 // SongModelの状態を管理
-final StateProvider<Song> songProvider = StateProvider<Song>((ref) => Song());
-final AudioPlayer audioPlayer = AudioPlayer();
+final songProvider = StateProvider<Song>((ref) => Song());
+final audioPlayer = AudioPlayer();
 // 再生リスト
 List<Song> songQueue = [];
 // 全曲リスト
@@ -31,27 +31,25 @@ List<Artist> artistList = [];
 // アーティスト該当曲
 List<Song> artistSongs = [];
 // リストインデックス
-final StateProvider<int> indexProvider = StateProvider<int>((ref) => 0);
+final indexProvider = StateProvider<int>((ref) => 0);
 // 再生時間を管理
-final StateProvider<Duration> positionProvider = StateProvider<Duration>((ref) => const Duration());
+final positionProvider = StateProvider<Duration>((ref) => const Duration());
 // 再生中の歌詞データを管理
-final StateProvider<List<String>> lyricProvider = StateProvider<List<String>>(((ref) => [""]));
+final lyricProvider = StateProvider<List<String>>(((ref) => [""]));
 // 下タブのコントローラー
-final PersistentTabController lowerTC = PersistentTabController();
-// 曲リスト上タブのコントローラー
-late TabController upperTC;
+final lowerTC = PersistentTabController();
+// 歌詞編集の「全体」「同期」のどちらが選択されているか
+final isSelectedProvider = StateProvider<List<bool>>((ref) => [true, false]);
 // 歌詞編集用SongModel
-final StateProvider<Song> editSongProvider = StateProvider<Song>((ref) => Song());
+final editSongProvider = StateProvider<Song>((ref) => Song());
 // 歌詞編集用AudioPlayer
-final AudioPlayer editAudioPlayer = AudioPlayer();
+final editAudioPlayer = AudioPlayer();
 // 歌詞編集用再生時間
-final StateProvider<Duration> editPosiProvider = StateProvider<Duration>((ref) => const Duration());
+final editPosiProvider = StateProvider<Duration>((ref) => const Duration());
 // 歌詞編集用歌詞データ(歌い出し時間は含まない)
 List<String> editLrc = [];
 // 歌詞編集用歌詞データの歌い出し時間(mm:ss:cc変換前のduration)
 List<int> editStartTime = [];
-// 歌詞編集用テキストコントローラー
-TextEditingController tec = TextEditingController();
 // スプラッシュ画面に表示する[歌詞, 曲名, アーティスト名]のリスト
 List<String> splashTextList = ['', '', ''];
 // チュートリアル用のキー
@@ -59,4 +57,4 @@ List<GlobalKey> key = [GlobalKey(), GlobalKey(), GlobalKey(), GlobalKey(), Globa
 // チュートリアル
 TutorialCoachMark? tcm;
 // 保存されてるカラー値のprovider
-final StateProvider<int> colorValueProvider = StateProvider<int>(((ref) => prefs.getInt('selectedColor') ?? Colors.blue.value));
+final colorValueProvider = StateProvider<int>(((ref) => prefs.getInt('selectedColor') ?? Colors.blue.value));

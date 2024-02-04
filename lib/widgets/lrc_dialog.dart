@@ -2,50 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:music_lyrics/provider/provider.dart';
 import 'package:music_lyrics/widgets/bottom_player_bar.dart';
 
-class LrcDialog extends StatefulWidget {
+class LrcDialog extends StatelessWidget {
   final int index;
   const LrcDialog({super.key, required this.index});
 
   @override
-  State<LrcDialog> createState() => _LrcDialogState();
-}
-
-class _LrcDialogState extends State<LrcDialog> {
-  late TextEditingController lrcController;
-  late TextEditingController timeController;
-  late FocusNode myFocusNode;
-
-  @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context) {
     // 歌詞テキストのコントローラー
-    lrcController = TextEditingController(text: editLrc[widget.index]);
+    final lrcController = TextEditingController(text: editLrc[index]);
     // カーソルの位置を末尾に設定
     lrcController.selection = TextSelection.fromPosition(TextPosition(offset: lrcController.text.length));
 
     // 歌い出し時間のコントローラー
-    timeController = TextEditingController(text: milliToMinSec(editStartTime[widget.index]));
+    final timeController = TextEditingController(text: milliToMinSec(editStartTime[index]));
 
-    myFocusNode = FocusNode();
-  }
+    final myFocusNode = FocusNode();
 
-  @override
-  void dispose() {
-    lrcController.dispose();
-    timeController.dispose();
-    myFocusNode.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return AlertDialog(
       content: SizedBox(
         height: 200,
         child: Column(
           children: [
             // 歌い出し時間（未設定なら空欄）
-            editStartTime[widget.index] != -1
+            editStartTime[index] != -1
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -156,9 +135,9 @@ class _LrcDialogState extends State<LrcDialog> {
             GestureDetector(
               onTap: () {
                 // 歌詞テキストの更新
-                editLrc[widget.index] = lrcController.text;
+                editLrc[index] = lrcController.text;
                 // 歌い出し時間の更新
-                editStartTime[widget.index] = minsecToMilli(timeController.text);
+                editStartTime[index] = minsecToMilli(timeController.text);
 
                 // ダイアログを閉じる
                 Navigator.pop(context);
