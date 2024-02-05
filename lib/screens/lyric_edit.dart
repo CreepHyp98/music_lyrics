@@ -35,9 +35,6 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
         showTutorial(context, 1);
       });
     }
-
-    // 歌い出し時間のリストを-1で初期化
-    editStartTime = List.generate(editLrc.length, (index) => -1);
   }
 
   @override
@@ -84,6 +81,9 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
         // 編集用再生位置も初期化
         ref.read(editPosiProvider.notifier).state = Duration.zero;
 
+        // 次回表示用に「全体」選択に戻しておく
+        ref.read(isSelectedProvider.notifier).state = [true, false];
+
         // チュートリアル画面終了
         if (tcm != null) {
           tcm!.finish();
@@ -106,6 +106,9 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
               // 編集用再生位置も初期化
               ref.read(editPosiProvider.notifier).state = Duration.zero;
 
+              // 次回表示用に「全体」選択に戻しておく
+              ref.read(isSelectedProvider.notifier).state = [true, false];
+
               // ダイアログに戻る
               Navigator.pop(context);
             },
@@ -123,6 +126,8 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                   // 歌詞プロバイダーにTextFieldの入力をセット
                   editLrc = tec.text.split('\n');
 
+                  // 歌い出し時間のリストを-1で初期化
+                  editStartTime = List.generate(editLrc.length, (index) => -1);
                   for (int i = 0; i < editLrc.length; i++) {
                     // 歌い出し時間のセット
                     editStartTime[i] = getLyricStartTime(editLrc[i]);
@@ -199,6 +204,10 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
 
                   // データベースを更新
                   SongDB.instance.updateSong(ref.watch(editSongProvider));
+
+                  // 次回表示用に「全体」選択に戻しておく
+                  ref.read(isSelectedProvider.notifier).state = [true, false];
+
                   // ダイアログに戻る
                   Navigator.pop(context);
                 },
