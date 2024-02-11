@@ -223,6 +223,7 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
               ? Padding(
                   padding: const EdgeInsets.only(top: 5.0),
                   child: SizedBox(
+                    key: key[0],
                     width: deviceWidth * 0.9,
                     // キーボードが出たときの画面下端からキーボード上端までの高さを考慮する
                     height: deviceHeight - (MediaQuery.of(context).viewInsets.bottom),

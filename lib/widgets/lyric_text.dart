@@ -49,12 +49,7 @@ class _LyricTextState extends ConsumerState<LyricText> {
       startTime.add(getLyricStartTime(temp[i]));
       // すでにstartTimeには[0, 1]が入っているので+2する
       if (startTime[i + 2] != -1) {
-        // 時間情報のみ　⇒　改行
-        if (temp[i].length == 10) {
-          lyricList.add('\n');
-        } else {
-          lyricList.add(temp[i].substring(10));
-        }
+        lyricList.add(temp[i].substring(10));
       } else {
         lyricList.add(temp[i]);
       }
@@ -135,10 +130,11 @@ class _LyricTextState extends ConsumerState<LyricText> {
       itemBuilder: (context, index) {
         return GestureDetector(
           child: VerticalRotatedWriting(
-            text: lyricList[index],
+            // 同期されていない空行を無視しないために空白チェック
+            text: (lyricList[index] != '') ? lyricList[index] : '\n',
             fontSize: 18,
-            // 現在の歌詞インデックスは黒色、それ以外は灰色
-            color: (index == currentLyricIndex) ? Colors.black : Colors.grey,
+            // 現在の歌詞インデックスもしくは歌い出し時間がなければ黒色、それ以外は灰色
+            color: ((index == currentLyricIndex) || (startTime[index] == -1)) ? Colors.black : Colors.grey,
           ),
           onTap: () {
             // 歌い出し時間が設定されている場合のみ飛べるようにする

@@ -58,17 +58,16 @@ class VerticalRotatedWriting extends StatelessWidget {
       // 小書き文字なら
       return Container(
         // 右寄せするため左に余白を入れる
-        padding: const EdgeInsets.only(left: 3.0),
+        padding: const EdgeInsets.only(left: 4.0),
         width: boxSize,
-        // 上寄せする分高さは少し小さくする
-        height: boxSize * 0.9,
+        height: boxSize,
         child: Text(
           char,
           style: TextStyle(
             fontSize: fontSize,
             fontFamily: 'shippori3',
             // 上寄せするため1よりも小さい値を設定
-            height: 0.7,
+            height: 0.8,
             // 指定があれば色を変える
             color: color,
           ),
