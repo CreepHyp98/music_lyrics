@@ -244,18 +244,19 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
         ),
 
         // 下バーは"全体"なら検索などのボタン、"同期"なら再生バー
-        bottomNavigationBar: ref.watch(isSelectedProvider)[0]
-            ? BottomAppBar(
-                // 画面スクロールで色が変わるのを防ぐ
-                elevation: 0,
-                // 下側の余白のみ削除
-                padding: const EdgeInsets.only(left: 19.0, right: 8.0),
-                height: deviceHeight * 0.12,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Row(
+        bottomNavigationBar: BottomAppBar(
+          // 画面スクロールで色が変わるのを防ぐ
+          elevation: 0,
+          // 下側の余白のみ削除
+          padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
+          height: ref.watch(isSelectedProvider)[0] ? deviceHeight * 0.12 : deviceHeight * 0.15,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ref.watch(isSelectedProvider)[0]
+                  ? Row(
                       children: [
+                        SizedBox(width: deviceWidth * 0.01),
                         // 検索ボタン
                         OutlinedButton(
                           key: key[1],
@@ -313,18 +314,20 @@ class _LyricEditState extends ConsumerState<LyricEdit> {
                           },
                         ),
                       ],
-                    ),
+                    )
 
-                    // バナー広告
-                    SizedBox(
-                      height: myBanner.size.height.toDouble(),
-                      width: myBanner.size.width.toDouble(),
-                      child: AdWidget(ad: myBanner),
-                    ),
-                  ],
-                ),
-              )
-            : const BottomPlayerBar(),
+                  // 同期画面ではプレイヤーバー
+                  : const BottomPlayerBar(),
+
+              // バナー広告
+              SizedBox(
+                height: myBanner.size.height.toDouble(),
+                width: myBanner.size.width.toDouble(),
+                child: AdWidget(ad: myBanner),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
