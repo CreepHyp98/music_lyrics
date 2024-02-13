@@ -54,7 +54,11 @@ class _MainPageState extends ConsumerState<MainPage> with SingleTickerProviderSt
     );
 
     // 許可されたら画面を再描画
-    _hasPermission ? setState(() {}) : null;
+    _hasPermission
+        ? setState(() {
+            setAllLists();
+          })
+        : null;
   }
 
   Widget noAccessToLibraryWidget() {
@@ -80,35 +84,28 @@ class _MainPageState extends ConsumerState<MainPage> with SingleTickerProviderSt
 
   // データベースからそれぞれのリストを取得
   Future<void> setAllLists() async {
-    if (_hasList == false) {
-      songList = await SongDB.instance.getAllSongs();
-      albumList = await AlbumDB.instance.getAllAlbums();
-      artistList = await ArtistDB.instance.getAllArtists();
+    songList = await SongDB.instance.getAllSongs();
+    albumList = await AlbumDB.instance.getAllAlbums();
+    artistList = await ArtistDB.instance.getAllArtists();
 
-      setState(() {
-        // フリガナで五十音順にソート
-        songList.sort(
-          (a, b) => (a.titleFuri!.toLowerCase()).compareTo(b.titleFuri!.toLowerCase()),
-        );
-        albumList.sort(
-          (a, b) => (a.albumFuri!.toLowerCase()).compareTo(b.albumFuri!.toLowerCase()),
-        );
-        artistList.sort(
-          (a, b) => (a.artistFuri!.toLowerCase()).compareTo(b.artistFuri!.toLowerCase()),
-        );
-      });
+    // フリガナで五十音順にソート
+    songList.sort(
+      (a, b) => (a.titleFuri!.toLowerCase()).compareTo(b.titleFuri!.toLowerCase()),
+    );
+    albumList.sort(
+      (a, b) => (a.albumFuri!.toLowerCase()).compareTo(b.albumFuri!.toLowerCase()),
+    );
+    artistList.sort(
+      (a, b) => (a.artistFuri!.toLowerCase()).compareTo(b.artistFuri!.toLowerCase()),
+    );
 
+    setState(() {
       _hasList = true;
-    }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // アクセスが許可されたらデータベースの構築(すでに構築されてたらしない)
-    if (_hasPermission == true) {
-      setAllLists();
-    }
-
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(deviceWidth, 45),

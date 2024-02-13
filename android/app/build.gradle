@@ -49,7 +49,7 @@ android {
         applicationId "com.CreepHyp.music_lyrics"
         minSdkVersion 21 // flutter.minSdkVersion → 21
         targetSdkVersion flutter.targetSdkVersion
-        versionCode 77   // 更新
+        versionCode 78   // 更新
         versionName flutterVersionName
     }
 
