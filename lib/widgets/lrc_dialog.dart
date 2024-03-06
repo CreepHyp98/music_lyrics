@@ -20,10 +20,10 @@ class LrcDialog extends StatelessWidget {
 
     return AlertDialog(
       content: SizedBox(
-        height: 200,
+        height: (editStartTime[index] != -1) ? 200 : 120,
         child: Column(
           children: [
-            // 歌い出し時間（未設定なら空欄）
+            // 歌い出し時間（未設定なら空欄）)
             editStartTime[index] != -1
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -136,8 +136,11 @@ class LrcDialog extends StatelessWidget {
               onTap: () {
                 // 歌詞テキストの更新
                 editLrc[index] = lrcController.text;
+
                 // 歌い出し時間の更新
-                editStartTime[index] = minsecToMilli(timeController.text);
+                if (editStartTime[index] != -1) {
+                  editStartTime[index] = minsecToMilli(timeController.text);
+                }
 
                 // ダイアログを閉じる
                 Navigator.pop(context);

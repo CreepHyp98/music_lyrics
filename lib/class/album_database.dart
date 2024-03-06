@@ -27,7 +27,7 @@ class AlbumDB {
   }
 
   Future<void> _onCreate(Database db, int version) async {
-    await db.execute('CREATE TABLE albums(album TEXT, albumFuri TEXT, artist TEXT, numSongs INTEGER, PRIMARY KEY(album, albumFuri))');
+    await db.execute('CREATE TABLE albums(album TEXT, albumFuri TEXT, artist TEXT, numSongs INTEGER, PRIMARY KEY(album, artist))');
   }
 
   // データの挿入
